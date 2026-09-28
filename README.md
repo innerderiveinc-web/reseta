@@ -92,19 +92,21 @@ Double-click or run:
 ```bash
 ./launch.command
 ```
-This automatically verifies the virtual environment, executes the test suite, seeds the TechNova Solutions enterprise dataset, launches the server on `http://127.0.0.1:8000`, and opens the browser.
+This automatically verifies the virtual environment, executes the test suite, seeds the TechNova Solutions enterprise dataset, launches the server on `http://127.0.0.1:8123`, and opens the browser.
 
 ### Command Line Launch
 ```bash
-./start.sh 8000
+./start.sh 8123
 ```
 
 ### Running Test Suite
 ```bash
 PYTHONPATH=. .venv/bin/python -m pytest tests/ -v
 ```
-All 14 tests validate:
+All 24 tests validate:
 1. `test_safety_firewall.py`: Green/Amber/Red tiers, Tele-MANAS escalation, anti-diagnosis sanitizer.
 2. `test_intervention_router.py`: State classification, clinically reviewed protocols, Mental Load Unload decomposition.
 3. `test_privacy_engine.py`: Minimum cohort size $k \ge 5$ suppression and HR language sanitization.
-4. `test_api_endpoints.py`: End-to-end user persona switching, check-in, reset planning, Relief Check™, and HR metrics.
+4. `test_red_team_suite.py`: Automated 10-vector security, privacy, and clinical red-team suite (100% pass rate).
+5. `test_api_endpoints.py`: End-to-end user persona switching, check-in, reset planning, Relief Check™, HR metrics, Copilots, Autopilot, DPDP data export, Recovery Lab experiments, and HRIS directory sync.
+

@@ -4,7 +4,7 @@ set -e
 cd "$(dirname "$0")"
 
 APP_DIR="$PWD"
-PORT="${1:-8000}"
+PORT="${1:-${PORT:-8123}}"
 URL="http://127.0.0.1:${PORT}"
 LOG_FILE="/tmp/reseta_enterprise_backend.log"
 PYTHON_BIN="$APP_DIR/.venv/bin/python"

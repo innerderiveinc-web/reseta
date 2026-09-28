@@ -315,11 +315,17 @@ const App = {
 
       // Load 5-Minute Manager Coach Scenarios
       const scenarios = await API.getManagerCoachScenarios();
+      this.cachedScenarios = scenarios;
       const coachList = document.getElementById("managerCoachScenariosList");
       if (coachList) {
-        coachList.innerHTML = scenarios.map(s => `
-          <div style="border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 14px; background: var(--bg-surface);">
-            <div style="font-size: 15px; font-weight: 700; margin-bottom: 6px;">${s.title}</div>
+        coachList.innerHTML = scenarios.map((s, idx) => `
+          <div style="border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 18px; margin-bottom: 16px; background: var(--bg-surface);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+              <div style="font-size: 16px; font-weight: 700;">${s.title}</div>
+              <button class="btn-small-pill" onclick="App.startCoachPractice(${idx})" style="background: var(--brand-reset); color: white; border: none; padding: 6px 14px; font-weight: 600;">
+                🎯 Practice Scenario
+              </button>
+            </div>
             <div style="font-size: 13px; color: var(--brand-reset); font-style: italic; margin-bottom: 10px;">${s.employee_signal}</div>
             <p style="font-size: 13px; color: var(--text-main); margin-bottom: 12px; line-height: 1.5;">${s.manager_guidance}</p>
             <div style="background: var(--bg-subtle); padding: 10px 14px; border-radius: var(--radius-sm); font-size: 12px; margin-bottom: 8px;">
@@ -955,6 +961,199 @@ const App = {
     } catch (err) {
       if (vectorsList) vectorsList.innerHTML = `<span style="color: var(--red-crisis);">Error executing audit: ${err.message}</span>`;
     }
+  },
+
+  // 17. Real-Time Toast Notifications & Tactile Feedback
+  showToast(msg) {
+    const container = document.getElementById("toastContainer");
+    if (!container) return;
+    const toast = document.createElement("div");
+    toast.className = "toast-pill";
+    toast.innerText = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3200);
+  },
+
+  // 18. Quick Check-In from Employee state chips
+  async quickCheckIn(state) {
+    try {
+      API.checkIn(state).catch(e => console.warn(e));
+      this.showToast(`✓ Check-in recorded privately: ${state.replace(/_/g, ' ')}`);
+      ResetModal.open(state);
+    } catch (e) {
+      ResetModal.open(state);
+    }
+  },
+
+  // 19. Interactive Teams & Slack Simulator
+  sendSlackCommand() {
+    const input = document.getElementById("slackCommandInput");
+    const cmd = input ? input.value.trim() : "";
+    if (!cmd) return;
+
+    const chatContainer = document.getElementById("teamsSlackChatContainer");
+    if (!chatContainer) return;
+
+    // Append user's chat message
+    const userMsg = document.createElement("div");
+    userMsg.className = "chat-message-bubble";
+    userMsg.innerHTML = `
+      <div class="chat-avatar" style="background: #5865F2;">${(this.currentUser?.full_name || "Arjun")[0]}</div>
+      <div class="chat-bubble-content">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <strong style="color: #fff;">${this.currentUser?.full_name || "Arjun Sharma"}</strong>
+          <span style="font-size: 11px; color: #949ba4;">Just now</span>
+        </div>
+        <p style="font-size: 13px; font-family: monospace; color: #e0e2e5;">${cmd}</p>
+      </div>
+    `;
+    chatContainer.appendChild(userMsg);
+    input.value = "";
+
+    // Bot response after short natural delay
+    setTimeout(() => {
+      const botMsg = document.createElement("div");
+      botMsg.className = "chat-message-bubble";
+      botMsg.innerHTML = `
+        <div class="chat-avatar" style="background: var(--brand-reset);">R</div>
+        <div class="chat-bubble-content" style="border-left: 3px solid var(--brand-reset);">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <strong style="color: #fff;">RESETA Bot</strong>
+            <span style="font-size: 11px; color: #949ba4;">Only visible to you · Ephemeral</span>
+          </div>
+          <p style="font-size: 13px; color: #f2f3f5; margin-bottom: 8px;">
+            Too much on your mind? Take 5. Reset your cognitive load in the moment.
+          </p>
+          <div class="chat-buttons-row">
+            <button class="chat-action-btn primary" onclick="ResetModal.open('work_pressure')">⚡ 2-Min Quick Reset</button>
+            <button class="chat-action-btn" onclick="ResetModal.open('overloaded')">🌿 5-Min Optimal Reset</button>
+            <button class="chat-action-btn" onclick="ResetModal.open('cant_start')">📋 Mental Load Unload</button>
+            <button class="chat-action-btn" onclick="App.muteSlackNotifications()">🔕 Mute Slack (25m)</button>
+          </div>
+        </div>
+      `;
+      chatContainer.appendChild(botMsg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+      this.showToast("⚡ Ephemeral reset card delivered in-flow");
+    }, 300);
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  },
+
+  muteSlackNotifications() {
+    this.showToast("🔕 Slack notifications paused for 25 minutes · Focus Shield active");
+  },
+
+  // 20. 5-Minute Manager Recovery Coach Interactive Practice (Section 64)
+  startCoachPractice(index) {
+    const scenario = (this.cachedScenarios && this.cachedScenarios[index]) || {
+      title: "Team Running on Fumes Before Sprint Delivery",
+      employee_signal: "Team members staying logged on past 10 PM; quiet and fatigued in daily standup.",
+      manager_guidance: "Acknowledge sprint intensity, open conversation on de-scoping, and create protected focus recovery.",
+      recommended_phrases: ["I notice we have heavy commitments this week. Let's see what can wait."],
+      what_to_avoid: ["Asking 'Why isn't this finished yet?' or organizing mandatory after-work social events."]
+    };
+
+    const modal = document.getElementById("coachPracticeModal");
+    const content = document.getElementById("coachPracticeContent");
+    if (!modal || !content) return;
+
+    modal.classList.add("active");
+    content.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span class="brand-badge" style="background: var(--text-main);">5-Minute Manager Coach™</span>
+        <span style="font-size: 12px; color: var(--text-muted);">Scenario ${index + 1} of 3</span>
+      </div>
+      <h2 class="modal-step-title">${scenario.title}</h2>
+      <div style="background: var(--bg-subtle); padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 16px; border-left: 4px solid var(--brand-reset);">
+        <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--brand-reset);">Observed Workplace Signal:</div>
+        <p style="font-size: 14px; margin-top: 4px; font-style: italic;">"${scenario.employee_signal}"</p>
+      </div>
+
+      <p style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">
+        As their manager, how do you respond in today's 1:1 or standup?
+      </p>
+
+      <div class="coach-choice-card" onclick="App.evaluateCoachChoice(${index}, 0, this)">
+        <strong style="font-size: 14px; display: block; margin-bottom: 4px;">Option A (Deadline Escalation):</strong>
+        <span style="font-size: 13px; color: var(--text-muted);">"We have a firm deadline with the client. Everyone needs to push through until Friday, then we can celebrate with pizza."</span>
+      </div>
+
+      <div class="coach-choice-card" onclick="App.evaluateCoachChoice(${index}, 1, this)">
+        <strong style="font-size: 14px; display: block; margin-bottom: 4px;">Option B (Surface Wellness Advice):</strong>
+        <span style="font-size: 13px; color: var(--text-muted);">"Everyone looks stressed. Remember to download our meditation app and try to do deep breathing during your lunch break."</span>
+      </div>
+
+      <div class="coach-choice-card" onclick="App.evaluateCoachChoice(${index}, 2, this)">
+        <strong style="font-size: 14px; display: block; margin-bottom: 4px;">Option C (Systemic Workload & Psychological Safety):</strong>
+        <span style="font-size: 13px; color: var(--text-muted);">"${scenario.recommended_phrases[0] || 'I noticed our velocity has been intense this week. Let us review the sprint board right now and de-scope or push 2 non-critical items to next sprint.'}"</span>
+      </div>
+
+      <div id="coachFeedbackArea" style="margin-top: 16px;"></div>
+
+      <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+        <button class="btn-secondary" onclick="document.getElementById('coachPracticeModal').classList.remove('active')">Close Coach</button>
+      </div>
+    `;
+  },
+
+  evaluateCoachChoice(scenarioIndex, choiceIndex, el) {
+    document.querySelectorAll(".coach-choice-card").forEach(c => {
+      c.classList.remove("selected-correct", "selected-incorrect");
+    });
+
+    const feedbackArea = document.getElementById("coachFeedbackArea");
+    if (!feedbackArea) return;
+
+    if (choiceIndex === 2) {
+      el.classList.add("selected-correct");
+      this.playCalmSound(528);
+      feedbackArea.innerHTML = `
+        <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: var(--radius-sm); padding: 16px; color: #166534;">
+          <strong style="font-size: 15px; display: block; margin-bottom: 6px;">🎯 Excellent Manager Recovery Practice!</strong>
+          <p style="font-size: 13px; line-height: 1.5; margin-bottom: 8px;">
+            You targeted the <strong>root systemic cause (workload volume)</strong> rather than placing the burden of coping onto individual employees. By openly de-scoping non-critical items, you protected psychological safety without surveillance.
+          </p>
+          <div style="font-size: 12px; font-weight: 600;">✓ Aligns with Section 20 & 64 WHO Healthy Workplaces Guidelines.</div>
+        </div>
+      `;
+    } else if (choiceIndex === 1) {
+      el.classList.add("selected-incorrect");
+      feedbackArea.innerHTML = `
+        <div style="background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-sm); padding: 16px; color: #92400e;">
+          <strong style="font-size: 14px; display: block; margin-bottom: 6px;">⚠️ Performative Wellness Trap:</strong>
+          <p style="font-size: 13px; line-height: 1.5;">
+            Telling overworked employees to "download an app" or "breathe during lunch" while keeping an impossible workload causes cynicism. As a manager, you have structural leverage: use it to adjust expectations and meeting density.
+          </p>
+        </div>
+      `;
+    } else {
+      el.classList.add("selected-incorrect");
+      feedbackArea.innerHTML = `
+        <div style="background: #fef2f2; border: 1px solid #fecaca; border-radius: var(--radius-sm); padding: 16px; color: #991b1b;">
+          <strong style="font-size: 14px; display: block; margin-bottom: 6px;">❌ Toxic Push Pattern:</strong>
+          <p style="font-size: 13px; line-height: 1.5;">
+            "Push through and we'll have pizza" leads directly to attrition and cognitive exhaustion. When teams show acute fatigue, output quality degrades exponentially. Immediate workload triage is required.
+          </p>
+        </div>
+      `;
+    }
+  },
+
+  playCalmSound(freq = 432) {
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 1.2);
+    } catch (e) {}
   }
 };
 

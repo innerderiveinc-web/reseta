@@ -69,15 +69,15 @@
 
         <!-- State Chips -->
         <div class="state-selector-grid">
-          <button class="state-chip" onclick="ResetModal.open('overloaded')">🫠 Overloaded</button>
-          <button class="state-chip" onclick="ResetModal.open('work_pressure')">💼 Work Pressure</button>
-          <button class="state-chip" onclick="ResetModal.open('racing_thoughts')">🧠 Overthinking</button>
-          <button class="state-chip" onclick="ResetModal.open('cant_start')">🧱 Can't Start</button>
-          <button class="state-chip" onclick="ResetModal.open('frustration')">😤 Irritated</button>
-          <button class="state-chip" onclick="ResetModal.open('low_energy')">😴 Exhausted</button>
-          <button class="state-chip" onclick="ResetModal.open('general_tension')">😰 Stressed</button>
-          <button class="state-chip" onclick="ResetModal.open('night_stress')">🌙 End-of-Day</button>
-          <button class="state-chip" onclick="ResetModal.open('general_tension')">🤷 Don't Know</button>
+          <button class="state-chip" onclick="App.quickCheckIn('overloaded')">🫠 Overloaded</button>
+          <button class="state-chip" onclick="App.quickCheckIn('work_pressure')">💼 Work Pressure</button>
+          <button class="state-chip" onclick="App.quickCheckIn('racing_thoughts')">🧠 Overthinking</button>
+          <button class="state-chip" onclick="App.quickCheckIn('cant_start')">🧱 Can't Start</button>
+          <button class="state-chip" onclick="App.quickCheckIn('frustration')">😤 Irritated</button>
+          <button class="state-chip" onclick="App.quickCheckIn('low_energy')">😴 Exhausted</button>
+          <button class="state-chip" onclick="App.quickCheckIn('general_tension')">😰 Stressed</button>
+          <button class="state-chip" onclick="App.quickCheckIn('night_stress')">🌙 End-of-Day</button>
+          <button class="state-chip" onclick="App.quickCheckIn('general_tension')">🤷 Don't Know</button>
         </div>
 
         <!-- Hero Actions -->
@@ -201,8 +201,8 @@
           </div>
 
           <div style="display: flex; gap: 8px; margin-top: 16px;">
-            <input type="text" value="/reset I have 4 back-to-back meetings and urgent production deploy" readonly style="flex: 1; background: #383a40; border: none; padding: 10px 14px; border-radius: 6px; color: #fff; font-family: monospace; font-size: 13px;">
-            <button class="chat-action-btn primary" onclick="ResetModal.open('work_pressure')">Simulate Command ↵</button>
+            <input type="text" id="slackCommandInput" placeholder="Type /reset or describe workload (e.g. /reset 5 deadline stress)..." style="flex: 1; background: #383a40; border: 1px solid #4e5058; padding: 10px 14px; border-radius: 6px; color: #fff; font-family: monospace; font-size: 13px;" onkeydown="if(event.key==='Enter') App.sendSlackCommand()">
+            <button class="chat-action-btn primary" onclick="App.sendSlackCommand()">Send ↵</button>
           </div>
         </div>
 
@@ -775,10 +775,23 @@
     </div>
   </div>
 
+  <!-- 🎯 5-Minute Manager Recovery Coach Interactive Practice Modal (Section 64) -->
+  <div id="coachPracticeModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(680px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('coachPracticeModal').classList.remove('active')">&times;</button>
+      <div id="coachPracticeContent">
+        <!-- Rendered dynamically by App.startCoachPractice() -->
+      </div>
+    </div>
+  </div>
+
   <!-- Persistent 1-Click Floating Workplace Reset Widget (Section 61, 62) -->
   <button class="floating-reset-widget" onclick="ResetModal.open('overloaded')" title="Quick 2/5 Min Workplace Reset">
     🔴 1-Click Reset
   </button>
+
+  <!-- Live Toast Notifications Container -->
+  <div id="toastContainer" class="toast-container"></div>
 
   <!-- Client JavaScript -->
   <script src="/static/js/api.js"></script>
