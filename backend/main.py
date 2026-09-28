@@ -8,7 +8,7 @@ from fastapi.responses import FileResponse
 from backend.config import settings
 from backend.database import Base, engine
 from backend.seeds import seed_database
-from backend.routers import auth, employee, manager, hr, admin, care, integrations, copilot
+from backend.routers import auth, employee, manager, hr, admin, care, integrations, copilot, governance
 
 from contextlib import asynccontextmanager
 
@@ -45,6 +45,7 @@ app.include_router(admin.router)
 app.include_router(care.router)
 app.include_router(integrations.router)
 app.include_router(copilot.router)
+app.include_router(governance.router)
 
 
 

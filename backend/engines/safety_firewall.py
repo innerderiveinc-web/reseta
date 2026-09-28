@@ -17,13 +17,12 @@ AMBER_KEYWORDS = [
 ]
 
 DIAGNOSTIC_TERMS = [
-    r"\byou have depression\b",
+    r"\b(?:you have|you are experiencing|diagnosed with)\s+(?:severe\s+|clinical\s+|acute\s+)?(?:depression|adhd|bipolar|anxiety|ptsd|schizophrenia|major depressive disorder)\b",
+    r"\b(?:you\s+)?suffer from\s+(?:ptsd|depression|anxiety|adhd|bipolar)\b",
+    r"\b(?:you are\s+)?clinically burned out\b",
     r"\byou have adhd\b",
-    r"\byou have bipolar\b",
-    r"\byou are clinically burned out\b",
-    r"\byou have clinical anxiety\b",
-    r"\byou suffer from ptsd\b",
-    r"\byou are experiencing major depressive disorder\b"
+    r"\byou have depression\b",
+    r"\byou have bipolar\b"
 ]
 
 EMERGENCY_RESOURCES = {

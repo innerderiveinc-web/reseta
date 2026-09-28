@@ -67,7 +67,13 @@ const API = {
   getAutopilotPrompt: (meetings = 4) => API.get(`/api/employee/autopilot/prompt?meetings_today=${meetings}`),
   exportDpdpArchive: () => API.get('/api/employee/dpdp/export'),
   toggleDpdpConsent: (purpose, granted) => API.post('/api/employee/dpdp/consent-toggle', { purpose, granted }),
-  requestDpdpErasure: () => API.post('/api/employee/dpdp/erasure', {})
+  requestDpdpErasure: () => API.post('/api/employee/dpdp/erasure', {}),
+
+  // Governance & Red-Team Suite (Section 39, 67, 68, 69)
+  getHrisConnectors: () => API.get('/api/governance/hris/connectors'),
+  syncHrisConnector: (provider_id) => API.post('/api/governance/hris/sync', { provider_id }),
+  runRedTeamSuite: () => API.post('/api/governance/red-team/run', {}),
+  getAiReleaseChecklist: () => API.get('/api/governance/ai-release-checklist')
 };
 
 window.API = API;

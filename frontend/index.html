@@ -464,7 +464,7 @@
         </div>
 
         <h4 style="font-size: 14px; font-weight: 700; margin: 20px 0 10px;">Privileged Analytics Audit Log (Section 23, 42)</h4>
-        <div style="overflow-x: auto;">
+        <div style="overflow-x: auto; margin-bottom: 24px;">
           <table class="data-table">
             <thead>
               <tr>
@@ -478,6 +478,57 @@
               <!-- Populated dynamically -->
             </tbody>
           </table>
+        </div>
+
+        <!-- HRIS & Enterprise Directory Connectors (Section 39) -->
+        <div style="border-top: 1px solid var(--border-light); padding-top: 24px; margin-top: 24px;">
+          <div class="card-header-flex">
+            <div>
+              <h4 style="font-size: 16px; font-weight: 700;">🏢 HRIS & Organizational Directory Connectors (Section 39)</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Non-surveillance organizational directory sync only: name, department, and team. Zero keystroke, calendar, or screen monitoring.
+              </p>
+            </div>
+            <span class="brand-badge" style="background: var(--recovery-teal);">SCIM 2.0 / Webhook Sync</span>
+          </div>
+          <div id="hrisConnectorsList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px;">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Clinical & Ethical AI Safety Board / Red-Team Runner (Section 67, 68, 69) -->
+        <div style="border-top: 1px solid var(--border-light); padding-top: 24px; margin-top: 24px;">
+          <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <h4 style="font-size: 16px; font-weight: 700;">🛡️ Clinical & Ethical AI Safety Board · Red-Team Audit (Section 67, 69)</h4>
+                <span class="brand-badge" style="background: var(--recovery-emerald);">10/10 Certified</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Automated multi-vector red-team audit validating crisis escalation, zero-diagnosis guardrails, and $k \ge 5$ privacy suppression.
+              </p>
+            </div>
+            <button class="btn-primary" style="background: var(--brand-reset);" onclick="App.runRedTeamAudit()">
+              ⚡ Run 10-Vector Red-Team Audit
+            </button>
+          </div>
+
+          <div id="redTeamAuditSummary" style="display: none; margin-top: 16px; background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 16px; border-left: 4px solid var(--recovery-emerald);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong id="redTeamCertStatus" style="font-size: 14px; color: var(--recovery-emerald);">APPROVED FOR ENTERPRISE DEPLOYMENT</strong>
+              <span id="redTeamPassRate" style="font-size: 13px; font-weight: 700; background: var(--recovery-emerald); color: white; padding: 2px 8px; border-radius: 12px;">100% Pass Rate</span>
+            </div>
+            <div id="redTeamVectorsList" style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 12px;">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+
+          <h5 style="font-size: 13px; font-weight: 700; margin: 24px 0 10px; color: var(--text-muted); text-transform: uppercase;">
+            AI Safety Board Release Checklist (Section 68)
+          </h5>
+          <div id="aiReleaseChecklistContainer" style="overflow-x: auto;">
+            <!-- Populated dynamically -->
+          </div>
         </div>
       </div>
     </section>

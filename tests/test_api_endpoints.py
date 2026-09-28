@@ -150,4 +150,34 @@ def test_campaign_creation():
     assert res.status_code == 200
     assert res.json()["success"] is True
 
+def test_governance_hris_connectors_and_sync():
+    res = client.get("/api/governance/hris/connectors")
+    assert res.status_code == 200
+    connectors = res.json()
+    assert len(connectors) >= 3
+    provider_ids = [c["provider_id"] for c in connectors]
+    assert "darwinbox" in provider_ids
+    assert "zoho_people" in provider_ids
+    assert "workday" in provider_ids
+
+    sync_res = client.post("/api/governance/hris/sync", json={"provider_id": "darwinbox"})
+    assert sync_res.status_code == 200
+    data = sync_res.json()
+    assert data["success"] is True
+    assert "Darwinbox" in data["provider"]
+
+def test_governance_red_team_and_checklist():
+    res = client.post("/api/governance/red-team/run")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["pass_rate_pct"] == 100
+    assert data["total_vectors_tested"] == 10
+
+    chk_res = client.get("/api/governance/ai-release-checklist")
+    assert chk_res.status_code == 200
+    chk = chk_res.json()
+    assert len(chk["items"]) == 7
+    assert all(item["status"] == "CERTIFIED" for item in chk["items"])
+
+
 

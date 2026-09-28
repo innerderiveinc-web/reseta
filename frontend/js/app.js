@@ -467,6 +467,67 @@ const App = {
           </tr>
         `).join('');
       }
+
+      // HRIS Connectors (Section 39)
+      const connectors = await API.getHrisConnectors();
+      const connList = document.getElementById("hrisConnectorsList");
+      if (connList) {
+        connList.innerHTML = connectors.map(c => `
+          <div class="action-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                <div>
+                  <strong style="font-size: 15px;">${c.name}</strong>
+                  <div style="font-size: 12px; color: var(--text-muted);">${c.category}</div>
+                </div>
+                <span class="brand-badge" style="background: ${c.status === 'CONNECTED' ? 'var(--recovery-emerald)' : 'var(--bg-subtle)'}; color: ${c.status === 'CONNECTED' ? '#fff' : 'var(--text-muted)'};">
+                  ${c.status}
+                </span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted); margin: 8px 0;">
+                Mode: <strong>${c.sync_mode}</strong><br>
+                Last Sync: <strong>${c.last_sync}</strong> · Users: <strong>${c.synced_users}</strong>
+              </div>
+              <div style="font-size: 11px; color: var(--recovery-teal); margin-bottom: 12px;">
+                ✓ ${c.features.join(" · ")}
+              </div>
+            </div>
+            <button class="btn-small-pill" onclick="App.syncHris('${c.provider_id}')" style="align-self: flex-start;">
+              🔄 Sync Now
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // AI Release Checklist (Section 68)
+      const checklist = await API.getAiReleaseChecklist();
+      const checkCont = document.getElementById("aiReleaseChecklistContainer");
+      if (checkCont) {
+        checkCont.innerHTML = `
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Criterion</th>
+                <th>Certification Status</th>
+                <th>Safety Verification Detail</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${checklist.items.map(item => `
+                <tr>
+                  <td><strong>${item.criterion}</strong></td>
+                  <td>
+                    <span style="background: var(--recovery-emerald); color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">
+                      ${item.status}
+                    </span>
+                  </td>
+                  <td style="font-size: 13px; color: var(--text-muted);">${item.detail}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
     } catch (err) {
       console.error("Error loading admin data:", err);
     }
@@ -844,6 +905,55 @@ const App = {
       await this.refreshPersonalData();
     } catch (err) {
       alert("Error requesting erasure: " + err.message);
+    }
+  },
+
+  // 15. HRIS Directory Sync (Section 39)
+  async syncHris(providerId) {
+    try {
+      const res = await API.syncHrisConnector(providerId);
+      alert(`🏢 ${res.message}\nSynced ${res.synced_users} users and ${res.synced_departments} departments without surveillance telemetry.`);
+      await this.loadAdminData();
+    } catch (err) {
+      alert("Error syncing directory: " + err.message);
+    }
+  },
+
+  // 16. AI Safety Board Red-Team Audit (Section 67, 69)
+  async runRedTeamAudit() {
+    const summaryBox = document.getElementById("redTeamAuditSummary");
+    const vectorsList = document.getElementById("redTeamVectorsList");
+    const certStatus = document.getElementById("redTeamCertStatus");
+    const passRate = document.getElementById("redTeamPassRate");
+
+    if (summaryBox) {
+      summaryBox.style.display = "block";
+      vectorsList.innerHTML = `<div style="padding: 12px; color: var(--text-muted);">Executing 10-vector security, privacy, and clinical red-team suite...</div>`;
+    }
+
+    try {
+      const res = await API.runRedTeamSuite();
+      if (certStatus) certStatus.innerText = res.certification_status.replace(/_/g, " ");
+      if (passRate) passRate.innerText = `${res.pass_rate_pct}% Pass Rate (${res.passed_count}/${res.total_vectors_tested})`;
+
+      if (vectorsList) {
+        vectorsList.innerHTML = res.tests.map(t => `
+          <div style="background: var(--bg-surface); padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <code style="font-weight: 700; color: var(--brand-reset);">${t.vector_id}</code>
+                <strong style="font-size: 13px;">${t.name}</strong>
+              </div>
+              <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">${t.details}</p>
+            </div>
+            <span style="background: ${t.status === 'PASSED' ? 'var(--recovery-emerald)' : 'var(--red-crisis)'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700;">
+              ${t.status}
+            </span>
+          </div>
+        `).join('');
+      }
+    } catch (err) {
+      if (vectorsList) vectorsList.innerHTML = `<span style="color: var(--red-crisis);">Error executing audit: ${err.message}</span>`;
     }
   }
 };
