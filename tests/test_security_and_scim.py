@@ -100,3 +100,65 @@ def test_admin_dpdp_genuine_status():
     assert isinstance(data["consent_count"], int)
     assert isinstance(data["audit_events_count"], int)
 
+def test_organizations_endpoint():
+    res = client.get("/api/auth/organizations")
+    assert res.status_code == 200
+    orgs = res.json()
+    assert isinstance(orgs, list)
+    assert len(orgs) >= 1
+    technova = next((o for o in orgs if "technova" in o["slug"]), None)
+    assert technova is not None
+    assert len(technova["departments"]) >= 1
+
+def test_register_company_flow():
+    import uuid
+    uid = uuid.uuid4().hex[:6]
+    payload = {
+        "company_name": f"Nexus Corp {uid}",
+        "admin_name": "Vikram Adani",
+        "admin_email": f"vikram.{uid}@nexuscorp.com",
+        "password": "SecurePassword123!",
+        "industry": "Fintech & Banking",
+        "employee_count": 350
+    }
+    res = client.post("/api/auth/register-company", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "access_token" in data
+    assert data["organization_name"] == f"Nexus Corp {uid}"
+    assert data["admin_user"]["role"] == "SUPER_ADMIN"
+    assert data["admin_user"]["email"] == payload["admin_email"]
+
+    # Verify admin can login with their password
+    login_res = client.post("/api/auth/login", json={
+        "email": payload["admin_email"],
+        "password": "SecurePassword123!"
+    })
+    assert login_res.status_code == 200
+    assert "access_token" in login_res.json()
+
+def test_register_employee_flow():
+    import uuid
+    uid = uuid.uuid4().hex[:6]
+    payload = {
+        "organization_id": "org-technova-01",
+        "full_name": f"Pooja Sharma {uid}",
+        "email": f"pooja.{uid}@technova.com",
+        "password": "EmployeeSecret456!",
+        "preferred_language": "English"
+    }
+    res = client.post("/api/auth/register-employee", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert "access_token" in data
+    assert data["user"]["full_name"] == f"Pooja Sharma {uid}"
+    assert data["user"]["role"] == "EMPLOYEE"
+
+    # Verify employee can login
+    login_res = client.post("/api/auth/login", json={
+        "email": payload["email"],
+        "password": "EmployeeSecret456!"
+    })
+    assert login_res.status_code == 200
+    assert login_res.json()["user"]["email"] == payload["email"]
+

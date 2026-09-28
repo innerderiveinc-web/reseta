@@ -77,6 +77,7 @@ class User(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     full_name = Column(String(255), nullable=False)
     role = Column(String(32), default="EMPLOYEE") # SUPER_ADMIN, HR_ADMIN, WELLNESS_ADMIN, MANAGER, CLINICIAN, AUDITOR, EMPLOYEE
+    hashed_password = Column(String(255), nullable=True)
     avatar_url = Column(String(512), nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)

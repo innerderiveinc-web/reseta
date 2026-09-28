@@ -1229,14 +1229,63 @@ const App = {
   },
 
   // 7. JWT Authentication & Persona Gateway
-  openLoginModal() {
+  _orgsCache: [],
+
+  openLoginModal(tab = 'signin') {
     const modal = document.getElementById("loginModal");
     if (modal) modal.classList.add("active");
+    this.switchAuthTab(tab);
+    this.loadRegistrationOrgs();
   },
 
   closeLoginModal() {
     const modal = document.getElementById("loginModal");
     if (modal) modal.classList.remove("active");
+  },
+
+  switchAuthTab(tab) {
+    const tabs = ['signin', 'company', 'employee'];
+    tabs.forEach(t => {
+      const btn = document.getElementById(`authTabBtn${t.charAt(0).toUpperCase() + t.slice(1)}`);
+      const pane = document.getElementById(`authPane${t.charAt(0).toUpperCase() + t.slice(1)}`);
+      if (btn) {
+        if (t === tab) btn.classList.add("active");
+        else btn.classList.remove("active");
+      }
+      if (pane) {
+        if (t === tab) pane.classList.add("active");
+        else pane.classList.remove("active");
+      }
+    });
+  },
+
+  async loadRegistrationOrgs() {
+    try {
+      const orgs = await API.getOrganizations();
+      this._orgsCache = orgs;
+      const orgSelect = document.getElementById("regEmpOrgSelect");
+      if (orgSelect && orgs.length > 0) {
+        orgSelect.innerHTML = orgs.map(o => `
+          <option value="${o.id}">${o.name} (${o.industry})</option>
+        `).join('');
+        this.onRegistrationOrgChange(orgSelect.value);
+      }
+    } catch (err) {
+      console.warn("Error loading registration orgs:", err);
+    }
+  },
+
+  onRegistrationOrgChange(orgId) {
+    const deptSelect = document.getElementById("regEmpDeptSelect");
+    if (!deptSelect) return;
+    const org = this._orgsCache.find(o => o.id === orgId);
+    if (org && org.departments && org.departments.length > 0) {
+      deptSelect.innerHTML = org.departments.map(d => `
+        <option value="${d.id}">${d.name}</option>
+      `).join('');
+    } else {
+      deptSelect.innerHTML = `<option value="">General Workspace</option>`;
+    }
   },
 
   async handleEmailLogin(e) {
@@ -1266,6 +1315,78 @@ const App = {
       this.showToast(`🟢 Signed in as ${this.currentUser.full_name} (${this.currentUser.role.replace('_', ' ')}) · Token Active`);
     } catch (err) {
       alert("Sign-in failed: " + err.message);
+    }
+  },
+
+  async handleCompanyRegistration(e) {
+    if (e) e.preventDefault();
+    const company_name = document.getElementById("regCompanyName").value.trim();
+    const industry = document.getElementById("regCompanyIndustry").value;
+    const employee_count = parseInt(document.getElementById("regCompanySeats").value, 10);
+    const admin_name = document.getElementById("regCompanyAdminName").value.trim();
+    const admin_email = document.getElementById("regCompanyAdminEmail").value.trim();
+    const password = document.getElementById("regCompanyPassword").value;
+
+    if (!company_name || !admin_name || !admin_email || !password) {
+      alert("Please fill in all required company and admin fields.");
+      return;
+    }
+
+    try {
+      const res = await API.registerCompany({
+        company_name,
+        admin_name,
+        admin_email,
+        password,
+        industry,
+        employee_count
+      });
+
+      this.currentUser = res.admin_user;
+      const tenantDisplay = document.getElementById("tenantOrgDisplay");
+      if (tenantDisplay) tenantDisplay.innerText = `${res.organization_name} (${employee_count} Seats)`;
+
+      this.updateAuthState();
+      this.closeLoginModal();
+      this.switchSurface("admin");
+      this.refreshActiveSurface();
+      this.showToast(`🏢 Workspace '${res.organization_name}' provisioned! Logged in as Super Admin.`);
+    } catch (err) {
+      alert("Company registration failed: " + err.message);
+    }
+  },
+
+  async handleEmployeeRegistration(e) {
+    if (e) e.preventDefault();
+    const organization_id = document.getElementById("regEmpOrgSelect").value;
+    const department_id = document.getElementById("regEmpDeptSelect").value;
+    const full_name = document.getElementById("regEmpFullName").value.trim();
+    const email = document.getElementById("regEmpEmail").value.trim();
+    const password = document.getElementById("regEmpPassword").value;
+
+    if (!organization_id || !full_name || !email || !password) {
+      alert("Please fill in all required employee fields.");
+      return;
+    }
+
+    try {
+      const res = await API.registerEmployee({
+        organization_id,
+        department_id: department_id || null,
+        full_name,
+        email,
+        password,
+        preferred_language: "English"
+      });
+
+      this.currentUser = res.user;
+      this.updateAuthState();
+      this.closeLoginModal();
+      this.switchSurface("employee");
+      this.refreshActiveSurface();
+      this.showToast(`🌿 Account created! Welcome, ${res.user.full_name}.`);
+    } catch (err) {
+      alert("Employee registration failed: " + err.message);
     }
   },
 
@@ -1522,6 +1643,20 @@ const App = {
       desc: "Inspect database pool, model gateway, and latency",
       category: "Platform Health",
       action: "App.openSystemStatusModal()"
+    },
+    {
+      icon: "🏢",
+      title: "Onboard New Enterprise Company",
+      desc: "Provision a new licensed tenant workspace with SOC 2 & DPDP controls",
+      category: "Tenant Onboarding",
+      action: "App.openLoginModal('company')"
+    },
+    {
+      icon: "👤",
+      title: "Join Company as New Employee",
+      desc: "Create your confidential account under your company workspace",
+      category: "Onboarding",
+      action: "App.openLoginModal('employee')"
     },
     {
       icon: "🆘",

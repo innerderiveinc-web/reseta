@@ -88,10 +88,10 @@
       </div>
       <!-- State 1: Logged Out Controls -->
       <div id="loggedOutControls" style="display: flex; align-items: center; gap: 8px;">
-        <span class="tenant-badge" style="background: rgba(0,0,0,0.04); font-size: 11px;">
-          🔒 SSO Portal
-        </span>
-        <button id="openLoginModalBtn" class="btn-primary" onclick="App.openLoginModal()" style="font-size: 12px; padding: 6px 14px; font-weight: 600; background: var(--brand-reset);">
+        <button class="btn-small-pill" onclick="App.openLoginModal('company')" style="font-size: 11px; padding: 6px 12px; font-weight: 700; border-color: var(--recovery-teal); color: var(--recovery-teal);" title="Register a new company workspace">
+          🏢 Onboard Company
+        </button>
+        <button id="openLoginModalBtn" class="btn-primary" onclick="App.openLoginModal('signin')" style="font-size: 12px; padding: 6px 14px; font-weight: 600; background: var(--brand-reset);">
           🔑 Enterprise Sign-In
         </button>
       </div>
@@ -989,54 +989,148 @@
     </div>
   </div>
 
-  <!-- 🔐 Secure Enterprise Sign-In Modal (RFC 7519 JWT Auth) -->
+  <!-- 🔐 Secure Enterprise Access & Onboarding Hub (Sign In & New Registration) -->
   <div id="loginModal" class="modal-backdrop">
-    <div class="reset-modal-window" style="width: min(480px, 100%);">
+    <div class="reset-modal-window" style="width: min(520px, 100%);">
       <button class="modal-close-btn" onclick="document.getElementById('loginModal').classList.remove('active')">&times;</button>
-      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
-        <div class="brand-symbol" style="width: 38px; height: 38px; font-size: 18px;">R</div>
-        <div>
-          <h3 style="font-size: 18px; font-weight: 700; margin: 0;">RESETA™ Enterprise Sign-In</h3>
-          <span style="font-size: 12px; color: var(--text-muted);">RFC 7519 Cryptographic JWT Bearer Auth</span>
-        </div>
-      </div>
-
-      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 6px; padding: 10px; margin-bottom: 16px; font-size: 12px; color: #065f46;">
-        🛡 <strong>True Cryptographic Security:</strong> Authenticating generates a signed HMAC-SHA256 JWT bearer token stored in client session, protecting all API endpoints with zero prototype mocks.
-      </div>
       
-      <form id="enterpriseLoginForm" onsubmit="App.handleEmailLogin(event)">
-        <div style="margin-bottom: 12px;">
-          <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Enterprise Email</label>
-          <input type="email" id="loginEmail" class="copilot-input" placeholder="arjun@technova.com" required style="width: 100%;">
-        </div>
-        <div style="margin-bottom: 14px;">
-          <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Password</label>
-          <input type="password" id="loginPassword" class="copilot-input" placeholder="••••••••••••" value="technova2026" required style="width: 100%;">
-          <span style="font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block;">Default tenant demo password: <code>technova2026</code></span>
-        </div>
-        <button type="submit" class="btn-primary" style="width: 100%; padding: 10px; font-size: 14px; background: var(--brand-reset);">
-          Sign In & Issue JWT Token 🔒
-        </button>
-      </form>
-
-      <div style="border-top: 1px solid var(--border-light); margin-top: 18px; padding-top: 14px;">
-        <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Quick Persona Access (1-Click JWT Switch)</span>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
-          <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-emp-arjun')">
-            👨‍💻 <strong>Arjun Mehta</strong><br><span style="color: var(--text-muted); font-size: 10px;">Employee (Frontend Dev)</span>
-          </button>
-          <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-mgr-priya')">
-            👩‍💼 <strong>Priya Sharma</strong><br><span style="color: var(--text-muted); font-size: 10px;">Engineering Manager</span>
-          </button>
-          <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-hr-kavita')">
-            📊 <strong>Kavita Nair</strong><br><span style="color: var(--text-muted); font-size: 10px;">Head of People & HR</span>
-          </button>
-          <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-admin-rahul')">
-            🛡 <strong>Rahul Deshmukh</strong><br><span style="color: var(--text-muted); font-size: 10px;">Enterprise Super Admin</span>
-          </button>
+      <!-- Brand & Security Header -->
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px;">
+        <div class="brand-symbol" style="width: 36px; height: 36px; font-size: 16px;">R</div>
+        <div>
+          <h3 style="font-size: 18px; font-weight: 800; margin: 0; letter-spacing: -0.02em;">RESETA™ Enterprise Gateway</h3>
+          <span style="font-size: 11px; color: var(--text-muted);">RFC 7519 Cryptographic JWT Bearer Auth · SOC 2 / DPDP Aligned</span>
         </div>
       </div>
+
+      <!-- Navigation Tabs: Sign In / Register Company / Join Employee -->
+      <div class="auth-tab-bar">
+        <button id="authTabBtnSignIn" class="auth-tab-btn active" onclick="App.switchAuthTab('signin')">🔑 Sign In</button>
+        <button id="authTabBtnCompany" class="auth-tab-btn" onclick="App.switchAuthTab('company')">🏢 Register Company</button>
+        <button id="authTabBtnEmployee" class="auth-tab-btn" onclick="App.switchAuthTab('employee')">👤 Join Employee</button>
+      </div>
+
+      <!-- PANE 1: Enterprise Sign-In -->
+      <div id="authPaneSignIn" class="auth-pane active">
+        <form id="enterpriseLoginForm" onsubmit="App.handleEmailLogin(event)">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Enterprise Work Email</label>
+            <input type="email" id="loginEmail" class="copilot-input" placeholder="arjun.sharma@technova.com" required style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Password</label>
+            <input type="password" id="loginPassword" class="copilot-input" placeholder="••••••••••••" value="technova2026" required style="width: 100%;">
+            <span style="font-size: 11px; color: var(--text-muted); margin-top: 3px; display: block;">Default tenant demo password: <code>technova2026</code></span>
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; padding: 10px; font-size: 14px; background: var(--brand-reset);">
+            Sign In & Issue JWT Token 🔒
+          </button>
+        </form>
+
+        <div style="border-top: 1px solid var(--border-light); margin-top: 16px; padding-top: 12px;">
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Quick Persona Access (1-Click JWT Switch)</span>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+            <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-emp-arjun')">
+              👨‍💻 <strong>Arjun Mehta</strong><br><span style="color: var(--text-muted); font-size: 10px;">Employee (Frontend Dev)</span>
+            </button>
+            <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-mgr-priya')">
+              👩‍💼 <strong>Priya Sharma</strong><br><span style="color: var(--text-muted); font-size: 10px;">Engineering Manager</span>
+            </button>
+            <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-hr-kavita')">
+              📊 <strong>Kavita Nair</strong><br><span style="color: var(--text-muted); font-size: 10px;">Head of People & HR</span>
+            </button>
+            <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-admin-rahul')">
+              🛡 <strong>Rahul Deshmukh</strong><br><span style="color: var(--text-muted); font-size: 10px;">Enterprise Super Admin</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PANE 2: Register New Company (Tenant Onboarding) -->
+      <div id="authPaneCompany" class="auth-pane">
+        <div style="background: rgba(13, 148, 136, 0.08); border: 1px solid rgba(13, 148, 136, 0.2); border-radius: 6px; padding: 10px; margin-bottom: 14px; font-size: 12px; color: var(--recovery-teal);">
+          🏢 <strong>New Enterprise Workspace:</strong> Instantly provisions dedicated tenant storage, standard departments, SCIM 2.0 readiness, and DPDP 2025 compliance.
+        </div>
+        <form id="enterpriseRegisterCompanyForm" onsubmit="App.handleCompanyRegistration(event)">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Company / Organization Name</label>
+            <input type="text" id="regCompanyName" class="copilot-input" placeholder="e.g. Acme Technologies India" required style="width: 100%;">
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <div>
+              <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Industry</label>
+              <select id="regCompanyIndustry" class="copilot-input" style="width: 100%;">
+                <option value="Technology & Cloud">Technology & Cloud</option>
+                <option value="Financial Services & Fintech">Financial Services & Fintech</option>
+                <option value="Healthcare & Life Sciences">Healthcare & Life Sciences</option>
+                <option value="E-Commerce & Retail">E-Commerce & Retail</option>
+                <option value="Consulting & Advisory">Consulting & Advisory</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Workforce Size</label>
+              <select id="regCompanySeats" class="copilot-input" style="width: 100%;">
+                <option value="150">50 - 250 Employees</option>
+                <option value="500" selected>250 - 1,000 Employees</option>
+                <option value="2500">1,000 - 5,000 Employees</option>
+                <option value="10000">5,000+ Enterprise Grid</option>
+              </select>
+            </div>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Administrator Full Name</label>
+            <input type="text" id="regCompanyAdminName" class="copilot-input" placeholder="e.g. Meera Ramanathan" required style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Work Email Address</label>
+            <input type="email" id="regCompanyAdminEmail" class="copilot-input" placeholder="meera@acmecorp.com" required style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Admin Password</label>
+            <input type="password" id="regCompanyPassword" class="copilot-input" placeholder="Minimum 8 characters" required style="width: 100%;">
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; padding: 10px; font-size: 14px; background: var(--recovery-teal);">
+            🏢 Provision Company & Activate Admin 🚀
+          </button>
+        </form>
+      </div>
+
+      <!-- PANE 3: Join as Employee (Individual Registration) -->
+      <div id="authPaneEmployee" class="auth-pane">
+        <div style="background: rgba(225, 29, 72, 0.06); border: 1px solid rgba(225, 29, 72, 0.18); border-radius: 6px; padding: 10px; margin-bottom: 14px; font-size: 12px; color: var(--brand-reset);">
+          🌿 <strong>Employee Privacy Guarantee:</strong> Your individual resets, thoughts, and check-ins are strictly confidential. Zero surveillance data is ever shared with managers.
+        </div>
+        <form id="enterpriseRegisterEmployeeForm" onsubmit="App.handleEmployeeRegistration(event)">
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Select Your Organization</label>
+            <select id="regEmpOrgSelect" class="copilot-input" style="width: 100%;" onchange="App.onRegistrationOrgChange(this.value)">
+              <!-- Loaded dynamically by App.loadRegistrationOrgs() -->
+            </select>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Department</label>
+            <select id="regEmpDeptSelect" class="copilot-input" style="width: 100%;">
+              <!-- Dynamically populated based on org -->
+            </select>
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Your Full Name</label>
+            <input type="text" id="regEmpFullName" class="copilot-input" placeholder="e.g. Pooja Sharma" required style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Work Email Address</label>
+            <input type="email" id="regEmpEmail" class="copilot-input" placeholder="pooja.sharma@technova.com" required style="width: 100%;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Create Password</label>
+            <input type="password" id="regEmpPassword" class="copilot-input" placeholder="••••••••••••" required style="width: 100%;">
+          </div>
+          <button type="submit" class="btn-primary" style="width: 100%; padding: 10px; font-size: 14px; background: var(--brand-reset);">
+            👤 Join Workspace & Start Resetting 🌿
+          </button>
+        </form>
+      </div>
+
     </div>
   </div>
 

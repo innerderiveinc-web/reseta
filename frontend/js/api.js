@@ -36,8 +36,19 @@ const API = {
   // Auth & Personas
   getUsers: () => API.get('/api/auth/users'),
   getCurrentUser: () => API.get('/api/auth/me'),
+  getOrganizations: () => API.get('/api/auth/organizations'),
   login: async (email, password) => {
     const res = await API.post('/api/auth/login', { email, password });
+    if (res.access_token) API.setToken(res.access_token);
+    return res;
+  },
+  registerCompany: async (payload) => {
+    const res = await API.post('/api/auth/register-company', payload);
+    if (res.access_token) API.setToken(res.access_token);
+    return res;
+  },
+  registerEmployee: async (payload) => {
+    const res = await API.post('/api/auth/register-employee', payload);
     if (res.access_token) API.setToken(res.access_token);
     return res;
   },
