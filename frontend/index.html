@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RESETA™ Enterprise · Workplace Mental Wellness & Stress Recovery Platform</title>
+  <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+  <!-- Global App Header -->
+  <header class="app-header">
+    <div class="brand-section">
+      <a href="#" class="brand-logo" onclick="App.switchSurface('employee'); return false;">
+        <span class="brand-badge">RESETA™</span>
+        <span class="brand-title">Enterprise</span>
+      </a>
+      <span class="brand-tagline">From workplace stress to workplace recovery</span>
+    </div>
+
+    <!-- Surface Navigation Switcher (7 Core Surfaces) -->
+    <nav class="surface-nav">
+      <button class="surface-tab active" data-surface="employee">🌿 Employee</button>
+      <button class="surface-tab" data-surface="teams-slack">💬 Teams & Slack</button>
+      <button class="surface-tab" data-surface="manager">👥 Manager Coach</button>
+      <button class="surface-tab" data-surface="hr">📊 HR Wellbeing</button>
+      <button class="surface-tab" data-surface="admin">⚙️ Admin Console</button>
+      <button class="surface-tab" data-surface="care">🩺 Care Console</button>
+      <button class="surface-tab" data-surface="trust">🛡️ Trust & DPDP</button>
+    </nav>
+
+    <!-- Persona & Role Switcher -->
+    <!-- Persona & Role Switcher + Utilities -->
+    <div class="user-tenant-bar">
+      <button class="btn-small-pill" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700;" onclick="App.run10SecondDemo()">
+        ⚡ 10-Sec Demo
+      </button>
+
+      <button id="themeToggleBtn" class="theme-toggle-btn" onclick="App.toggleTheme()">
+        🌙 Dark
+      </button>
+
+      <div class="tenant-badge">
+        <span class="tenant-dot"></span>
+        <span id="tenantOrgDisplay">TechNova India (850 Seats)</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <label for="personaSelect" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">ACTIVE ROLE:</label>
+        <select id="personaSelect" class="persona-select">
+          <!-- Populated by App.loadPersonas() -->
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Surfaces -->
+  <main class="main-content">
+    
+    <!-- ========================================================
+         SURFACE 1: EMPLOYEE APP & WEB (Sections 6, 7, 8, 9, 10, 11)
+         ======================================================== -->
+    <section id="view-employee" class="view-panel active">
+      <div class="employee-hero-card">
+        <div class="privacy-banner-pill">
+          🔒 Technical Privacy Wall: Private to you. Zero personal logs or scores are ever shared with employers.
+        </div>
+
+        <h1 class="employee-heading">How's your mind right now?</h1>
+        <p class="employee-subheading">Too much on your mind? Take 5. Reset your cognitive load in the moment.</p>
+
+        <!-- State Chips -->
+        <div class="state-selector-grid">
+          <button class="state-chip" onclick="ResetModal.open('overloaded')">🫠 Overloaded</button>
+          <button class="state-chip" onclick="ResetModal.open('work_pressure')">💼 Work Pressure</button>
+          <button class="state-chip" onclick="ResetModal.open('racing_thoughts')">🧠 Overthinking</button>
+          <button class="state-chip" onclick="ResetModal.open('cant_start')">🧱 Can't Start</button>
+          <button class="state-chip" onclick="ResetModal.open('frustration')">😤 Irritated</button>
+          <button class="state-chip" onclick="ResetModal.open('low_energy')">😴 Exhausted</button>
+          <button class="state-chip" onclick="ResetModal.open('general_tension')">😰 Stressed</button>
+          <button class="state-chip" onclick="ResetModal.open('night_stress')">🌙 End-of-Day</button>
+          <button class="state-chip" onclick="ResetModal.open('general_tension')">🤷 Don't Know</button>
+        </div>
+
+        <!-- Hero Actions -->
+        <div class="hero-cta-group">
+          <button id="heroResetBtn" class="btn-reset-hero">
+            🔴 RESET ME
+          </button>
+          <button id="heroTalkBtn" class="btn-talk-hero">
+            🎙 TALK IT OUT
+          </button>
+        </div>
+
+        <div style="margin-top: 14px; display: flex; justify-content: center; gap: 20px; align-items: center;">
+          <span class="zero-friction-footnote">⚡ Zero friction: Tap · One question · 2–10 min interactive reset</span>
+          <button id="sendResetBtn" class="btn-small-pill" style="border-color: var(--recovery-teal); color: var(--recovery-teal);">
+            💌 Send a Reset to a Colleague
+          </button>
+        </div>
+      </div>
+
+      <!-- Employee Lower Dashboard Grid -->
+      <div class="employee-grid">
+        <!-- Left: Mind Mirror™ & Personal History -->
+        <div class="content-card">
+          <div class="card-header-flex">
+            <h3 class="card-title">🪞 Mind Mirror™ & Personal Patterns</h3>
+            <span style="font-size: 11px; background: var(--bg-subtle); padding: 3px 8px; border-radius: var(--radius-full); color: var(--text-muted);">
+              Private to <span id="currentUserName">Arjun</span>
+            </span>
+          </div>
+
+          <div id="mindMirrorBox">
+            <!-- Populated dynamically -->
+          </div>
+
+          <h4 style="font-size: 14px; font-weight: 700; margin: 20px 0 10px;">Recent Personal Resets</h4>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Protocol</th>
+                  <th>State</th>
+                  <th>Duration</th>
+                  <th>Relief Shift</th>
+                  <th>Helpful?</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody id="personalHistoryTable">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Right: Daily Routine & Workplace Programs -->
+        <div>
+          <!-- Daily Routine -->
+          <div class="content-card" style="margin-bottom: 24px;">
+            <h3 class="card-title" style="margin-bottom: 14px;">☀️ Daily Recovery Routine</h3>
+            <div id="dailyRoutineBox" class="daily-routine-box">
+              <!-- Populated dynamically -->
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">
+              You control notification frequency. No guilt. No "You missed your wellness session."
+            </p>
+          </div>
+
+          <!-- Programs -->
+          <div class="content-card">
+            <div class="card-header-flex">
+              <h3 class="card-title">📚 Workplace Programs</h3>
+              <span style="font-size: 12px; color: var(--recovery-teal); font-weight: 600;">Self-paced</span>
+            </div>
+            <div id="workplaceProgramsList">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SURFACE 2: TEAMS & SLACK WORKPLACE SIMULATOR (Section 34)
+         ======================================================== -->
+    <section id="view-teams-slack" class="view-panel">
+      <div class="content-card">
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">💬 Workplace In-Flow Experience</h2>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+          RESETA lives directly inside Microsoft Teams and Slack so employees don't have to remember to open another separate portal when pressure hits.
+        </p>
+
+        <div class="workplace-chat-frame">
+          <div style="border-bottom: 1px solid #383a40; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; color: #fff;"># engineering-sprint · Slack / Teams Simulator</span>
+            <span style="font-size: 12px; color: #949ba4;">Type <code>/reset</code> anywhere</span>
+          </div>
+
+          <div id="teamsSlackChatContainer">
+            <!-- Rendered by App.loadTeamsSlackData() -->
+          </div>
+
+          <div style="display: flex; gap: 8px; margin-top: 16px;">
+            <input type="text" value="/reset I have 4 back-to-back meetings and urgent production deploy" readonly style="flex: 1; background: #383a40; border: none; padding: 10px 14px; border-radius: 6px; color: #fff; font-family: monospace; font-size: 13px;">
+            <button class="chat-action-btn primary" onclick="ResetModal.open('work_pressure')">Simulate Command ↵</button>
+          </div>
+        </div>
+
+        <div style="background: var(--bg-subtle); padding: 18px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.6;">
+          💡 <strong>Key Architectural Guarantee:</strong> All responses in Slack and Teams are dispatched as <code>ephemeral</code> messages. No teammate or manager can see when an employee requests a reset.
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SURFACE 3: MANAGER EXPERIENCE & COACH (Sections 20, 64)
+         ======================================================== -->
+    <section id="view-manager" class="view-panel">
+      <div class="content-card" style="margin-bottom: 24px;">
+        <div class="privacy-wall-callout">
+          🛡️ <span id="managerPrivacyBanner">Strictly Anonymous: Zero individual employee check-ins or chat data are visible to managers.</span>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <div>
+            <h2 style="font-size: 22px; font-weight: 700;">👥 Team Wellbeing Intelligence</h2>
+            <p style="font-size: 13px; color: var(--text-muted);">Squad: Frontend Experience · 12 Active Members (Cohort k ≥ 5 Met)</p>
+          </div>
+          <span class="brand-badge" style="background: var(--recovery-teal);">Aggregate Mode Only</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <div>
+            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Top Workplace Demand Themes</h4>
+            <div id="managerThemesList">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+          <div>
+            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Suggested Team-Level Actions</h4>
+            <div id="managerSuggestedActions">
+              <!-- Populated dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5-Minute Manager Coach (Section 64) -->
+      <div class="content-card">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">🎯 5-Minute Manager Recovery Coach™</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+              WHO-aligned conversation guidance for leaders when navigating team workload and burnout signals.
+            </p>
+          </div>
+          <span class="brand-badge" style="background: var(--text-main);">Scenario Library</span>
+        </div>
+        <div id="managerCoachScenariosList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Manager Copilot (Section 48) -->
+      <div class="content-card" style="margin-top: 24px;">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">🤖 Ask RESETA Manager Copilot™</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Get privacy-safe conversation guidance & workload distribution strategies.
+            </p>
+          </div>
+          <span class="brand-badge" style="background: var(--recovery-teal);">Zero Individual Disclosure</span>
+        </div>
+        <div class="copilot-input-row">
+          <input type="text" id="managerCopilotInput" class="copilot-input" placeholder="e.g., 'My squad has 3 urgent release deadlines this week. How should I structure protected focus blocks?'">
+          <button class="btn-primary" onclick="App.askManagerCopilot()">Ask Copilot →</button>
+        </div>
+        <div id="managerCopilotAnswer" class="copilot-answer-card"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SURFACE 4: HR / PEOPLE DASHBOARD (Sections 21, 24, 25, 35)
+         ======================================================== -->
+    <section id="view-hr" class="view-panel">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 24px; font-weight: 800;">📊 Workforce Wellbeing Intelligence</h2>
+          <p style="font-size: 13px; color: var(--text-muted);">Real-time organizational recovery indicators · TechNova Solutions India</p>
+        </div>
+        <button class="btn-primary" style="background: var(--recovery-teal); font-weight: 700;" onclick="App.openPilotReport()">
+          📄 View Executive Pilot Report (Q1 Analysis)
+        </button>
+      </div>
+
+      <!-- North Star KPI Row -->
+      <div class="metrics-summary-grid">
+        <div class="metric-stat-card hero-metric">
+          <div class="metric-label">North Star Metric</div>
+          <div id="hrMetricRecoveryMoments" class="metric-value">1,124</div>
+          <div class="metric-delta">Successful Recovery Moments™</div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Completed reset + reported positive relief</p>
+        </div>
+        <div class="metric-stat-card">
+          <div class="metric-label">Weekly Active Employees</div>
+          <div id="hrMetricWAU" class="metric-value">586</div>
+          <div class="metric-delta">69% workforce activation rate</div>
+        </div>
+        <div class="metric-stat-card">
+          <div class="metric-label">Total Resets Logged</div>
+          <div id="hrMetricTotalResets" class="metric-value">1,402</div>
+          <div class="metric-delta">2–10 min micro-interventions</div>
+        </div>
+        <div class="metric-stat-card">
+          <div class="metric-label">Average Relief Delta</div>
+          <div id="hrMetricAvgRelief" class="metric-value">-3.4 pts</div>
+          <div class="metric-delta">Self-reported stress drop</div>
+        </div>
+      </div>
+
+      <div class="privacy-wall-callout">
+        🛡️ <strong>RESETA Privacy Shield:</strong> Minimum cohort threshold enforced (k ≥ 5). Language sanitized to eliminate stigmatizing labels (Section 22: "Do not call everything risk").
+      </div>
+
+      <!-- HR Themes and Benchmarks -->
+      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; margin-bottom: 28px;">
+        <div class="content-card">
+          <h3 class="card-title" style="margin-bottom: 16px;">📈 Aggregate Workplace Themes</h3>
+          <div id="hrAggregateThemesList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+        <div class="content-card">
+          <h3 class="card-title" style="margin-bottom: 16px;">🏢 Department Breakdown (k ≥ 5 Enforced)</h3>
+          <div style="overflow-x: auto;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Active</th>
+                  <th>Moments</th>
+                  <th>Avg Drop</th>
+                  <th>Primary Focus</th>
+                </tr>
+              </thead>
+              <tbody id="hrDeptBenchmarksTable">
+                <!-- Populated dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Organizational Action Engine™ (Section 24) -->
+      <div class="content-card" style="margin-bottom: 28px;">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">⚡ Organizational Action Engine™</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">Moving from passive dashboards to SIGNAL → ACTION → RE-MEASURE</p>
+          </div>
+          <span class="brand-badge" style="background: var(--brand-reset);">Action Center</span>
+        </div>
+        <div id="hrActionEngineList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Team Recovery Lab™ (Section 25) & HR Campaign Engine (Section 35) -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <!-- Recovery Lab Experiments -->
+        <div class="content-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">🧪 Team Recovery Lab™</h3>
+              <p style="font-size: 12px; color: var(--text-muted);">Controlled workplace recovery experiments</p>
+            </div>
+            <button class="btn-small-pill" onclick="alert('Create Experiment: Define duration, target department, and workplace intervention.')">+ New Experiment</button>
+          </div>
+          <div id="teamRecoveryLabList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- HR Campaigns -->
+        <div class="content-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">📢 HR Wellbeing Campaigns</h3>
+              <p style="font-size: 12px; color: var(--text-muted);">In-flow nudges across Slack, Teams & Email</p>
+            </div>
+            <button class="btn-small-pill" onclick="alert('Launch Campaign: Choose audience, theme, and frequency cap.')">+ Launch</button>
+          </div>
+          <div id="hrCampaignsList">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Workforce Intelligence Copilot (Section 49) -->
+      <div class="content-card" style="margin-top: 24px;">
+        <div class="card-header-flex">
+          <div>
+            <h3 class="card-title">🤖 Ask RESETA Workforce Intelligence Copilot™</h3>
+            <p style="font-size: 13px; color: var(--text-muted);">
+              Query organizational trends, theme shifts, and workplace experiment findings with strict k ≥ 5 privacy guarantees.
+            </p>
+          </div>
+          <span class="brand-badge" style="background: var(--brand-reset);">Aggregate Copilot</span>
+        </div>
+        <div class="copilot-input-row">
+          <input type="text" id="hrCopilotInput" class="copilot-input" placeholder="e.g., 'Which wellbeing themes are increasing this quarter? How did Meeting-Free Wednesday impact Engineering?'">
+          <button class="btn-primary" onclick="App.askHrCopilot()">Query Intelligence →</button>
+        </div>
+        <div id="hrCopilotAnswer" class="copilot-answer-card"></div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SURFACE 5: ENTERPRISE ADMIN CONSOLE (Section 36, 37, 38)
+         ======================================================== -->
+    <section id="view-admin" class="view-panel">
+      <div class="content-card" style="margin-bottom: 24px;">
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">⚙️ Enterprise Admin Console</h2>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Identity, SSO, SCIM provisioning, RBAC, and billing management.</p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div class="action-card">
+            <div class="action-signal">Organization Profile</div>
+            <div id="adminOrgName" style="font-size: 16px; font-weight: 700;">TechNova Solutions India</div>
+            <div id="adminOrgLicenses" style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">850 / 1000 licenses active</div>
+          </div>
+          <div class="action-card">
+            <div class="action-signal">SSO & SCIM Gateway</div>
+            <div id="adminSsoStatus" style="font-size: 15px; font-weight: 600;">Microsoft Entra ID / Okta SAML 2.0</div>
+            <div style="font-size: 12px; color: var(--recovery-emerald); font-weight: 700; margin-top: 4px;">🟢 Automated SCIM Sync Active</div>
+          </div>
+          <div class="action-card">
+            <div class="action-signal">DPDP Act 2025 Status</div>
+            <div id="adminDpdpConsents" style="font-size: 15px; font-weight: 600;">842 Active Consents</div>
+            <div id="adminDpdpAuditCount" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">231 Privileged Audits Recorded</div>
+          </div>
+        </div>
+
+        <h4 style="font-size: 14px; font-weight: 700; margin: 20px 0 10px;">Role-Based Access Control (RBAC) Matrix</h4>
+        <div style="overflow-x: auto; margin-bottom: 24px;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Privileges & Boundary Enforcements</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>Super Admin</strong></td><td>Complete organization tenant configuration, identity mapping, SCIM, billing</td></tr>
+              <tr><td><strong>HR Admin</strong></td><td>Aggregate workforce wellbeing trends, programs, campaign engine, action center</td></tr>
+              <tr><td><strong>Wellness Admin</strong></td><td>Workplace program content, pulse check-in schedules, learning catalog</td></tr>
+              <tr><td><strong>Manager</strong></td><td>Strictly k ≥ 5 anonymous squad themes, suggested team actions, 5-Min Manager Coach</td></tr>
+              <tr><td><strong>Clinician</strong></td><td>RESETA Care triage queue, Tele-MANAS escalation protocols, clinical notes</td></tr>
+              <tr><td><strong>Auditor</strong></td><td>Read-only compliance audit logs, DPDP consent registry, verification export</td></tr>
+              <tr><td><strong>Employee</strong></td><td>100% private personal space: resets, mental unload buckets, Personal Relief Map</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 style="font-size: 14px; font-weight: 700; margin: 20px 0 10px;">Privileged Analytics Audit Log (Section 23, 42)</h4>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Actor Role</th>
+                <th>Action</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="adminAuditLogsTable">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SURFACE 6: CARE CONSOLE (Section 26, 27)
+         ======================================================== -->
+    <section id="view-care" class="view-panel">
+      <div class="content-card" style="margin-bottom: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h2 style="font-size: 22px; font-weight: 700;">🩺 RESETA Care™ Console</h2>
+          <span class="brand-badge" style="background: var(--brand-reset);">Clinical Care Pathways</span>
+        </div>
+        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6;">
+          RESETA is an AI-powered workplace mental recovery system, not an AI therapist. When an employee's needs exceed self-guided resets, seamless escalation pathways connect them with human professionals.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 18px; border-left: 4px solid var(--red-crisis);">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--red-crisis);">Official National Helpline (India)</div>
+            <div style="font-size: 18px; font-weight: 800; margin: 6px 0;">Tele-MANAS</div>
+            <div style="font-size: 20px; font-weight: 800; color: var(--brand-reset);">📞 14416 / 1800-89-14416</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">24/7 free, confidential psychological first aid in 20+ languages.</p>
+          </div>
+
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 18px; border-left: 4px solid var(--amber-warn);">
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--amber-warn);">Corporate EAP Support</div>
+            <div style="font-size: 18px; font-weight: 800; margin: 6px 0;">Optum Corporate Health</div>
+            <div style="font-size: 15px; font-weight: 600;">6 Fully Sponsored Sessions / Employee</div>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">Confidential external care. No employer disclosure.</p>
+          </div>
+        </div>
+
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Active Safety & Care Triage Queue (Section 26, 27)</h4>
+        <div style="overflow-x: auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Tier</th>
+                <th>Anonymized Ref</th>
+                <th>Trigger Summary</th>
+                <th>Care Action</th>
+              </tr>
+            </thead>
+            <tbody id="careTriageTable">
+              <!-- Populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         SURFACE 7: TRUST CENTER & DPDP (Section 43, 44, 66)
+         ======================================================== -->
+    <section id="view-trust" class="view-panel">
+      <div class="content-card">
+        <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">🛡️ RESETA Trust Center™</h2>
+        <p style="font-size: 15px; color: var(--text-muted); max-width: 720px; margin-bottom: 24px; line-height: 1.6;">
+          "Your employer doesn't need to know what's inside your head to build a healthier workplace."
+        </p>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px;">
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 20px;">
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--brand-reset); margin-bottom: 8px;">PRIVATE TO YOU (Employee)</h4>
+            <ul style="list-style: none; font-size: 13px; line-height: 1.8; color: var(--text-main);">
+              <li>✅ Your private chat transcripts & voice notes</li>
+              <li>✅ Your individual Mental Load Unload notebooks</li>
+              <li>✅ Your Personal Relief Map & Mind Mirror history</li>
+              <li>✅ Your exact before/after stress ratings</li>
+            </ul>
+          </div>
+          <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 20px;">
+            <h4 style="font-size: 15px; font-weight: 700; color: var(--recovery-teal); margin-bottom: 8px;">ORGANIZATION MAY SEE (Aggregate Only)</h4>
+            <ul style="list-style: none; font-size: 13px; line-height: 1.8; color: var(--text-main);">
+              <li>🔹 Aggregate participation count (k ≥ 5 strictly enforced)</li>
+              <li>🔹 High-level workplace themes (Workload, Meeting density)</li>
+              <li>🔹 Team Recovery Lab experiment results</li>
+              <li>🔹 Zero individual names or individual stress scores</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="border-top: 1px solid var(--border-light); padding-top: 20px;">
+          <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">🇮🇳 Digital Personal Data Protection (DPDP) Act, 2025 Compliance</h4>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+            Architected specifically for India's DPDP Rules 2025 and CERT-In security guidance: Clear purpose-specific notice, explicit consent toggles, automated consent withdrawal, data deletion workflows, and immutable privileged audit logging.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================
+       MODALS: RESET MODAL & TALK IT OUT MODAL
+       ========================================================== -->
+  <!-- 🔴 RESET ME Modal (Section 8, 9, 10, 11, 12) -->
+  <div id="resetModal" class="modal-backdrop">
+    <div class="reset-modal-window">
+      <button id="resetModalClose" class="modal-close-btn">&times;</button>
+      <div id="resetModalContent">
+        <!-- Rendered by ResetModal component -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎙 TALK IT OUT Modal (Section 16) -->
+  <div id="talkModal" class="modal-backdrop">
+    <div class="reset-modal-window">
+      <button id="talkModalClose" class="modal-close-btn">&times;</button>
+      <div id="talkModalContent">
+        <!-- Rendered by TalkItOut component -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 📄 Pilot Report Executive Modal (Section 58) -->
+  <div id="pilotReportModal" class="modal-backdrop">
+    <div class="pilot-report-window">
+      <button class="modal-close-btn" onclick="App.closePilotReport()">&times;</button>
+      <div id="pilotReportContent">
+        <!-- Rendered dynamically by App.openPilotReport() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Persistent 1-Click Floating Workplace Reset Widget (Section 61, 62) -->
+  <button class="floating-reset-widget" onclick="ResetModal.open('overloaded')" title="Quick 2/5 Min Workplace Reset">
+    🔴 1-Click Reset
+  </button>
+
+  <!-- Client JavaScript -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/components/resetModal.js"></script>
+  <script src="/static/js/components/talkItOut.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>
