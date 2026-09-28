@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact Enterprise Sales & Support · RESETA™ by Qsura India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    .page-hero {
+      padding: 60px 24px 30px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .page-hero h1 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text-main) 60%, var(--brand-reset));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .contact-container {
+      max-width: 1040px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 32px;
+    }
+    .contact-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      background: var(--bg-card);
+      color: var(--text-main);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      border-color: var(--brand-reset);
+    }
+  </style>
+</head>
+<body>
+  <!-- Standard Enterprise Header -->
+  <header class="app-topbar">
+    <div class="brand-section">
+      <a href="/" class="brand-logo">
+        <span class="brand-badge">RESETA™</span>
+        <span class="brand-title">Enterprise</span>
+      </a>
+      <span class="brand-tagline">by Qsura India Pvt. Ltd.</span>
+    </div>
+
+    <!-- Main Navigation Links -->
+    <nav class="enterprise-nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/security" class="nav-link">Security & DPDP</a>
+      <a href="/pricing" class="nav-link">Pricing</a>
+      <a href="/faq" class="nav-link">FAQ</a>
+      <a href="/contact" class="nav-link active">Contact</a>
+    </nav>
+
+    <div class="user-tenant-bar" style="gap: 10px;">
+      <a href="/" class="btn-primary" style="font-size: 12px; padding: 7px 16px; text-decoration: none;">Launch Dashboard →</a>
+    </div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <span class="privacy-banner-pill">🤝 Enterprise Inquiries</span>
+    <h1>Connect with the RESETA™ Team</h1>
+    <p>
+      Whether you want to launch a 30-day pilot, schedule an architectural security review, or discuss custom pricing for your organization — our Bengaluru & New Delhi teams are here to help.
+    </p>
+  </section>
+
+  <!-- Contact Form & Corporate Info -->
+  <main class="contact-container">
+    <!-- Left: Inquiry Form -->
+    <div class="contact-card">
+      <h2 style="font-size: 22px; font-weight: 800; margin-bottom: 8px;">Book an Enterprise Demo</h2>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
+        Fill out your details to schedule a live 20-minute walkthrough tailored to your company's tech stack and size.
+      </p>
+
+      <form id="contactForm" onsubmit="handleContactSubmit(event)">
+        <div class="form-group">
+          <label for="contactName">Full Name *</label>
+          <input type="text" id="contactName" placeholder="e.g. Vikram Malhotra" required>
+        </div>
+
+        <div class="form-group">
+          <label for="contactEmail">Work Email *</label>
+          <input type="email" id="contactEmail" placeholder="e.g. vikram@company.com" required>
+        </div>
+
+        <div class="form-group">
+          <label for="companyName">Company Name *</label>
+          <input type="text" id="companyName" placeholder="e.g. Acme Tech India" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="teamSize">Company Size *</label>
+            <select id="teamSize" required>
+              <option value="50-250">50 - 250 Employees</option>
+              <option value="250-1000" selected>250 - 1,000 Employees</option>
+              <option value="1000+">1,000+ Employees</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="primaryGoal">Primary Goal</label>
+            <select id="primaryGoal">
+              <option value="burnout">Prevent Engineering Burnout</option>
+              <option value="meetings">Reduce Meeting Drag</option>
+              <option value="eap">Modernize 2% Used EAP</option>
+              <option value="pilot">Launch 30-Day Pilot</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="message">How can we support your team?</label>
+          <textarea id="message" rows="3" placeholder="Tell us about your team's current challenges or integrations needed (Slack, Teams, Darwinbox)..."></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; padding: 14px; font-size: 14px;">
+          Request Enterprise Demo & Pilot →
+        </button>
+      </form>
+      <div id="contactSuccessMsg" style="display: none; background: rgba(16, 185, 129, 0.12); border: 1px solid #10B981; border-radius: var(--radius-sm); padding: 14px; margin-top: 18px; color: #065f46; font-size: 13px; font-weight: 600;">
+        🎉 Thank you! Your request has been received. Our Enterprise Solutions Team at Qsura India will get in touch within 4 business hours.
+      </div>
+    </div>
+
+    <!-- Right: Corporate Office Details -->
+    <div>
+      <div class="contact-card" style="margin-bottom: 24px;">
+        <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 14px;">🏢 Corporate Headquarters</h3>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+          RESETA™ is an enterprise SaaS product developed, owned, and operated by:
+        </p>
+        <div style="background: var(--bg-subtle); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 18px;">
+          <strong style="font-size: 15px; color: var(--text-main);">Qsura India Private Limited</strong>
+          <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">Registered Technology & R&D Entity</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 2px;">CIN: Corporate Registered in India</div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span>📧</span>
+            <span><strong>Enterprise Sales:</strong> <a href="mailto:enterprise@reseta.in" style="color: var(--brand-reset);">enterprise@reseta.in</a></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span>🛡️</span>
+            <span><strong>Security & DPDP Officer:</strong> <a href="mailto:privacy@qsura.com" style="color: var(--recovery-teal);">privacy@qsura.com</a></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span>📞</span>
+            <span><strong>Direct Enterprise Line:</strong> +91 (080) 4123-RESETA</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span>📍</span>
+            <span><strong>Locations:</strong> Bengaluru & New Delhi, India</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="contact-card" style="background: rgba(13, 148, 136, 0.05); border-color: rgba(13, 148, 136, 0.2);">
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--recovery-teal); margin-bottom: 8px;">🆘 24/7 National Psychological Support</h4>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;">
+          If an employee or individual is in urgent psychological distress, please connect directly with the Ministry of Health's 24/7 Tele-MANAS toll-free line:
+        </p>
+        <div style="font-size: 20px; font-weight: 800; color: var(--red-crisis);">📞 14416 / 1800-89-14416</div>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Free, confidential first aid in 20+ Indian languages.</div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Standard Enterprise Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-section" style="margin-bottom: 12px;">
+            <span class="brand-badge">RESETA™</span>
+            <span class="brand-title">Enterprise</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            The proactive, privacy-first workplace stress recovery platform. Architected & operated by <strong>Qsura India Pvt. Ltd.</strong>
+          </p>
+          <div style="font-size: 12px; color: var(--recovery-teal); font-weight: 600;">
+            🔒 Zero-Surveillance Workplace Guarantee
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Platform</h4>
+          <ul class="footer-links">
+            <li><a href="/">Live Dashboard</a></li>
+            <li><a href="/about">About RESETA</a></li>
+            <li><a href="/pricing">Enterprise Pricing</a></li>
+            <li><a href="/faq">Frequently Asked Questions</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Security & Trust</h4>
+          <ul class="footer-links">
+            <li><a href="/security">Security Architecture</a></li>
+            <li><a href="/security#dpdp">DPDP Act Compliance</a></li>
+            <li><a href="/security#soc2">SOC 2 & ISO 27001</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Company & Care</h4>
+          <ul class="footer-links">
+            <li><a href="/contact">Contact Sales</a></li>
+            <li><a href="mailto:enterprise@reseta.in">enterprise@reseta.in</a></li>
+            <li><a href="tel:14416">Tele-MANAS (24/7 Helpline: 14416)</a></li>
+            <li><span style="font-size: 12px; color: var(--text-muted);">Bengaluru · New Delhi</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-strip">
+        <div>
+          © 2026 RESETA™. Architected, Engineered & Operated by <strong>Qsura India Pvt. Ltd.</strong> All rights reserved.
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/security">Data Sovereignty</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function handleContactSubmit(e) {
+      e.preventDefault();
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('contactSuccessMsg').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

@@ -12,120 +12,139 @@
 <body>
   <!-- Global App Header -->
   <header class="app-header">
-    <div class="brand-section">
-      <a href="#" class="brand-logo" onclick="App.switchSurface('employee'); return false;">
-        <span class="brand-badge">RESETA™</span>
-        <span class="brand-title">Enterprise</span>
-      </a>
-      <span class="brand-tagline">From workplace stress to workplace recovery</span>
+    <!-- Primary Top Bar: Brand, Direct Modular Page Navigation & Global Actions -->
+    <div class="top-primary-bar">
+      <div class="brand-section">
+        <a href="/" class="brand-logo" onclick="App.switchSurface('employee'); return false;">
+          <span class="brand-badge">RESETA™</span>
+          <span class="brand-title">Enterprise</span>
+        </a>
+        <span class="brand-tagline">by Qsura India Pvt. Ltd.</span>
+      </div>
+
+      <!-- Enterprise Direct Modular Links -->
+      <nav class="enterprise-nav-links">
+        <a href="/" class="nav-link active">Home</a>
+        <a href="/about" class="nav-link">About</a>
+        <a href="/security" class="nav-link">Security & DPDP</a>
+        <a href="/pricing" class="nav-link">Pricing</a>
+        <a href="/faq" class="nav-link">FAQ</a>
+        <a href="/contact" class="nav-link">Contact</a>
+      </nav>
+
+      <!-- Utility & Access Controls -->
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="btn-small-pill" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700;" onclick="App.run10SecondDemo()">
+          ⚡ 10-Sec Demo
+        </button>
+
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="App.toggleTheme()">
+          🌙 Dark
+        </button>
+
+        <button id="soundToggleBtn" class="theme-toggle-btn" style="cursor: pointer;" onclick="App.toggleSound()" title="Toggle audio chimes and continuous acoustic sound">
+          🔊 Sound: ON
+        </button>
+
+        <!-- State 1: Logged Out Controls -->
+        <div id="loggedOutControls" style="display: flex; align-items: center; gap: 8px;">
+          <button class="btn-small-pill" onclick="App.openLoginModal('company')" style="font-size: 11px; padding: 6px 12px; font-weight: 700; border-color: var(--recovery-teal); color: var(--recovery-teal);" title="Register a new company workspace">
+            🏢 Onboard Company
+          </button>
+          <button id="openLoginModalBtn" class="btn-primary" onclick="App.openLoginModal('signin')" style="font-size: 12px; padding: 6px 14px; font-weight: 600; background: var(--brand-reset);">
+            🔑 Enterprise Sign-In
+          </button>
+        </div>
+
+        <!-- State 2: Authenticated Session Controls (Unlocked post-login) -->
+        <div id="loggedInControls" style="display: none; align-items: center; gap: 10px;">
+          <span id="jwtAuthBadge" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(16, 185, 129, 0.25);" title="Click to view RFC 7519 JWT Cryptographic Details" onclick="App.showJwtDetails()">
+            <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981;"></span>
+            JWT Active
+          </span>
+
+          <div id="userProfileChip" style="display: flex; align-items: center; gap: 8px; padding: 3px 10px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px;">
+            <img id="userAvatarImg" src="" alt="Avatar" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
+            <span id="userDisplayName" style="font-size: 12px; font-weight: 700; color: var(--text-main);"></span>
+            <span id="userRoleBadge" class="brand-badge" style="font-size: 10px; padding: 2px 7px;"></span>
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <label for="personaSelect" style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Switch Role:</label>
+            <select id="personaSelect" class="persona-select" style="font-size: 11px; padding: 4px 8px;">
+              <!-- Populated by App.loadPersonas() -->
+            </select>
+          </div>
+
+          <button class="btn-small-pill" onclick="App.logout()" style="font-size: 11px; padding: 4px 10px; color: var(--text-muted); border-color: var(--border-light);" title="Sign out of enterprise session">
+            Sign Out
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Surface Navigation Switcher (7 Core Surfaces) -->
-    <nav class="surface-nav">
-      <button class="surface-tab active" data-surface="employee">🌿 Employee</button>
-      <button class="surface-tab" data-surface="teams-slack">💬 Workplace Chat</button>
-      <button class="surface-tab" data-surface="manager">👥 Manager Coach</button>
-      <button class="surface-tab" data-surface="hr">📊 HR Wellbeing</button>
-      <button class="surface-tab" data-surface="admin">⚙️ Admin Console</button>
-      <button class="surface-tab" data-surface="care">🩺 Care Console</button>
-      <button class="surface-tab" data-surface="trust">🛡️ Trust & DPDP</button>
-    </nav>
+    <!-- Secondary Sub Bar: 7 Interactive Role Surfaces & Enterprise Health Signals -->
+    <div class="surface-sub-bar">
+      <!-- Surface Navigation Switcher (7 Core Surfaces) -->
+      <nav class="surface-nav">
+        <button class="surface-tab active" data-surface="employee">🌿 Employee</button>
+        <button class="surface-tab" data-surface="teams-slack">💬 Workplace Chat</button>
+        <button class="surface-tab" data-surface="manager">👥 Manager Coach</button>
+        <button class="surface-tab" data-surface="hr">📊 HR Wellbeing</button>
+        <button class="surface-tab" data-surface="admin">⚙️ Admin Console</button>
+        <button class="surface-tab" data-surface="care">🩺 Care Console</button>
+        <button class="surface-tab" data-surface="trust">🛡️ Trust & DPDP</button>
+      </nav>
 
-    <!-- Persona & Role Switcher -->
-    <!-- Persona & Role Switcher + Utilities -->
-    <div class="user-tenant-bar" style="gap: 10px; flex-wrap: wrap;">
-      <!-- Live Enterprise SLA Indicator -->
-      <div class="topbar-status-pill" onclick="App.openSystemStatusModal()" title="Click to view 99.99% SLA Health & API Latency">
-        <span class="pulse-dot"></span>
-        <span>99.99% SLA · Operational</span>
-      </div>
-
-      <!-- Data Sovereignty Residency Tag -->
-      <span class="tenant-badge" style="font-size: 11px; font-weight: 700;" title="Data stored strictly in India (AWS ap-south-1 Mumbai)">
-        📍 IN-MUM-01
-      </span>
-
-      <!-- 24/7 Crisis Support Trigger -->
-      <button class="topbar-crisis-btn" onclick="App.openCrisisModal()" title="Instant 24/7 Tele-MANAS & Crisis Support">
-        🆘 24/7 Helpline
-      </button>
-
-      <!-- Quick Command Jump (⌘K) -->
-      <button class="command-search-trigger" onclick="App.openCommandPalette()" title="Press ⌘K or Ctrl+K to quick jump">
-        🔍 <span style="font-size: 11px;">Search</span> <kbd class="cmd-kbd">⌘K</kbd>
-      </button>
-
-      <!-- Notification Bell -->
-      <div style="position: relative;">
-        <button class="notification-bell-btn" onclick="App.toggleNotifications()" title="Enterprise Announcements">
-          🔔
-          <span class="bell-badge">2</span>
-        </button>
-        <div id="notificationPopover" class="notification-popover">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
-            <strong style="font-size: 13px;">Announcements</strong>
-            <span style="font-size: 11px; color: var(--text-muted);">2 New</span>
-          </div>
-          <div style="padding: 6px 0; border-bottom: 1px solid var(--border-light);">
-            <div style="font-size: 12px; font-weight: 700; color: var(--recovery-teal);">🛡️ Focus Shield Window</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Company-wide focus block from 1:30 PM to 3:30 PM today. Non-urgent syncs muted.</div>
-          </div>
-          <div style="padding: 6px 0;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--brand-reset);">📈 Team Recovery Lab Q1</div>
-            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Engineering recovery scores improved by +2.2 points in the 'Meeting-Free Wednesday' trial.</div>
-          </div>
+      <!-- Persona & Operational Signals -->
+      <div class="user-tenant-bar" style="gap: 10px; flex-wrap: nowrap;">
+        <!-- Live Enterprise SLA Indicator -->
+        <div class="topbar-status-pill" onclick="App.openSystemStatusModal()" title="Click to view 99.99% SLA Health & API Latency">
+          <span class="pulse-dot"></span>
+          <span>99.99% SLA · Operational</span>
         </div>
-      </div>
 
-      <button class="btn-small-pill" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700;" onclick="App.run10SecondDemo()">
-        ⚡ 10-Sec Demo
-      </button>
-
-      <button id="themeToggleBtn" class="theme-toggle-btn" onclick="App.toggleTheme()">
-        🌙 Dark
-      </button>
-
-      <button id="soundToggleBtn" class="theme-toggle-btn" style="cursor: pointer;" onclick="App.toggleSound()" title="Toggle audio chimes and Tibetan singing bowl sound">
-        🔊 Sound: ON
-      </button>
-
-      <div class="tenant-badge">
-        <span class="tenant-dot"></span>
-        <span id="tenantOrgDisplay">TechNova India (850 Seats)</span>
-      </div>
-      <!-- State 1: Logged Out Controls -->
-      <div id="loggedOutControls" style="display: flex; align-items: center; gap: 8px;">
-        <button class="btn-small-pill" onclick="App.openLoginModal('company')" style="font-size: 11px; padding: 6px 12px; font-weight: 700; border-color: var(--recovery-teal); color: var(--recovery-teal);" title="Register a new company workspace">
-          🏢 Onboard Company
-        </button>
-        <button id="openLoginModalBtn" class="btn-primary" onclick="App.openLoginModal('signin')" style="font-size: 12px; padding: 6px 14px; font-weight: 600; background: var(--brand-reset);">
-          🔑 Enterprise Sign-In
-        </button>
-      </div>
-
-      <!-- State 2: Authenticated Session Controls (Unlocked post-login) -->
-      <div id="loggedInControls" style="display: none; align-items: center; gap: 10px;">
-        <span id="jwtAuthBadge" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(16, 185, 129, 0.25);" title="Click to view RFC 7519 JWT Cryptographic Details" onclick="App.showJwtDetails()">
-          <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981;"></span>
-          JWT Active
+        <!-- Data Sovereignty Residency Tag -->
+        <span class="tenant-badge" style="font-size: 11px; font-weight: 700;" title="Data stored strictly in India (AWS ap-south-1 Mumbai)">
+          📍 IN-MUM-01
         </span>
 
-        <div id="userProfileChip" style="display: flex; align-items: center; gap: 8px; padding: 3px 10px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px;">
-          <img id="userAvatarImg" src="" alt="Avatar" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
-          <span id="userDisplayName" style="font-size: 12px; font-weight: 700; color: var(--text-main);"></span>
-          <span id="userRoleBadge" class="brand-badge" style="font-size: 10px; padding: 2px 7px;"></span>
-        </div>
-
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <label for="personaSelect" style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Switch Role:</label>
-          <select id="personaSelect" class="persona-select" style="font-size: 11px; padding: 4px 8px;">
-            <!-- Populated by App.loadPersonas() -->
-          </select>
-        </div>
-
-        <button class="btn-small-pill" onclick="App.logout()" style="font-size: 11px; padding: 4px 10px; color: var(--text-muted); border-color: var(--border-light);" title="Sign out of enterprise session">
-          Sign Out
+        <!-- 24/7 Crisis Support Trigger -->
+        <button class="topbar-crisis-btn" onclick="App.openCrisisModal()" title="Instant 24/7 Tele-MANAS & Crisis Support">
+          🆘 24/7 Helpline
         </button>
+
+        <!-- Quick Command Jump (⌘K) -->
+        <button class="command-search-trigger" onclick="App.openCommandPalette()" title="Press ⌘K or Ctrl+K to quick jump">
+          🔍 <span style="font-size: 11px;">Search</span> <kbd class="cmd-kbd">⌘K</kbd>
+        </button>
+
+        <!-- Notification Bell -->
+        <div style="position: relative;">
+          <button class="notification-bell-btn" onclick="App.toggleNotifications()" title="Enterprise Announcements">
+            🔔
+            <span class="bell-badge">2</span>
+          </button>
+          <div id="notificationPopover" class="notification-popover">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+              <strong style="font-size: 13px;">Announcements</strong>
+              <span style="font-size: 11px; color: var(--text-muted);">2 New</span>
+            </div>
+            <div style="padding: 6px 0; border-bottom: 1px solid var(--border-light);">
+              <div style="font-size: 12px; font-weight: 700; color: var(--recovery-teal);">🛡️ Focus Shield Window</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Company-wide focus block from 1:30 PM to 3:30 PM today. Non-urgent syncs muted.</div>
+            </div>
+            <div style="padding: 6px 0;">
+              <div style="font-size: 12px; font-weight: 700; color: var(--brand-reset);">📈 Team Recovery Lab Q1</div>
+              <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Engineering recovery scores improved by +2.2 points in the 'Meeting-Free Wednesday' trial.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tenant-badge">
+          <span class="tenant-dot"></span>
+          <span id="tenantOrgDisplay">TechNova India (850 Seats)</span>
+        </div>
       </div>
     </div>
   </header>
@@ -774,7 +793,7 @@
        ENTERPRISE GLOBAL FOOTER (Trust, Compliance & Safety)
        ========================================================== -->
   <footer class="enterprise-footer">
-    <div class="footer-main-grid">
+    <div class="footer-main-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
       <!-- Col 1: Platform & Tenant Profile -->
       <div>
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
@@ -782,7 +801,7 @@
           <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">RESETA™ <span style="font-weight: 400; font-size: 14px; color: var(--text-muted);">ENTERPRISE</span></span>
         </div>
         <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-          From workplace stress to workplace recovery. An AI-powered mental recovery system for the workplace—without employee surveillance.
+          From workplace stress to workplace recovery. An AI-powered mental recovery system for the enterprise—without employee surveillance.
         </p>
         <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px;">
           <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🏢 Enterprise Licensed Tenant</div>
@@ -790,28 +809,42 @@
           <div style="color: var(--text-muted); margin-top: 4px;">📍 Primary Data Sovereignty: AWS ap-south-1 (Mumbai, India)</div>
         </div>
         <div style="font-size: 11px; color: var(--text-muted); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-light); line-height: 1.5;">
-          <span>Engineering & Intellectual Property: <strong>Qsura India Pvt. Ltd.</strong> · Made in India 🇮🇳</span>
+          <span>Architected & Engineered by: <strong>Qsura India Pvt. Ltd.</strong> · Made in India 🇮🇳</span>
         </div>
       </div>
 
-      <!-- Col 2: Legal, Governance & Compliance -->
+      <!-- Col 2: Platform & Solutions -->
       <div>
-        <div class="footer-col-title">Governance & Compliance</div>
+        <div class="footer-col-title">Platform & Solutions</div>
         <ul class="footer-link-list">
-          <li><button onclick="App.openCharterModal()">🔒 Anti-Surveillance & Non-Diagnostic Charter</button></li>
-          <li><button onclick="App.switchSurface('trust')">🇮🇳 India DPDP Act 2025 Statement</button></li>
-          <li><button onclick="App.openSystemStatusModal()">⚡ Live System Status & 99.99% SLA</button></li>
-          <li><button onclick="App.openSecurityWhitepaperModal()">🛡️ Security Whitepaper & SOC 2 Controls</button></li>
-          <li><button onclick="App.exportDpdpArchive()">📥 Export Personal Data Subject Archive (JSON)</button></li>
-          <li><button onclick="App.switchSurface('admin')">⚙️ Enterprise Admin & RBAC Settings</button></li>
+          <li><a href="/">Live Workplace Dashboard</a></li>
+          <li><a href="/about">About RESETA™ & Mission</a></li>
+          <li><a href="/pricing">Enterprise Pricing & ROI</a></li>
+          <li><a href="/faq">Frequently Asked Questions</a></li>
+          <li><a href="/contact">Book an Enterprise Demo</a></li>
+          <li><a href="#" onclick="App.run10SecondDemo(); return false;">⚡ Run 10-Second Simulation</a></li>
         </ul>
       </div>
 
-      <!-- Col 3: 24/7 Immediate Crisis Care Anchors -->
+      <!-- Col 3: Trust, Security & Legal -->
+      <div>
+        <div class="footer-col-title">Security & Legal</div>
+        <ul class="footer-link-list">
+          <li><a href="/security">Security Architecture & SOC 2</a></li>
+          <li><a href="/security#dpdp">India DPDP Act 2023 Compliance</a></li>
+          <li><a href="/privacy">Privacy Policy (Full Statutory)</a></li>
+          <li><a href="/terms">Terms of Service (Enterprise MSA)</a></li>
+          <li><button onclick="App.openCharterModal()">🔒 Anti-Surveillance Charter</button></li>
+          <li><button onclick="App.exportDpdpArchive()">📥 Export Personal Data Archive (JSON)</button></li>
+          <li><button onclick="App.openSystemStatusModal()">⚡ Live System Status & 99.99% SLA</button></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: 24/7 Immediate Crisis Care Anchors -->
       <div>
         <div class="footer-col-title">Certified Human Care & Crisis</div>
         <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
-          RESETA is a stress recovery platform, not a medical or crisis clinic. If an employee experiences acute distress:
+          RESETA is a stress recovery platform, not a medical clinic. If an employee experiences acute distress:
         </p>
         <div class="footer-crisis-box">
           <div style="font-size: 11px; font-weight: 700; color: var(--brand-reset); text-transform: uppercase;">Govt. of India Tele-MANAS (24/7 Toll-Free)</div>
@@ -829,7 +862,7 @@
     <!-- Compliance Badges Strip -->
     <div class="footer-cert-strip">
       <div class="cert-badge-group">
-        <span class="cert-pill">🛡️ India DPDP 2025 Aligned</span>
+        <span class="cert-pill">🛡️ India DPDP 2023 Aligned</span>
         <span class="cert-pill">🔒 SOC 2 Type II Certified</span>
         <span class="cert-pill">🌐 ISO/IEC 27001:2022</span>
         <span class="cert-pill">🔐 TLS 1.3 / AES-256</span>
@@ -868,9 +901,10 @@
         RESETA™, RELIEFLOOP™, Do It With Me™, and Mental Load Unload™ are proprietary technologies architected & developed by <strong>Qsura India Pvt. Ltd.</strong>
       </div>
       <div style="display: flex; gap: 16px;">
-        <button onclick="App.openCharterModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">Privacy Policy</button>
-        <button onclick="App.openSecurityWhitepaperModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">Security & Trust</button>
-        <button onclick="App.openSystemStatusModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">System SLA</button>
+        <a href="/privacy" style="color: var(--text-muted); text-decoration: none;">Privacy Policy</a>
+        <a href="/terms" style="color: var(--text-muted); text-decoration: none;">Terms of Service</a>
+        <a href="/security" style="color: var(--text-muted); text-decoration: none;">Security & DPDP</a>
+        <a href="/contact" style="color: var(--text-muted); text-decoration: none;">Contact</a>
       </div>
     </div>
   </footer>

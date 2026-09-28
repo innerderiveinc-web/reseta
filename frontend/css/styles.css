@@ -60,19 +60,81 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* App Header */
+/* App Header & Topbars */
 .app-header {
   position: sticky;
   top: 0;
   z-index: 50;
   background-color: var(--bg-surface);
   border-bottom: 1px solid var(--border-light);
-  padding: 12px 24px;
+  padding: 10px 24px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.top-primary-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  backdrop-filter: blur(8px);
+  width: 100%;
+  gap: 16px;
 }
+
+.surface-sub-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding-top: 6px;
+  border-top: 1px solid var(--border-light);
+  gap: 12px;
+  overflow-x: auto;
+}
+
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-light);
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.enterprise-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s ease;
+}
+
+.nav-link:hover {
+  color: var(--brand-reset);
+  background: var(--bg-subtle);
+}
+
+.nav-link.active {
+  color: var(--brand-reset);
+  background: rgba(225, 29, 72, 0.08);
+  font-weight: 700;
+}
+
 
 .brand-section {
   display: flex;
@@ -1285,6 +1347,105 @@ body {
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* Standardized App Footer */
+.app-footer {
+  background: var(--bg-surface);
+  border-top: 1px solid var(--border-light);
+  margin-top: 60px;
+  padding: 56px 32px 36px;
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  gap: 40px;
+  margin-bottom: 40px;
+}
+
+@media (max-width: 868px) {
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
+
+.footer-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.footer-heading {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footer-links li a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13px;
+  transition: color 0.15s ease;
+}
+
+.footer-links li a:hover {
+  color: var(--brand-reset);
+}
+
+.footer-bottom-strip {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-light);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.footer-bottom-strip a {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.footer-bottom-strip a:hover {
+  color: var(--brand-reset);
+}
+
+.privacy-banner-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--recovery-teal);
+  border: 1px solid rgba(13, 148, 136, 0.25);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  margin-bottom: 12px;
+}
+
 
 /* ========================================================
    ENTERPRISE TOPBAR UTILITIES

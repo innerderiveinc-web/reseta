@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enterprise Pricing & ROI · RESETA™ by Qsura India</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/styles.css">
+  <style>
+    .page-hero {
+      padding: 60px 24px 30px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .page-hero h1 {
+      font-size: 40px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, var(--text-main) 60%, var(--brand-reset));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+      gap: 24px;
+      max-width: 1080px;
+      margin: 40px auto 60px;
+      padding: 0 24px;
+    }
+    .pricing-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-lg);
+      padding: 36px 30px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    .pricing-card.featured {
+      border: 2px solid var(--brand-reset);
+      box-shadow: 0 10px 30px rgba(79, 70, 229, 0.12);
+    }
+    .pricing-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--brand-reset);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 14px;
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .pricing-tier-name {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .pricing-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .pricing-cost {
+      font-size: 42px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+    .pricing-cost span {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .pricing-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+    .pricing-features {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 32px 0;
+      flex-grow: 1;
+    }
+    .pricing-features li {
+      font-size: 13px;
+      color: var(--text-main);
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pricing-features li::before {
+      content: "✓";
+      color: var(--recovery-teal);
+      font-weight: 800;
+    }
+    .roi-section {
+      max-width: 1040px;
+      margin: 0 auto 60px;
+      padding: 0 24px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Standard Enterprise Header -->
+  <header class="app-topbar">
+    <div class="brand-section">
+      <a href="/" class="brand-logo">
+        <span class="brand-badge">RESETA™</span>
+        <span class="brand-title">Enterprise</span>
+      </a>
+      <span class="brand-tagline">by Qsura India Pvt. Ltd.</span>
+    </div>
+
+    <!-- Main Navigation Links -->
+    <nav class="enterprise-nav-links">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/about" class="nav-link">About</a>
+      <a href="/security" class="nav-link">Security & DPDP</a>
+      <a href="/pricing" class="nav-link active">Pricing</a>
+      <a href="/faq" class="nav-link">FAQ</a>
+      <a href="/contact" class="nav-link">Contact</a>
+    </nav>
+
+    <div class="user-tenant-bar" style="gap: 10px;">
+      <a href="/" class="btn-primary" style="font-size: 12px; padding: 7px 16px; text-decoration: none;">Launch Dashboard →</a>
+    </div>
+  </header>
+
+  <!-- Page Hero -->
+  <section class="page-hero">
+    <span class="privacy-banner-pill">💼 Transparent Enterprise B2B SaaS</span>
+    <h1>Predictable Seat-Based Pricing with Measurable ROI</h1>
+    <p>
+      Deploy India's leading workplace mental recovery platform. No hidden setup fees, compliant with Indian GST, and backed by a 30-day risk-free pilot.
+    </p>
+  </section>
+
+  <!-- Pricing Cards Grid -->
+  <section class="pricing-grid">
+    <!-- Tier 1: Starter -->
+    <div class="pricing-card">
+      <div class="pricing-tier-name">Starter Squad</div>
+      <div class="pricing-desc">For fast-growing startups and mid-sized tech teams needing instant burnout reduction.</div>
+      <div class="pricing-cost">₹199 <span>/ seat / month</span></div>
+      <div class="pricing-sub">Billed annually · Up to 150 employees</div>
+      <ul class="pricing-features">
+        <li>Unlimited 2, 5 & 10 Min Reset Sessions</li>
+        <li>Continuous 432Hz Soundscape Engine</li>
+        <li>Spoken Voice Coach Narration</li>
+        <li>Personal Mind Mirror™ & Relief Map</li>
+        <li>Slack & Microsoft Teams /reset integration</li>
+        <li>Aggregated Department Burnout Dashboard</li>
+        <li>Zero-Surveillance k ≥ 5 Privacy Enforcement</li>
+        <li>Standard Email Support (24h SLA)</li>
+      </ul>
+      <a href="/contact?plan=starter" class="btn-primary" style="text-align: center; text-decoration: none; padding: 12px;">Get Started with Starter</a>
+    </div>
+
+    <!-- Tier 2: Growth (Featured) -->
+    <div class="pricing-card featured">
+      <div class="pricing-badge">Most Popular for Enterprises</div>
+      <div class="pricing-tier-name" style="color: var(--brand-reset);">Enterprise Growth</div>
+      <div class="pricing-desc">For companies serious about systematic workload recovery, manager enablement, and retention.</div>
+      <div class="pricing-cost">₹299 <span>/ seat / month</span></div>
+      <div class="pricing-sub">Billed annually · 150 to 1,000 employees</div>
+      <ul class="pricing-features">
+        <li><strong>Everything in Starter, plus:</strong></li>
+        <li>5-Minute Manager Coach (Scenario Playbooks)</li>
+        <li>Team Recovery Lab™ (A/B Intervention Experiments)</li>
+        <li>HR Autopilot & Company Focus Shielding</li>
+        <li>Darwinbox, Zoho People & Workday HRIS Connectors</li>
+        <li>SCIM 2.0 Directory Sync (Entra ID, Okta)</li>
+        <li>Custom Solfeggio Sound Presets & Language Packs</li>
+        <li>Quarterly Clinical Wellbeing Audit Report</li>
+        <li>Dedicated Enterprise Customer Success Manager</li>
+      </ul>
+      <a href="/contact?plan=growth" class="btn-primary" style="text-align: center; text-decoration: none; padding: 14px; background: var(--brand-reset);">Start 30-Day Enterprise Pilot →</a>
+    </div>
+
+    <!-- Tier 3: Custom Enterprise Scale -->
+    <div class="pricing-card">
+      <div class="pricing-tier-name">Custom Enterprise</div>
+      <div class="pricing-desc">For large multi-national enterprises with stringent custom compliance and hybrid tenancy requirements.</div>
+      <div class="pricing-cost">Custom <span>volume tiered</span></div>
+      <div class="pricing-sub">Custom invoicing · 1,000+ employees</div>
+      <ul class="pricing-features">
+        <li><strong>Everything in Growth, plus:</strong></li>
+        <li>Dedicated Tenant Isolation or On-Premise VPC</li>
+        <li>Custom Master Services Agreement (MSA)</li>
+        <li>SLA Guarantee: 99.99% Uptime with Financial Backing</li>
+        <li>Custom AI Safety Firewall & Internal Policy Tuning</li>
+        <li>Direct Integration with Company EAP Clinicians</li>
+        <li>Enterprise Red-Team Security Certification Runs</li>
+        <li>Quarterly Board-Level Workforce Sustainability Decks</li>
+        <li>24/7 Priority Phone & Dedicated Slack Bridge</li>
+      </ul>
+      <a href="/contact?plan=enterprise" class="btn-primary" style="text-align: center; text-decoration: none; padding: 12px; background: var(--text-main); color: var(--bg-surface);">Contact Enterprise Sales</a>
+    </div>
+  </section>
+
+  <!-- ROI Calculator Section -->
+  <section class="roi-section">
+    <div class="content-card">
+      <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">The Real Cost of Burnout vs. The Math of RESETA™</h2>
+      <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px;">
+        Workplace stress is India's costliest hidden line item. Here is how an average 500-person tech organization calculates the return on investment:
+      </p>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
+        <div style="background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Unplanned Sick Leave Reduction</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--recovery-teal); margin-top: 4px;">-22%</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Saved engineering days per quarter</div>
+        </div>
+        <div style="background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Voluntary Attrition Prevention</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--brand-reset); margin-top: 4px;">-3.4%</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Saved re-hiring & replacement costs</div>
+        </div>
+        <div style="background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Annual Savings Per Employee</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--recovery-emerald); margin-top: 4px;">₹14,200</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Against an annual cost of ₹3,588</div>
+        </div>
+        <div style="background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--text-muted);">Measured Return on Investment</div>
+          <div style="font-size: 32px; font-weight: 800; color: var(--text-main); margin-top: 4px;">3.9x</div>
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Net ROI generated in Year 1</div>
+        </div>
+      </div>
+
+      <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-sm); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+        <span style="font-size: 14px; font-weight: 600; color: #059669;">
+          🚀 Ready to test RESETA in your engineering or product department?
+        </span>
+        <a href="/contact" class="btn-primary" style="font-size: 13px; padding: 8px 18px; text-decoration: none; background: #059669;">Book a 30-Day Pilot Demo →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Standard Enterprise Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="brand-section" style="margin-bottom: 12px;">
+            <span class="brand-badge">RESETA™</span>
+            <span class="brand-title">Enterprise</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            The proactive, privacy-first workplace stress recovery platform. Architected & operated by <strong>Qsura India Pvt. Ltd.</strong>
+          </p>
+          <div style="font-size: 12px; color: var(--recovery-teal); font-weight: 600;">
+            🔒 Zero-Surveillance Workplace Guarantee
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Platform</h4>
+          <ul class="footer-links">
+            <li><a href="/">Live Dashboard</a></li>
+            <li><a href="/about">About RESETA</a></li>
+            <li><a href="/pricing">Enterprise Pricing</a></li>
+            <li><a href="/faq">Frequently Asked Questions</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Security & Trust</h4>
+          <ul class="footer-links">
+            <li><a href="/security">Security Architecture</a></li>
+            <li><a href="/security#dpdp">DPDP Act Compliance</a></li>
+            <li><a href="/security#soc2">SOC 2 & ISO 27001</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+            <li><a href="/terms">Terms of Service</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 class="footer-heading">Company & Care</h4>
+          <ul class="footer-links">
+            <li><a href="/contact">Contact Sales</a></li>
+            <li><a href="mailto:sales@reseta.in">sales@reseta.in</a></li>
+            <li><a href="tel:14416">Tele-MANAS (24/7 Helpline: 14416)</a></li>
+            <li><span style="font-size: 12px; color: var(--text-muted);">Bengaluru · New Delhi</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom-strip">
+        <div>
+          © 2026 RESETA™. Architected, Engineered & Operated by <strong>Qsura India Pvt. Ltd.</strong> All rights reserved.
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <a href="/privacy">Privacy Policy</a>
+          <a href="/terms">Terms of Service</a>
+          <a href="/security">Data Sovereignty</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

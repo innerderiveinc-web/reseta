@@ -179,5 +179,21 @@ def test_governance_red_team_and_checklist():
     assert len(chk["items"]) == 7
     assert all(item["status"] == "CERTIFIED" for item in chk["items"])
 
+def test_modular_enterprise_pages():
+    routes = {
+        "/about": "Qsura India Pvt. Ltd.",
+        "/security": "Zero-Surveillance",
+        "/pricing": "Predictable Seat-Based Pricing",
+        "/faq": "Frequently Asked Questions",
+        "/contact": "Book an Enterprise Demo",
+        "/privacy": "Digital Personal Data Protection Act",
+        "/terms": "Master Services Agreement"
+    }
+    for route, expected_text in routes.items():
+        resp = client.get(route)
+        assert resp.status_code == 200, f"Route {route} failed with status {resp.status_code}"
+        assert expected_text in resp.text, f"Expected '{expected_text}' not found in {route}"
+
+
 
 

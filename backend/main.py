@@ -69,3 +69,32 @@ if os.path.exists(frontend_path):
     @app.get("/")
     def serve_index():
         return FileResponse(os.path.join(frontend_path, "index.html"))
+
+    @app.get("/about")
+    def serve_about():
+        return FileResponse(os.path.join(frontend_path, "about.html"))
+
+    @app.get("/security")
+    def serve_security():
+        return FileResponse(os.path.join(frontend_path, "security.html"))
+
+    @app.get("/pricing")
+    def serve_pricing():
+        return FileResponse(os.path.join(frontend_path, "pricing.html"))
+
+    @app.get("/faq")
+    def serve_faq():
+        return FileResponse(os.path.join(frontend_path, "faq.html"))
+
+    @app.get("/contact")
+    def serve_contact():
+        return FileResponse(os.path.join(frontend_path, "contact.html"))
+
+    @app.get("/privacy")
+    def serve_privacy():
+        return FileResponse(os.path.join(frontend_path, "privacy.html"))
+
+    @app.get("/terms")
+    def serve_terms():
+        return FileResponse(os.path.join(frontend_path, "terms.html"))
+
