@@ -50,31 +50,33 @@ class AIGateway:
 
         if is_hinglish_or_hindi or preferred_language == "Hinglish":
             fallback_reflection = (
-                "Main sun raha hoon. Jab ek ke baad ek cheezein aati hain, to dimaag overwhelmed feel hona natural hai. "
-                "Aapko sab kuch abhi isi pal solve nahi karna hai. Chaliye pehle 5 minute ka reset karte hain aur isko clear karte hain."
+                "Main bilkul samajh raha hoon. Jab ek ke baad ek deliverables aate hain, to dimaag exhaust ho jana bilkul natural hai. "
+                "Aapko abhi sab kuch akele fix nahi karna hai. Chaliye 5 minute ka pause lete hain aur saath milkar thoda headspace banate hain."
             )
-            action_prompt = "Chaliye 2 minute mein sabse pehle aapka mental load unload karte hain."
+            action_prompt = "Chaliye 2 minute mein sabse pehle aapka mental load unload karte hain, ek-ek karke."
             lang_instruction = "Respond in warm, natural Hinglish (conversational Hindi-English blend)."
         elif preferred_language == "Hindi":
             fallback_reflection = (
-                "मैं आपकी बात समझ रहा हूँ। जब काम का दबाव बढ़ता है, तो मन पर बोझ महसूस होना स्वाभाविक है। "
-                "आपको सब कुछ अभी एक साथ हल करने की आवश्यकता नहीं है। आइए 5 मिनट का विराम लें।"
+                "मैं आपकी बात पूरी तरह समझ रहा हूँ। जब काम का दबाव एक साथ बढ़ता है, तो थकान महसूस होना स्वाभाविक है। "
+                "आपको सब कुछ अभी एक साथ हल करने की ज़रूरत नहीं है। आइए 5 मिनट का शांत विराम लेते हैं।"
             )
-            action_prompt = "आइए पहले अपने दिमाग से इस तनाव को खाली करें।"
+            action_prompt = "आइए पहले अपने दिमाग से इस भारीपन को हल्का करें।"
             lang_instruction = "Respond in supportive, calm Hindi."
         else:
             fallback_reflection = (
-                "I hear you. When multiple priorities demand your attention at once, feeling overloaded is a completely natural reaction. "
-                "You do not need to resolve everything this very minute. Let's take 5 minutes together to clear the noise."
+                "I hear you completely. When multiple urgent demands stack up, feeling overloaded is an entirely natural human response. "
+                "You don't have to carry or solve everything this very minute. Let's take 5 quiet minutes together to step back and clear the fog."
             )
-            action_prompt = "Let's unload what's occupying your headspace right now."
+            action_prompt = "Let's unload what's occupying your headspace right now, one piece at a time."
             lang_instruction = "Respond in warm, actionable calm English."
 
         system_prompt = (
-            f"You are RESETA TALK™, an active-listening workplace stress recovery assistant. {lang_instruction} "
-            "Acknowledge what the employee shared in 2 short sentences. Validate their feeling of pressure without judgment. "
-            "NEVER diagnose, NEVER mention clinical terms (depression, ADHD, anxiety disorder). "
-            "Encourage them to take a 5-minute cognitive reset."
+            f"You are RESETA TALK™, an empathetic workplace companion having a genuine, supportive 1-on-1 conversation with a colleague. {lang_instruction} "
+            "Speak with warmth, authenticity, and actionable calm—like a thoughtful, grounded human mentor. "
+            "Never use robotic AI clichés ('As an AI', 'I understand your query', 'How may I assist you today?'). "
+            "Acknowledge what they shared in 2 grounded sentences, gently validating their pressure without judgment. "
+            "CRITICAL BOUNDARIES: Absolutely NEVER diagnose or use medicalized/clinical terms (such as depression, ADHD, anxiety disorder). "
+            "Warmly invite them to take a 5-minute breather together."
         )
 
         llm_res = LLMProvider.generate_chat_response(

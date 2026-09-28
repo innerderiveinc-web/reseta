@@ -127,9 +127,9 @@ const ResetModal = {
 
     this.containerEl.innerHTML = `
       <div style="text-align: center; padding: 40px 0;">
-        <div class="breath-circle" style="margin: 0 auto 20px;">Routing...</div>
-        <h3 style="font-size: 18px; margin-bottom: 6px;">Safety Screen & Protocol Matching...</h3>
-        <p style="font-size: 13px; color: var(--text-muted);">Consulting Clinically-Reviewed Intervention Catalog</p>
+        <div class="breath-circle" style="margin: 0 auto 20px;">Breathe...</div>
+        <h3 style="font-size: 18px; margin-bottom: 6px;">Setting up your quiet space...</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Finding the right breathing and decompression flow</p>
       </div>
     `;
 

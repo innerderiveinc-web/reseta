@@ -32,14 +32,14 @@ class PersonalizationEngine:
 
         # Generate personal insight based on the delta
         if delta >= 3:
-            insight = f"Significant relief detected (down {delta} points). This protocol aligned well with your current mental state."
-            recommendation = "Saved to your Personal Relief Map™ for similar future moments."
+            insight = f"You created genuine breathing space (stress dropped by {delta} points). Taking those minutes to step back made a tangible difference."
+            recommendation = "Saved to your Personal Relief Map™ so you know this works for you next time."
         elif delta > 0:
-            insight = f"Positive shift of {delta} point(s). Even small decelerations protect cognitive bandwidth."
-            recommendation = "Hydrate and tackle your selected single next micro-action."
+            insight = f"You moved the needle by {delta} point(s). Even a quick deceleration helps clear cognitive clutter."
+            recommendation = "Take a sip of water and tackle your chosen single focus with a clearer head."
         else:
-            insight = "Stress remained steady. You may benefit from stepping away from your screen or taking a brief physical walk."
-            recommendation = "Consider a somatic grounding reset or a short 5-minute break."
+            insight = "Tension is still lingering, and that's completely okay. Some days require physical movement or quiet."
+            recommendation = "Try standing up, stretching your shoulders, or stepping outside for 5 minutes."
 
         return {
             "delta_relief": delta,

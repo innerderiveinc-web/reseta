@@ -145,9 +145,9 @@ const TalkItOut = {
 
     this.contentEl.innerHTML = `
       <div style="text-align: center; padding: 40px 0;">
-        <div class="breath-circle" style="margin: 0 auto 20px;">Reflecting...</div>
-        <h3 style="font-size: 18px;">Listening & Extracting Context...</h3>
-        <p style="font-size: 13px; color: var(--text-muted);">Enforcing clinical safety boundaries & non-diagnostic reflection</p>
+        <div class="breath-circle" style="margin: 0 auto 20px;">Listening...</div>
+        <h3 style="font-size: 18px;">Taking in what you shared...</h3>
+        <p style="font-size: 13px; color: var(--text-muted);">Creating a quiet space to decompress</p>
       </div>
     `;
 
@@ -162,11 +162,11 @@ const TalkItOut = {
         <div style="text-align: left;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <span class="brand-badge">${res.suggested_intervention_name}</span>
-            <span style="font-size: 12px; color: var(--recovery-emerald); font-weight: 700;">🟢 Safety Screen: Passed</span>
+            <span style="font-size: 12px; color: var(--recovery-emerald); font-weight: 700;">🟢 Private & Grounded</span>
           </div>
 
           <div style="background: var(--bg-subtle); border-radius: var(--radius-md); padding: 20px; margin-bottom: 20px; border-left: 4px solid var(--recovery-teal);">
-            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--recovery-teal); margin-bottom: 6px;">RESETA Reflection:</div>
+            <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--recovery-teal); margin-bottom: 6px;">Empathetic Check-in:</div>
             <p style="font-size: 15px; line-height: 1.6; color: var(--text-main);">${res.reflection}</p>
           </div>
 

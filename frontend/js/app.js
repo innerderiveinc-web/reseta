@@ -1184,7 +1184,7 @@ const App = {
       else if (this.currentUser.role === "CLINICIAN") this.switchSurface("care");
 
       this.refreshActiveSurface();
-      alert(`Authenticated successfully as ${this.currentUser.full_name} (${this.currentUser.role}). Cryptographic JWT Bearer token issued.`);
+      this.showToast(`🟢 Signed in as ${this.currentUser.full_name} (${this.currentUser.role.replace('_', ' ')}) · Token Active`);
     } catch (err) {
       alert("Sign-in failed: " + err.message);
     }
