@@ -98,6 +98,26 @@
         </div>
       </div>
 
+      <!-- Autopilot Contextual Signal Card (Section 15) -->
+      <div id="autopilotCard" class="content-card" style="margin-bottom: 24px; border-left: 4px solid var(--recovery-teal);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span class="brand-badge" style="background: var(--recovery-teal);">RESETA AUTOPILOT™</span>
+          <span style="font-size: 11px; color: var(--text-muted);">Permissioned Contextual Prompt · Local Only</span>
+        </div>
+        <h3 id="autopilotHeadline" style="font-size: 17px; font-weight: 700; margin-bottom: 4px;">Long day? Take 5?</h3>
+        <p id="autopilotSubtext" style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+          You've had multiple consecutive syncs today. Take 2-5 minutes to clear cognitive backlog before your next task.
+        </p>
+        <div style="display: flex; gap: 10px;">
+          <button id="autopilotActionBtn" class="btn-primary" style="background: var(--brand-reset); padding: 8px 18px; font-size: 13px;" onclick="ResetModal.open('overloaded')">
+            Start 5-Min Reset 🔴
+          </button>
+          <button class="btn-secondary" style="padding: 8px 14px; font-size: 12px;" onclick="document.getElementById('autopilotCard').style.display='none'">
+            Dismiss
+          </button>
+        </div>
+      </div>
+
       <!-- Employee Lower Dashboard Grid -->
       <div class="employee-grid">
         <!-- Left: Mind Mirror™ & Personal History -->
@@ -355,7 +375,7 @@
               <h3 class="card-title">🧪 Team Recovery Lab™</h3>
               <p style="font-size: 12px; color: var(--text-muted);">Controlled workplace recovery experiments</p>
             </div>
-            <button class="btn-small-pill" onclick="alert('Create Experiment: Define duration, target department, and workplace intervention.')">+ New Experiment</button>
+            <button class="btn-small-pill" onclick="App.openExperimentModal()">+ New Experiment</button>
           </div>
           <div id="teamRecoveryLabList">
             <!-- Populated dynamically -->
@@ -369,7 +389,7 @@
               <h3 class="card-title">📢 HR Wellbeing Campaigns</h3>
               <p style="font-size: 12px; color: var(--text-muted);">In-flow nudges across Slack, Teams & Email</p>
             </div>
-            <button class="btn-small-pill" onclick="alert('Launch Campaign: Choose audience, theme, and frequency cap.')">+ Launch</button>
+            <button class="btn-small-pill" onclick="App.openCampaignModal()">+ Launch</button>
           </div>
           <div id="hrCampaignsList">
             <!-- Populated dynamically -->
@@ -544,9 +564,21 @@
 
         <div style="border-top: 1px solid var(--border-light); padding-top: 20px;">
           <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 10px;">🇮🇳 Digital Personal Data Protection (DPDP) Act, 2025 Compliance</h4>
-          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+          <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
             Architected specifically for India's DPDP Rules 2025 and CERT-In security guidance: Clear purpose-specific notice, explicit consent toggles, automated consent withdrawal, data deletion workflows, and immutable privileged audit logging.
           </p>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+            <button class="btn-primary" style="background: var(--recovery-teal);" onclick="App.openDpdpExport()">
+              📥 Export My Personal Data Archive (JSON)
+            </button>
+            <button class="btn-secondary" onclick="App.toggleSampleConsent()">
+              🔒 Toggle Anonymized Analytics Consent
+            </button>
+            <button class="btn-small-pill" style="border-color: var(--red-crisis); color: var(--red-crisis);" onclick="App.requestDataErasure()">
+              🗑️ Erase My Personal History (Right to Erasure)
+            </button>
+          </div>
         </div>
       </div>
     </section>
@@ -582,6 +614,112 @@
       <button class="modal-close-btn" onclick="App.closePilotReport()">&times;</button>
       <div id="pilotReportContent">
         <!-- Rendered dynamically by App.openPilotReport() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 📚 Program Walkthrough Modal (Section 18, 63) -->
+  <div id="programModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(720px, 100%);">
+      <button class="modal-close-btn" onclick="App.closeProgramModal()">&times;</button>
+      <div id="programModalContent">
+        <!-- Rendered dynamically by App.openProgramModal() -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 🧪 Team Recovery Lab Experiment Creator Modal (Section 25) -->
+  <div id="experimentModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(640px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('experimentModal').classList.remove('active')">&times;</button>
+      <h2 class="modal-step-title">🧪 Create Recovery Lab Experiment</h2>
+      <p class="modal-step-subtitle">Deploy a controlled workplace experiment to test interventions on team strain.</p>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Experiment Title:</label>
+        <input type="text" id="newExpTitle" class="copilot-input" value="Protected Afternoon Deep Work Block">
+      </div>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Hypothesis:</label>
+        <textarea id="newExpHypothesis" class="reset-input-area" style="min-height: 70px;">Blocking 2 hours on Tuesday and Thursday afternoons with zero internal meetings will decrease self-reported workload strain by 25%.</textarea>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Intervention Protocol:</label>
+        <select id="newExpProtocol" class="copilot-input">
+          <option value="Protected Focus Blocks">Protected Focus Blocks (2h No-Meeting Shield)</option>
+          <option value="25/50 Min Meeting Rule">25/50 Min Meeting Rule (5-min recovery buffer)</option>
+          <option value="Async Update Fridays">Async Update Fridays</option>
+          <option value="End-of-Day Shutdown Ritual">End-of-Day Shutdown Ritual</option>
+        </select>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Target Departments:</label>
+        <div style="display: flex; gap: 12px; font-size: 13px;">
+          <label><input type="checkbox" id="expDeptEng" checked> Engineering</label>
+          <label><input type="checkbox" id="expDeptProd" checked> Product & Design</label>
+          <label><input type="checkbox" id="expDeptCS"> Customer Success</label>
+          <label><input type="checkbox" id="expDeptSales"> Sales</label>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+        <button class="btn-secondary" onclick="document.getElementById('experimentModal').classList.remove('active')">Cancel</button>
+        <button class="btn-primary" style="background: var(--recovery-teal);" onclick="App.submitNewExperiment()">Launch Experiment 🧪</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📢 HR Campaign Dispatcher Modal (Section 35) -->
+  <div id="campaignModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(600px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('campaignModal').classList.remove('active')">&times;</button>
+      <h2 class="modal-step-title">📢 Launch Wellbeing Campaign</h2>
+      <p class="modal-step-subtitle">Deploy a respectful, frequency-capped recovery campaign across workspace channels.</p>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Campaign Title:</label>
+        <input type="text" id="newCampTitle" class="copilot-input" value="5-Minute Reset Week (Sprint Recovery)">
+      </div>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Campaign Theme:</label>
+        <input type="text" id="newCampTheme" class="copilot-input" value="From Workplace Stress to Workplace Recovery">
+      </div>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Delivery Channels:</label>
+        <div style="display: flex; gap: 14px; font-size: 13px;">
+          <label><input type="checkbox" id="campChanSlack" checked> Slack</label>
+          <label><input type="checkbox" id="campChanTeams" checked> Microsoft Teams</label>
+          <label><input type="checkbox" id="campChanEmail"> Email</label>
+        </div>
+      </div>
+
+      <div style="margin: 16px 0;">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 4px;">Frequency Cap:</label>
+        <select id="newCampFreq" class="copilot-input">
+          <option value="Max 1 gentle nudge per 48 hours">Max 1 gentle nudge per 48 hours (Recommended)</option>
+          <option value="Max 1 prompt every 24 hours">Max 1 prompt every 24 hours</option>
+          <option value="Once a week during sprint kickoff">Once a week during sprint kickoff</option>
+        </select>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+        <button class="btn-secondary" onclick="document.getElementById('campaignModal').classList.remove('active')">Cancel</button>
+        <button class="btn-primary" style="background: var(--brand-reset);" onclick="App.submitNewCampaign()">Activate Campaign 📢</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 📥 DPDP Data Subject Export Modal (Section 43) -->
+  <div id="dpdpExportModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(720px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('dpdpExportModal').classList.remove('active')">&times;</button>
+      <div id="dpdpExportContent">
+        <!-- Rendered dynamically -->
       </div>
     </div>
   </div>

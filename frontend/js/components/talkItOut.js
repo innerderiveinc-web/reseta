@@ -36,7 +36,13 @@ const TalkItOut = {
           <div class="wave-bar"></div>
         </div>
 
-        <div style="margin: 20px 0;">
+        <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 16px;">
+          <button id="speechToggleBtn" class="btn-primary" style="background: var(--brand-reset); display: flex; align-items: center; gap: 6px;" onclick="TalkItOut.toggleMicrophone()">
+            🎙 <span id="speechBtnText">Start Speaking (Mic)</span>
+          </button>
+        </div>
+
+        <div style="margin: 14px 0;">
           <textarea id="talkTranscriptInput" class="reset-input-area" placeholder="Speak or type what's on your mind... (e.g. 'Yaar aaj bohot zyada pressure feel ho raha hai, multiple tasks hain...')"></textarea>
         </div>
 
@@ -63,6 +69,65 @@ const TalkItOut = {
         </div>
       </div>
     `;
+  },
+
+  recognition: null,
+
+  toggleMicrophone() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Web Speech API is not supported in this browser. You can type or use the quick sample buttons below.");
+      return;
+    }
+
+    if (this.isRecording) {
+      if (this.recognition) this.recognition.stop();
+      this.isRecording = false;
+      document.getElementById("speechBtnText").innerText = "Start Speaking (Mic)";
+      document.getElementById("speechToggleBtn").style.background = "var(--brand-reset)";
+      return;
+    }
+
+    try {
+      this.recognition = new SpeechRecognition();
+      this.recognition.continuous = true;
+      this.recognition.interimResults = true;
+      this.recognition.lang = "en-IN"; // Supports English/Indian accents and Hinglish phonetics
+
+      this.recognition.onstart = () => {
+        this.isRecording = true;
+        document.getElementById("speechBtnText").innerText = "Listening... (Click to Stop)";
+        document.getElementById("speechToggleBtn").style.background = "var(--recovery-emerald)";
+      };
+
+      this.recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          transcript += event.results[i][0].transcript;
+        }
+        const input = document.getElementById("talkTranscriptInput");
+        if (input && transcript) {
+          input.value = transcript;
+        }
+      };
+
+      this.recognition.onerror = (e) => {
+        console.warn("Speech recognition error:", e);
+        this.isRecording = false;
+        const btnText = document.getElementById("speechBtnText");
+        if (btnText) btnText.innerText = "Start Speaking (Mic)";
+      };
+
+      this.recognition.onend = () => {
+        this.isRecording = false;
+        const btnText = document.getElementById("speechBtnText");
+        if (btnText) btnText.innerText = "Start Speaking (Mic)";
+      };
+
+      this.recognition.start();
+    } catch (err) {
+      console.warn("Could not start speech recognition:", err);
+    }
   },
 
   fillSample(text) {

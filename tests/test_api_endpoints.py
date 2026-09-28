@@ -102,3 +102,52 @@ def test_pilot_report_endpoint():
     assert "3_completed_recovery_moments" in report["sections"]
     assert report["sections"]["3_completed_recovery_moments"]["total_recovery_moments"] > 1000
 
+def test_autopilot_prompt_endpoint():
+    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    res = client.get("/api/employee/autopilot/prompt?meetings_today=4")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["autopilot_active"] is True
+    assert "Take" in data["headline"] or "day" in data["headline"].lower()
+    assert "anxiety" not in data["headline"].lower()
+
+def test_dpdp_export_and_consent_toggle():
+    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    res = client.get("/api/employee/dpdp/export")
+    assert res.status_code == 200
+    data = res.json()
+    assert "data_subject" in data
+    assert "consents" in data
+    assert "completed_sessions_count" in data
+
+    toggle_res = client.post("/api/employee/dpdp/consent-toggle", json={
+        "purpose": "ANONYMIZED_WORKFORCE_AGGREGATION",
+        "granted": False
+    })
+    assert toggle_res.status_code == 200
+    assert toggle_res.json()["granted"] is False
+
+def test_experiment_creation():
+    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    res = client.post("/api/hr/experiments", json={
+        "title": "25-Minute Meeting Rule Pilot",
+        "hypothesis": "Ending meetings 5 minutes early will reduce cognitive fatigue.",
+        "intervention_type": "25/50 Min Meeting Rule",
+        "duration_weeks": 4,
+        "target_departments": ["Engineering"]
+    })
+    assert res.status_code == 200
+    assert res.json()["success"] is True
+
+def test_campaign_creation():
+    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    res = client.post("/api/hr/campaigns", json={
+        "title": "Focus Without Burnout Week",
+        "theme": "Restorative Work Practices",
+        "channels": ["SLACK", "TEAMS"],
+        "frequency_cap": "Max 1 gentle nudge per 48 hours"
+    })
+    assert res.status_code == 200
+    assert res.json()["success"] is True
+
+

@@ -170,20 +170,38 @@ const App = {
         `;
       }
 
+      // Autopilot Contextual Signal (Section 15)
+      try {
+        const autopilot = await API.getAutopilotPrompt(4);
+        const autoCard = document.getElementById("autopilotCard");
+        if (autoCard && autopilot) {
+          autoCard.style.display = "block";
+          document.getElementById("autopilotHeadline").innerText = autopilot.headline;
+          document.getElementById("autopilotSubtext").innerText = autopilot.subtext;
+          const autoBtn = document.getElementById("autopilotActionBtn");
+          if (autoBtn) {
+            autoBtn.innerText = `Start ${autopilot.recommended_minutes}-Min Reset 🔴`;
+            autoBtn.onclick = () => ResetModal.open(autopilot.recommended_state);
+          }
+        }
+      } catch (err) {
+        console.warn("Autopilot prompt error:", err);
+      }
+
       // Personal Relief Map & Mind Mirror
       this.refreshPersonalData();
 
-      // Programs
-      const programs = await API.getPrograms();
+      // Programs (Section 18, 63)
+      this.cachedPrograms = await API.getPrograms();
       const progList = document.getElementById("workplaceProgramsList");
       if (progList) {
-        progList.innerHTML = programs.map(p => `
+        progList.innerHTML = this.cachedPrograms.map(p => `
           <div class="program-item">
             <div>
               <div class="program-name">${p.name}</div>
               <div class="program-meta">${p.duration_days} Days · ${p.active_participants} colleagues enrolled · ${p.completion_rate_pct}% completion</div>
             </div>
-            <button class="btn-small-pill" onclick="alert('Enrolled in ${p.name}! Daily gentle micro-prompts will guide you.')">Enroll</button>
+            <button class="btn-small-pill" onclick="App.openProgramModal('${p.id}')">Explore & Enroll →</button>
           </div>
         `).join('');
       }
@@ -641,6 +659,192 @@ const App = {
   closePilotReport() {
     const modal = document.getElementById("pilotReportModal");
     if (modal) modal.classList.remove("active");
+  },
+
+  // 11. Program Walkthrough Modal (Section 18, 63)
+  openProgramModal(progId) {
+    const prog = (this.cachedPrograms || []).find(p => p.id === progId);
+    if (!prog) return;
+
+    const modal = document.getElementById("programModal");
+    const content = document.getElementById("programModalContent");
+    if (!modal || !content) return;
+
+    modal.classList.add("active");
+    content.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <span class="brand-badge">${prog.duration_days}-Day Program</span>
+        <span style="font-size: 13px; color: var(--recovery-teal); font-weight: 600;">Active Enrollees: ${prog.active_participants}</span>
+      </div>
+      <h2 class="modal-step-title">${prog.name}</h2>
+      <p class="modal-step-subtitle">${prog.description}</p>
+
+      <div style="background: var(--bg-subtle); padding: 14px 18px; border-radius: var(--radius-sm); margin-bottom: 20px; font-size: 13px;">
+        👥 <strong>Target Audience:</strong> ${prog.target_audience} · <strong>Completion Rate:</strong> ${prog.completion_rate_pct}%
+      </div>
+
+      <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Daily Guided Pathway:</h4>
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px;">
+        ${(prog.steps || []).map((step, idx) => `
+          <div style="border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-surface);">
+            <div>
+              <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: var(--recovery-teal);">Day ${step.day} · ${step.minutes} Minutes</div>
+              <div style="font-size: 14px; font-weight: 600; margin-top: 2px;">${step.title}</div>
+            </div>
+            <button class="btn-small-pill" onclick="App.startProgramStep(${step.day}, '${prog.name}', '${step.title}')">
+              ${idx === 0 ? 'Start Day 1 🔴' : 'Preview'}
+            </button>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn-secondary" onclick="App.closeProgramModal()">Close</button>
+      </div>
+    `;
+  },
+
+  startProgramStep(day, progName, stepTitle) {
+    this.closeProgramModal();
+    ResetModal.open("general_tension");
+    setTimeout(() => {
+      const input = document.getElementById("resetRawInput");
+      if (input) input.value = `${progName} (Day ${day}): ${stepTitle}`;
+    }, 150);
+  },
+
+  closeProgramModal() {
+    const modal = document.getElementById("programModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  // 12. Team Recovery Lab Experiment Modal (Section 25)
+  openExperimentModal() {
+    const modal = document.getElementById("experimentModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  async submitNewExperiment() {
+    const title = document.getElementById("newExpTitle").value.trim();
+    const hypothesis = document.getElementById("newExpHypothesis").value.trim();
+    const protocol = document.getElementById("newExpProtocol").value;
+
+    const depts = [];
+    if (document.getElementById("expDeptEng")?.checked) depts.push("Engineering");
+    if (document.getElementById("expDeptProd")?.checked) depts.push("Product & Design");
+    if (document.getElementById("expDeptCS")?.checked) depts.push("Customer Success");
+    if (document.getElementById("expDeptSales")?.checked) depts.push("Sales");
+
+    if (!title || !hypothesis) {
+      alert("Please fill in both the experiment title and hypothesis.");
+      return;
+    }
+
+    try {
+      await API.createExperiment({
+        title,
+        hypothesis,
+        intervention_type: protocol,
+        duration_weeks: 4,
+        target_departments: depts
+      });
+      document.getElementById("experimentModal").classList.remove("active");
+      await this.loadHrData();
+      alert(`🧪 Experiment Launched: "${title}" is now active in the Team Recovery Lab!`);
+    } catch (err) {
+      alert("Error launching experiment: " + err.message);
+    }
+  },
+
+  // 13. HR Campaign Dispatcher Modal (Section 35)
+  openCampaignModal() {
+    const modal = document.getElementById("campaignModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  async submitNewCampaign() {
+    const title = document.getElementById("newCampTitle").value.trim();
+    const theme = document.getElementById("newCampTheme").value.trim();
+    const freq = document.getElementById("newCampFreq").value;
+
+    const channels = [];
+    if (document.getElementById("campChanSlack")?.checked) channels.push("SLACK");
+    if (document.getElementById("campChanTeams")?.checked) channels.push("TEAMS");
+    if (document.getElementById("campChanEmail")?.checked) channels.push("EMAIL");
+
+    if (!title || !theme) {
+      alert("Please enter title and theme.");
+      return;
+    }
+
+    try {
+      await API.createCampaign({
+        title,
+        theme,
+        channels,
+        frequency_cap: freq
+      });
+      document.getElementById("campaignModal").classList.remove("active");
+      await this.loadHrData();
+      alert(`📢 Campaign Activated: "${title}" deployed across ${channels.join(", ")}!`);
+    } catch (err) {
+      alert("Error activating campaign: " + err.message);
+    }
+  },
+
+  // 14. India DPDP 2025 Data Subject Rights (Section 43)
+  async openDpdpExport() {
+    const modal = document.getElementById("dpdpExportModal");
+    const content = document.getElementById("dpdpExportContent");
+    if (!modal || !content) return;
+
+    modal.classList.add("active");
+    content.innerHTML = `<div style="text-align: center; padding: 30px;">Compiling DPDP Personal Data Archive...</div>`;
+
+    try {
+      const data = await API.exportDpdpArchive();
+      content.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <div>
+            <span class="brand-badge" style="background: var(--recovery-teal);">DPDP Act 2025 · Right to Data Portability</span>
+            <h2 class="modal-step-title" style="margin-top: 6px;">Personal Data Archive</h2>
+          </div>
+          <button class="btn-primary" onclick="navigator.clipboard.writeText(JSON.stringify(window._lastDpdpExport, null, 2)); alert('Copied JSON archive to clipboard!');">📋 Copy JSON</button>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Subject: <strong>${data.data_subject.name}</strong> (${data.data_subject.email}) · Organization: ${data.data_subject.organization_id}
+        </p>
+        <pre style="background: var(--bg-subtle); padding: 16px; border-radius: var(--radius-sm); font-size: 12px; overflow-x: auto; max-height: 380px; border: 1px solid var(--border-light); font-family: monospace;">${JSON.stringify(data, null, 2)}</pre>
+        <div style="display: flex; justify-content: flex-end; margin-top: 20px;">
+          <button class="btn-secondary" onclick="document.getElementById('dpdpExportModal').classList.remove('active')">Close</button>
+        </div>
+      `;
+      window._lastDpdpExport = data;
+    } catch (err) {
+      content.innerHTML = `<span style="color: var(--red-crisis);">Error: ${err.message}</span>`;
+    }
+  },
+
+  async toggleSampleConsent() {
+    try {
+      await API.toggleDpdpConsent("ANONYMIZED_WORKFORCE_AGGREGATION", false);
+      alert("🔒 Consent updated: Anonymized aggregation for your account has been toggled in accordance with DPDP Rules 2025.");
+    } catch (err) {
+      alert("Error: " + err.message);
+    }
+  },
+
+  async requestDataErasure() {
+    const confirmErasure = confirm("Are you sure you want to invoke your Right to Erasure under the DPDP Act, 2025?\n\nThis will permanently delete all your private reflections, thought unload buckets, and learned personal patterns.");
+    if (!confirmErasure) return;
+
+    try {
+      const res = await API.requestDpdpErasure();
+      alert(`🗑️ ${res.message}`);
+      await this.refreshPersonalData();
+    } catch (err) {
+      alert("Error requesting erasure: " + err.message);
+    }
   }
 };
 

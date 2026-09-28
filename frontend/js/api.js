@@ -61,7 +61,13 @@ const API = {
   queryHrCopilot: (query) => API.post('/api/copilot/hr', { query }),
 
   // Pilot Report (Section 58)
-  getPilotReport: () => API.get('/api/hr/pilot-report')
+  getPilotReport: () => API.get('/api/hr/pilot-report'),
+
+  // Autopilot (Section 15) & DPDP Rights (Section 43)
+  getAutopilotPrompt: (meetings = 4) => API.get(`/api/employee/autopilot/prompt?meetings_today=${meetings}`),
+  exportDpdpArchive: () => API.get('/api/employee/dpdp/export'),
+  toggleDpdpConsent: (purpose, granted) => API.post('/api/employee/dpdp/consent-toggle', { purpose, granted }),
+  requestDpdpErasure: () => API.post('/api/employee/dpdp/erasure', {})
 };
 
 window.API = API;

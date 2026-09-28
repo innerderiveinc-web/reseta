@@ -3,6 +3,7 @@
 import uuid
 import datetime
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
@@ -296,3 +297,107 @@ def send_a_reset(colleague_name: str = "Teammate"):
         "invite_text": "Take 5 minutes. You don't have to fix everything right now.",
         "invite_link": "/?action=reset_invite&from=colleague"
     }
+
+# ==========================================================
+# Section 15: RESETA AUTOPILOT™ & Section 43: DPDP Rights
+# ==========================================================
+from backend.engines.autopilot_engine import AutopilotEngine
+from backend.models import Consent, PersonalPattern
+
+@router.get("/autopilot/prompt")
+def get_autopilot_prompt(meetings_today: int = 4, db: Session = Depends(get_db)):
+    """Contextual JITAI reset prompt based on permissioned signals"""
+    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
+    return AutopilotEngine.evaluate_contextual_signal(
+        db=db,
+        user_id=user.id if user else "user-emp-arjun",
+        simulated_calendar_meetings_today=meetings_today
+    )
+
+@router.get("/dpdp/export")
+def export_employee_data_archive(db: Session = Depends(get_db)):
+    """Right to Data Portability (DPDP Act 2025)"""
+    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    sessions = db.query(InterventionSession).filter(InterventionSession.user_id == user.id).all()
+    consents = db.query(Consent).filter(Consent.user_id == user.id).all()
+    patterns = db.query(PersonalPattern).filter(PersonalPattern.user_id == user.id).all()
+
+    return {
+        "data_subject": {
+            "name": user.full_name,
+            "email": user.email,
+            "organization_id": user.organization_id
+        },
+        "export_timestamp": datetime.datetime.utcnow().isoformat(),
+        "dpdp_notice": "Full personal export in machine-readable JSON format.",
+        "consents": [
+            {"purpose": c.purpose, "granted": c.granted, "granted_at": str(c.granted_at)}
+            for c in consents
+        ],
+        "completed_sessions_count": len(sessions),
+        "sessions": [
+            {
+                "id": s.id,
+                "date": str(s.completed_at),
+                "state": s.starting_state,
+                "protocol": s.intervention_name,
+                "stress_before": s.stress_before,
+                "stress_after": s.stress_after,
+                "helped": s.did_this_help
+            }
+            for s in sessions
+        ],
+        "learned_patterns": [
+            {"situation": p.situation, "recommended": p.recommended_intervention, "avg_relief": p.avg_delta_relief}
+            for p in patterns
+        ]
+    }
+
+class ConsentToggleRequest(BaseModel):
+    purpose: str
+    granted: bool
+
+@router.post("/dpdp/consent-toggle")
+def toggle_consent(req: ConsentToggleRequest, db: Session = Depends(get_db)):
+    """Right to Withdraw Consent (DPDP Act 2025)"""
+    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
+    user_id = user.id if user else "user-emp-arjun"
+
+    consent = db.query(Consent).filter(Consent.user_id == user_id, Consent.purpose == req.purpose).first()
+    if not consent:
+        consent = Consent(user_id=user_id, purpose=req.purpose, granted=req.granted)
+        db.add(consent)
+    else:
+        consent.granted = req.granted
+        if not req.granted:
+            consent.withdrawn_at = datetime.datetime.utcnow()
+    db.commit()
+
+    return {"success": True, "purpose": req.purpose, "granted": req.granted}
+
+@router.post("/dpdp/erasure")
+def request_personal_data_erasure(db: Session = Depends(get_db)):
+    """Right to Erasure (DPDP Act 2025)"""
+    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Erase employee personal raw sessions and patterns
+    db.query(PersonalPattern).filter(PersonalPattern.user_id == user.id).delete()
+    
+    # Anonymize past sessions so organization aggregates remain mathematically sound without user trace
+    user_sessions = db.query(InterventionSession).filter(InterventionSession.user_id == user.id).all()
+    for s in user_sessions:
+        s.private_raw_input = None
+        s.unload_data = None
+        s.user_id = "erased-dpdp-subject"
+    
+    db.commit()
+    return {
+        "success": True,
+        "message": "All private reflections, unloads, and personal relief patterns have been permanently erased per DPDP Act 2025."
+    }
+
