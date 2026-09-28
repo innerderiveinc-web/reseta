@@ -1760,9 +1760,12 @@ const App = {
       if (btn) btn.innerHTML = window.SoundEngine.enabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
       if (window.SoundEngine.enabled) {
         window.SoundEngine.playBell(528, 1.8);
-        this.showToast("🔊 Audio chimes enabled");
+        this.showToast("🔊 Audio chimes & ambient sound enabled");
       } else {
-        this.showToast("🔇 Audio chimes muted");
+        if (window.SoundEngine.isAmbientPlaying) {
+          window.SoundEngine.stopAmbientSoundscape(0.4);
+        }
+        this.showToast("🔇 Audio chimes & soundscape muted");
       }
     }
   }

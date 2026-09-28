@@ -88,6 +88,179 @@ const SoundEngine = {
     if (!this.enabled) return;
     this.playBell(528, 2.4); // 528Hz Solfeggio frequency
     setTimeout(() => this.playBell(660, 1.8), 220);
+  },
+
+  // ==========================================================
+  // Continuous Ambient Soundscape (432Hz Om, Zen Bowl & Breath Wave)
+  // ==========================================================
+  ambientNodes: null,
+  isAmbientPlaying: false,
+  ambientVolume: 0.22,
+
+  startAmbientSoundscape() {
+    if (!this.enabled) return;
+    if (this.isAmbientPlaying) return;
+    this.unlock();
+    try {
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      // 1. Master ambient gain with smooth 2.0s fade-in
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.0001, now);
+      masterGain.gain.linearRampToValueAtTime(this.ambientVolume, now + 2.0);
+      masterGain.connect(ctx.destination);
+
+      // 2. Breath-sync gain node (undulates softly with 8-second breathing pace)
+      const breathGain = ctx.createGain();
+      breathGain.gain.setValueAtTime(0.82, now);
+      breathGain.connect(masterGain);
+
+      // 3. Gentle 0.125 Hz LFO (8.0s breathing cycle: 4s inhale swell, 4s exhale ebb)
+      const lfo = ctx.createOscillator();
+      const lfoDepth = ctx.createGain();
+      lfo.type = "sine";
+      lfo.frequency.setValueAtTime(0.125, now);
+      lfoDepth.gain.setValueAtTime(0.18, now); // gentle depth
+      lfo.connect(lfoDepth);
+      lfoDepth.connect(breathGain.gain);
+
+      // 4. Low-pass soothing acoustic filter (cuts harsh highs, keeps warm analog timbre)
+      const filter = ctx.createBiquadFilter();
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(540, now);
+      filter.Q.setValueAtTime(1.1, now);
+      filter.connect(breathGain);
+
+      // 5. Root Drone: 136.1 Hz (Cosmic Om / Grounding Earth Frequency)
+      const oscRoot = ctx.createOscillator();
+      const gainRoot = ctx.createGain();
+      oscRoot.type = "sine";
+      oscRoot.frequency.setValueAtTime(136.1, now);
+      gainRoot.gain.setValueAtTime(0.32, now);
+      oscRoot.connect(gainRoot);
+      gainRoot.connect(filter);
+
+      // 6. Perfect Fifth Harmony: 204.15 Hz (Solfeggio harmonic fifth)
+      const oscFifth = ctx.createOscillator();
+      const gainFifth = ctx.createGain();
+      oscFifth.type = "sine";
+      oscFifth.frequency.setValueAtTime(204.15, now);
+      gainFifth.gain.setValueAtTime(0.20, now);
+      oscFifth.connect(gainFifth);
+      gainFifth.connect(filter);
+
+      // 7. Singing Bowl Shimmer: 432 Hz + 528 Hz (Clarity and Calm Overtone)
+      const oscShimmer = ctx.createOscillator();
+      const gainShimmer = ctx.createGain();
+      oscShimmer.type = "sine";
+      oscShimmer.frequency.setValueAtTime(432.0, now);
+      gainShimmer.gain.setValueAtTime(0.08, now);
+      oscShimmer.connect(gainShimmer);
+      gainShimmer.connect(filter);
+
+      const oscClarity = ctx.createOscillator();
+      const gainClarity = ctx.createGain();
+      oscClarity.type = "sine";
+      oscClarity.frequency.setValueAtTime(528.0, now);
+      gainClarity.gain.setValueAtTime(0.04, now);
+      oscClarity.connect(gainClarity);
+      gainClarity.connect(filter);
+
+      // 8. Soft pink noise ocean/wind surf texture
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.04;
+        b6 = white * 0.115926;
+      }
+      const noiseSource = ctx.createBufferSource();
+      noiseSource.buffer = noiseBuffer;
+      noiseSource.loop = true;
+
+      const noiseFilter = ctx.createBiquadFilter();
+      noiseFilter.type = "bandpass";
+      noiseFilter.frequency.setValueAtTime(260, now);
+      noiseFilter.Q.setValueAtTime(0.9, now);
+
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.045, now);
+
+      noiseSource.connect(noiseFilter);
+      noiseFilter.connect(noiseGain);
+      noiseGain.connect(breathGain);
+
+      // Start all audio nodes
+      oscRoot.start(now);
+      oscFifth.start(now);
+      oscShimmer.start(now);
+      oscClarity.start(now);
+      lfo.start(now);
+      noiseSource.start(now);
+
+      this.ambientNodes = {
+        masterGain,
+        breathGain,
+        filter,
+        oscRoot,
+        oscFifth,
+        oscShimmer,
+        oscClarity,
+        lfo,
+        noiseSource
+      };
+      this.isAmbientPlaying = true;
+    } catch (e) {
+      console.warn("Could not start ambient soundscape:", e);
+    }
+  },
+
+  stopAmbientSoundscape(fadeSeconds = 1.2) {
+    if (!this.isAmbientPlaying || !this.ambientNodes) return;
+    try {
+      const ctx = this.ctx;
+      const nodes = this.ambientNodes;
+      if (ctx && nodes && nodes.masterGain) {
+        const now = ctx.currentTime;
+        nodes.masterGain.gain.cancelScheduledValues(now);
+        nodes.masterGain.gain.setValueAtTime(nodes.masterGain.gain.value, now);
+        nodes.masterGain.gain.linearRampToValueAtTime(0.0001, now + fadeSeconds);
+        setTimeout(() => {
+          try {
+            nodes.oscRoot.stop();
+            nodes.oscFifth.stop();
+            nodes.oscShimmer.stop();
+            nodes.oscClarity.stop();
+            nodes.lfo.stop();
+            nodes.noiseSource.stop();
+          } catch (e) {}
+        }, fadeSeconds * 1000 + 100);
+      }
+    } catch (e) {
+      console.warn("Could not stop ambient soundscape:", e);
+    }
+    this.ambientNodes = null;
+    this.isAmbientPlaying = false;
+  },
+
+  toggleAmbient() {
+    if (this.isAmbientPlaying) {
+      this.stopAmbientSoundscape(0.5);
+      return false;
+    } else {
+      this.startAmbientSoundscape();
+      return true;
+    }
   }
 };
 
@@ -128,6 +301,7 @@ const ResetModal = {
 
   close() {
     if (this.stepTimer) clearInterval(this.stepTimer);
+    SoundEngine.stopAmbientSoundscape(0.3);
     this.modalEl.classList.remove("active");
   },
 
@@ -214,6 +388,9 @@ const ResetModal = {
     // Unlock and play bell synchronously on click gesture
     SoundEngine.playBell(432, 2.4);
 
+    // Start continuous, pleasant, mind-refreshing background soundscape!
+    SoundEngine.startAmbientSoundscape();
+
     const rawInputEl = document.getElementById("resetRawInput");
     const rawInput = rawInputEl ? rawInputEl.value : "";
 
@@ -239,6 +416,7 @@ const ResetModal = {
 
       // Handle RED tier (Safety Escalation)
       if (plan.safety_tier === "RED") {
+        SoundEngine.stopAmbientSoundscape(0.3);
         this.renderRedTier(plan);
         return;
       }
@@ -246,6 +424,7 @@ const ResetModal = {
       this.currentStepIndex = 0;
       this.renderGuidedStep();
     } catch (err) {
+      SoundEngine.stopAmbientSoundscape(0.3);
       alert("Error starting reset: " + err.message);
       this.renderStep1();
     }
@@ -313,6 +492,17 @@ const ResetModal = {
         <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Step ${this.currentStepIndex + 1} of ${totalSteps}</span>
       </div>
 
+      <!-- Continuous Mind-Refreshing Ambient Soundscape Bar -->
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(79, 70, 229, 0.07); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 16px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--brand-reset);">
+          <span id="modalAmbientIndicator" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${SoundEngine.isAmbientPlaying ? '#10B981' : '#9CA3AF'}; box-shadow: ${SoundEngine.isAmbientPlaying ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none'}; animation: breathePaced 4s infinite;"></span>
+          <span>Continuous Mind Refresh: <strong>432Hz Zen Bowl & Ocean Rhythm</strong></span>
+        </div>
+        <button id="modalAmbientBtn" class="btn-small-pill" onclick="ResetModal.toggleAmbientSound()" style="font-size: 11px; padding: 4px 10px; cursor: pointer; border-color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--border-light)'}; color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--text-muted)'};" title="Toggle continuous ambient sound">
+          ${SoundEngine.isAmbientPlaying ? '🔊 Sound: Playing' : '🔇 Sound: Muted'}
+        </button>
+      </div>
+
       <div class="breath-container">
         <div class="breath-circle">${step.action_type}</div>
       </div>
@@ -336,6 +526,21 @@ const ResetModal = {
         </div>
       </div>
     `;
+  },
+
+  toggleAmbientSound() {
+    const isPlaying = SoundEngine.toggleAmbient();
+    const btn = document.getElementById("modalAmbientBtn");
+    const indicator = document.getElementById("modalAmbientIndicator");
+    if (btn) {
+      btn.innerHTML = isPlaying ? "🔊 Sound: Playing" : "🔇 Sound: Muted";
+      btn.style.color = isPlaying ? "var(--brand-reset)" : "var(--text-muted)";
+      btn.style.borderColor = isPlaying ? "var(--brand-reset)" : "var(--border-light)";
+    }
+    if (indicator) {
+      indicator.style.background = isPlaying ? "#10B981" : "#9CA3AF";
+      indicator.style.boxShadow = isPlaying ? "0 0 8px rgba(16, 185, 129, 0.6)" : "none";
+    }
   },
 
   nextStep() {
@@ -449,6 +654,7 @@ const ResetModal = {
   },
 
   async submitCompletion() {
+    SoundEngine.stopAmbientSoundscape(1.0);
     SoundEngine.playReliefChime();
     try {
       const res = await API.completeReset({
