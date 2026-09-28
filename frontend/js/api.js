@@ -1,7 +1,24 @@
 // RESETA™ Enterprise Client API Gateway
+// RFC 7519 JWT Bearer Token authenticated API Client
 const API = {
+  token: localStorage.getItem('reseta_access_token') || '',
+
+  setToken(token) {
+    this.token = token;
+    if (token) localStorage.setItem('reseta_access_token', token);
+    else localStorage.removeItem('reseta_access_token');
+  },
+
+  getHeaders() {
+    const headers = { 'Content-Type': 'application/json' };
+    if (this.token) {
+      headers['Authorization'] = `Bearer ${this.token}`;
+    }
+    return headers;
+  },
+
   async get(url) {
-    const res = await fetch(url);
+    const res = await fetch(url, { headers: this.getHeaders() });
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     return res.json();
   },
@@ -9,7 +26,7 @@ const API = {
   async post(url, data) {
     const res = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.getHeaders(),
       body: JSON.stringify(data)
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
@@ -19,6 +36,11 @@ const API = {
   // Auth & Personas
   getUsers: () => API.get('/api/auth/users'),
   getCurrentUser: () => API.get('/api/auth/me'),
+  login: async (email, password) => {
+    const res = await API.post('/api/auth/login', { email, password });
+    if (res.access_token) API.setToken(res.access_token);
+    return res;
+  },
   switchUser: (userId) => API.post('/api/auth/switch-user', { user_id: userId }),
 
   // Employee Surface

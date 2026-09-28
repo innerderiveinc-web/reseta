@@ -258,34 +258,55 @@ const ResetModal = {
 
   // Step 4: Relief Check™ (Section 12)
   renderReliefCheck() {
+    const initialDelta = Math.max(0, this.stressBefore - this.stressAfter);
     this.containerEl.innerHTML = `
       <div class="relief-check-container">
         <h2 class="modal-step-title">Relief Check™</h2>
-        <p class="modal-step-subtitle">Did this 5 minutes create breathing space in your head?</p>
+        <p class="modal-step-subtitle">Did this reset create breathing space in your head?</p>
 
-        <div style="display: flex; justify-content: space-around; background: var(--bg-subtle); padding: 20px; border-radius: var(--radius-md); margin: 20px 0;">
-          <div>
-            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Before Stress</div>
-            <div style="font-size: 32px; font-weight: 800; color: var(--brand-reset);">8/10</div>
+        <div style="display: flex; justify-content: space-around; align-items: center; background: var(--bg-subtle); padding: 18px; border-radius: var(--radius-md); margin: 20px 0;">
+          <div style="text-align: center;">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Before Stress</div>
+            <div id="stressBeforeDisplay" style="font-size: 32px; font-weight: 800; color: var(--brand-reset);">${this.stressBefore}/10</div>
           </div>
-          <div style="font-size: 28px; color: var(--text-muted); align-self: center;">→</div>
-          <div>
-            <div style="font-size: 12px; color: var(--text-muted); text-transform: uppercase;">After Stress</div>
-            <div id="stressAfterDisplay" style="font-size: 32px; font-weight: 800; color: var(--recovery-teal);">4/10</div>
+          <div style="font-size: 24px; color: var(--text-muted);">→</div>
+          <div style="text-align: center;">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">After Stress</div>
+            <div id="stressAfterDisplay" style="font-size: 32px; font-weight: 800; color: var(--recovery-teal);">${this.stressAfter}/10</div>
+          </div>
+          <div style="text-align: center; border-left: 1px solid var(--border-light); padding-left: 16px;">
+            <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Relief Shift</div>
+            <div id="stressDeltaDisplay" style="font-size: 28px; font-weight: 800; color: var(--recovery-emerald);">-${initialDelta} pts</div>
+          </div>
+        </div>
+
+        <div class="slider-group" style="margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <label>1. Rate your starting stress when you opened this:</label>
+            <span id="sliderBeforeVal" style="color: var(--brand-reset); font-weight: 700;">${this.stressBefore}/10</span>
+          </div>
+          <input type="range" id="stressBeforeSlider" min="1" max="10" value="${this.stressBefore}" style="width: 100%; margin-top: 8px;" oninput="ResetModal.updateStressBeforeSlider(this.value)">
+          <div class="slider-label-row">
+            <span>1 · Mild Strain</span>
+            <span>5 · Moderate Pressure</span>
+            <span>10 · Severe Overload</span>
           </div>
         </div>
 
         <div class="slider-group">
-          <label style="font-size: 13px; font-weight: 600;">Rate your stress right now (1 = Deep Calm, 10 = Maximum Overload):</label>
-          <input type="range" id="stressAfterSlider" min="1" max="10" value="4" style="width: 100%; margin-top: 10px;" oninput="ResetModal.updateStressSlider(this.value)">
+          <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600;">
+            <label>2. Rate your stress right now (after this reset):</label>
+            <span id="sliderAfterVal" style="color: var(--recovery-teal); font-weight: 700;">${this.stressAfter}/10</span>
+          </div>
+          <input type="range" id="stressAfterSlider" min="1" max="10" value="${this.stressAfter}" style="width: 100%; margin-top: 8px;" oninput="ResetModal.updateStressSlider(this.value)">
           <div class="slider-label-row">
-            <span>1 · Calm</span>
+            <span>1 · Deep Calm</span>
             <span>5 · Balanced</span>
             <span>10 · Overwhelmed</span>
           </div>
         </div>
 
-        <div style="margin-top: 24px;">
+        <div style="margin-top: 20px;">
           <label style="font-size: 13px; font-weight: 600;">Did this reset help?</label>
           <div class="relief-buttons-row">
             <button class="btn-relief-option selected" onclick="ResetModal.selectHelped('YES', this)">👍 Yes</button>
@@ -301,10 +322,31 @@ const ResetModal = {
     `;
   },
 
+  updateStressBeforeSlider(val) {
+    this.stressBefore = parseInt(val);
+    const display = document.getElementById("stressBeforeDisplay");
+    const label = document.getElementById("sliderBeforeVal");
+    if (display) display.innerText = `${val}/10`;
+    if (label) label.innerText = `${val}/10`;
+    this.updateDeltaDisplay();
+  },
+
   updateStressSlider(val) {
     this.stressAfter = parseInt(val);
     const display = document.getElementById("stressAfterDisplay");
+    const label = document.getElementById("sliderAfterVal");
     if (display) display.innerText = `${val}/10`;
+    if (label) label.innerText = `${val}/10`;
+    this.updateDeltaDisplay();
+  },
+
+  updateDeltaDisplay() {
+    const delta = this.stressBefore - this.stressAfter;
+    const deltaEl = document.getElementById("stressDeltaDisplay");
+    if (deltaEl) {
+      deltaEl.innerText = delta >= 0 ? `-${delta} pts` : `+${Math.abs(delta)} pts`;
+      deltaEl.style.color = delta > 0 ? "var(--recovery-emerald)" : "var(--brand-reset)";
+    }
   },
 
   selectedHelped: "YES",
@@ -318,7 +360,7 @@ const ResetModal = {
     try {
       const res = await API.completeReset({
         session_id: this.currentSession.session_id,
-        stress_before: 8,
+        stress_before: this.stressBefore,
         stress_after: this.stressAfter,
         did_this_help: this.selectedHelped
       });
