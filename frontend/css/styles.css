@@ -459,6 +459,30 @@ body {
   color: var(--bg-surface);
 }
 
+.sound-chip {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-light);
+  color: var(--text-muted);
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sound-chip:hover {
+  border-color: var(--brand-reset);
+  color: var(--brand-reset);
+}
+
+.sound-chip.active {
+  background: rgba(79, 70, 229, 0.12);
+  border-color: var(--brand-reset);
+  color: var(--brand-reset);
+  font-weight: 700;
+}
+
 /* ==========================================================
    2. RESET MODAL & RELIEFLOOP™ ENGINE (Sections 8, 9, 10, 11, 12)
    ========================================================== */

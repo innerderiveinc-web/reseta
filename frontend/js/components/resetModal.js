@@ -91,13 +91,36 @@ const SoundEngine = {
   },
 
   // ==========================================================
-  // Continuous Ambient Soundscape (432Hz Om, Zen Bowl & Breath Wave)
+  // Continuous Ambient Soundscape with 4 Scientific Presets:
+  // 1. zen_bowl: 432Hz Solfeggio & 136.1Hz Om (Grounding & anti-stress)
+  // 2. binaural_alpha: 10Hz Alpha Waves (Hemispheric synchronization & calm focus)
+  // 3. ocean_waves: Coastal Surf with 8s breathing tide (Heart-rate variability coherence)
+  // 4. forest_rain: Biophilic Green Noise & 528Hz Clarity (Cognitive restoration)
   // ==========================================================
   ambientNodes: null,
   isAmbientPlaying: false,
   ambientVolume: 0.22,
+  ambientPreset: "zen_bowl",
 
-  startAmbientSoundscape() {
+  getPresetName(preset = this.ambientPreset) {
+    switch (preset) {
+      case "zen_bowl": return "432Hz Zen Bowl & Om";
+      case "binaural_alpha": return "10Hz Binaural Alpha Waves";
+      case "ocean_waves": return "Ocean Breath Surf";
+      case "forest_rain": return "Forest Rain & 528Hz";
+      default: return "Calm Ambient Soundscape";
+    }
+  },
+
+  setPreset(preset) {
+    this.ambientPreset = preset;
+    if (this.isAmbientPlaying) {
+      this.stopAmbientSoundscape(0.3);
+      setTimeout(() => this.startAmbientSoundscape(preset), 350);
+    }
+  },
+
+  startAmbientSoundscape(preset = this.ambientPreset) {
     if (!this.enabled) return;
     if (this.isAmbientPlaying) return;
     this.unlock();
@@ -105,11 +128,12 @@ const SoundEngine = {
       const ctx = this.ctx;
       if (!ctx) return;
       const now = ctx.currentTime;
+      this.ambientPreset = preset;
 
-      // 1. Master ambient gain with smooth 2.0s fade-in
+      // 1. Master ambient gain with smooth 1.8s fade-in
       const masterGain = ctx.createGain();
       masterGain.gain.setValueAtTime(0.0001, now);
-      masterGain.gain.linearRampToValueAtTime(this.ambientVolume, now + 2.0);
+      masterGain.gain.linearRampToValueAtTime(this.ambientVolume, now + 1.8);
       masterGain.connect(ctx.destination);
 
       // 2. Breath-sync gain node (undulates softly with 8-second breathing pace)
@@ -122,53 +146,99 @@ const SoundEngine = {
       const lfoDepth = ctx.createGain();
       lfo.type = "sine";
       lfo.frequency.setValueAtTime(0.125, now);
-      lfoDepth.gain.setValueAtTime(0.18, now); // gentle depth
+      lfoDepth.gain.setValueAtTime(preset === "ocean_waves" ? 0.32 : 0.18, now);
       lfo.connect(lfoDepth);
       lfoDepth.connect(breathGain.gain);
 
-      // 4. Low-pass soothing acoustic filter (cuts harsh highs, keeps warm analog timbre)
+      // 4. Low-pass soothing acoustic filter (cuts harsh frequencies)
       const filter = ctx.createBiquadFilter();
       filter.type = "lowpass";
-      filter.frequency.setValueAtTime(540, now);
+      filter.frequency.setValueAtTime(preset === "forest_rain" ? 750 : 540, now);
       filter.Q.setValueAtTime(1.1, now);
       filter.connect(breathGain);
 
-      // 5. Root Drone: 136.1 Hz (Cosmic Om / Grounding Earth Frequency)
+      // 5. Preset-specific Oscillators
       const oscRoot = ctx.createOscillator();
       const gainRoot = ctx.createGain();
       oscRoot.type = "sine";
-      oscRoot.frequency.setValueAtTime(136.1, now);
-      gainRoot.gain.setValueAtTime(0.32, now);
-      oscRoot.connect(gainRoot);
-      gainRoot.connect(filter);
 
-      // 6. Perfect Fifth Harmony: 204.15 Hz (Solfeggio harmonic fifth)
       const oscFifth = ctx.createOscillator();
       const gainFifth = ctx.createGain();
       oscFifth.type = "sine";
-      oscFifth.frequency.setValueAtTime(204.15, now);
-      gainFifth.gain.setValueAtTime(0.20, now);
-      oscFifth.connect(gainFifth);
-      gainFifth.connect(filter);
 
-      // 7. Singing Bowl Shimmer: 432 Hz + 528 Hz (Clarity and Calm Overtone)
       const oscShimmer = ctx.createOscillator();
       const gainShimmer = ctx.createGain();
       oscShimmer.type = "sine";
-      oscShimmer.frequency.setValueAtTime(432.0, now);
-      gainShimmer.gain.setValueAtTime(0.08, now);
-      oscShimmer.connect(gainShimmer);
-      gainShimmer.connect(filter);
 
       const oscClarity = ctx.createOscillator();
       const gainClarity = ctx.createGain();
       oscClarity.type = "sine";
-      oscClarity.frequency.setValueAtTime(528.0, now);
-      gainClarity.gain.setValueAtTime(0.04, now);
+
+      // Configure Frequencies based on selected Scientific Acoustic Preset
+      if (preset === "binaural_alpha") {
+        // 10 Hz difference for true Alpha Brainwave Entrainment (226Hz - 216Hz = 10Hz)
+        oscRoot.frequency.setValueAtTime(108.0, now); // grounding sub
+        gainRoot.gain.setValueAtTime(0.24, now);
+
+        oscFifth.frequency.setValueAtTime(216.0, now); // base carrier
+        gainFifth.gain.setValueAtTime(0.26, now);
+
+        oscShimmer.frequency.setValueAtTime(226.0, now); // 10Hz beat offset
+        gainShimmer.gain.setValueAtTime(0.26, now);
+
+        oscClarity.frequency.setValueAtTime(432.0, now); // harmonic overtone
+        gainClarity.gain.setValueAtTime(0.06, now);
+      } else if (preset === "ocean_waves") {
+        // Subtle underlying chord with focus on surf rhythm
+        oscRoot.frequency.setValueAtTime(108.0, now);
+        gainRoot.gain.setValueAtTime(0.18, now);
+
+        oscFifth.frequency.setValueAtTime(162.0, now);
+        gainFifth.gain.setValueAtTime(0.12, now);
+
+        oscShimmer.frequency.setValueAtTime(216.0, now);
+        gainShimmer.gain.setValueAtTime(0.06, now);
+
+        oscClarity.frequency.setValueAtTime(324.0, now);
+        gainClarity.gain.setValueAtTime(0.03, now);
+      } else if (preset === "forest_rain") {
+        // 528 Hz Solfeggio clarity pad with soft resonant intervals
+        oscRoot.frequency.setValueAtTime(176.0, now);
+        gainRoot.gain.setValueAtTime(0.18, now);
+
+        oscFifth.frequency.setValueAtTime(264.0, now);
+        gainFifth.gain.setValueAtTime(0.14, now);
+
+        oscShimmer.frequency.setValueAtTime(352.0, now);
+        gainShimmer.gain.setValueAtTime(0.10, now);
+
+        oscClarity.frequency.setValueAtTime(528.0, now);
+        gainClarity.gain.setValueAtTime(0.08, now);
+      } else {
+        // "zen_bowl" Default: 136.1 Hz Om + 204.15 Hz Fifth + 432 Hz + 528 Hz
+        oscRoot.frequency.setValueAtTime(136.1, now);
+        gainRoot.gain.setValueAtTime(0.32, now);
+
+        oscFifth.frequency.setValueAtTime(204.15, now);
+        gainFifth.gain.setValueAtTime(0.20, now);
+
+        oscShimmer.frequency.setValueAtTime(432.0, now);
+        gainShimmer.gain.setValueAtTime(0.08, now);
+
+        oscClarity.frequency.setValueAtTime(528.0, now);
+        gainClarity.gain.setValueAtTime(0.04, now);
+      }
+
+      oscRoot.connect(gainRoot);
+      gainRoot.connect(filter);
+      oscFifth.connect(gainFifth);
+      gainFifth.connect(filter);
+      oscShimmer.connect(gainShimmer);
+      gainShimmer.connect(filter);
       oscClarity.connect(gainClarity);
       gainClarity.connect(filter);
 
-      // 8. Soft pink noise ocean/wind surf texture
+      // 6. Pink/White noise generator (surf/rain/breeze texture)
       const bufferSize = ctx.sampleRate * 2;
       const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
       const output = noiseBuffer.getChannelData(0);
@@ -189,18 +259,19 @@ const SoundEngine = {
       noiseSource.loop = true;
 
       const noiseFilter = ctx.createBiquadFilter();
-      noiseFilter.type = "bandpass";
-      noiseFilter.frequency.setValueAtTime(260, now);
+      noiseFilter.type = preset === "forest_rain" ? "highpass" : "bandpass";
+      noiseFilter.frequency.setValueAtTime(preset === "forest_rain" ? 650 : (preset === "ocean_waves" ? 220 : 260), now);
       noiseFilter.Q.setValueAtTime(0.9, now);
 
       const noiseGain = ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.045, now);
+      const nGainVal = preset === "ocean_waves" ? 0.16 : (preset === "forest_rain" ? 0.11 : 0.045);
+      noiseGain.gain.setValueAtTime(nGainVal, now);
 
       noiseSource.connect(noiseFilter);
       noiseFilter.connect(noiseGain);
       noiseGain.connect(breathGain);
 
-      // Start all audio nodes
+      // Start all audio components
       oscRoot.start(now);
       oscFifth.start(now);
       oscShimmer.start(now);
@@ -572,17 +643,25 @@ const ResetModal = {
         </div>
       </div>
 
-      <!-- Continuous Mind-Refreshing Ambient Soundscape Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(79, 70, 229, 0.07); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px;">
-        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--brand-reset);">
-          <span id="modalAmbientIndicator" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${SoundEngine.isAmbientPlaying ? '#10B981' : '#9CA3AF'}; box-shadow: ${SoundEngine.isAmbientPlaying ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none'}; animation: breathePaced 4s infinite;"></span>
-          <span>Soundscape: <strong>432Hz Zen Bowl & Ocean Rhythm</strong></span>
+      <!-- Continuous Mind-Refreshing Ambient Soundscape Bar with Scientific Presets -->
+      <div style="background: rgba(79, 70, 229, 0.07); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-sm); padding: 10px 14px; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--brand-reset);">
+            <span id="modalAmbientIndicator" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${SoundEngine.isAmbientPlaying ? '#10B981' : '#9CA3AF'}; box-shadow: ${SoundEngine.isAmbientPlaying ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none'}; animation: breathePaced 4s infinite;"></span>
+            <span>Soundscape: <strong id="activeSoundscapeTitle">${SoundEngine.getPresetName()}</strong></span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Next in: <span id="stepTimerDisplay" style="color: var(--brand-reset);">${this.stepSecondsRemaining}s</span></span>
+            <button id="modalAmbientBtn" class="btn-small-pill" onclick="ResetModal.toggleAmbientSound()" style="font-size: 11px; padding: 4px 10px; cursor: pointer; border-color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--border-light)'}; color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--text-muted)'};">
+              ${SoundEngine.isAmbientPlaying ? '🔊 Sound: Playing' : '🔇 Muted'}
+            </button>
+          </div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Next in: <span id="stepTimerDisplay" style="color: var(--brand-reset);">${this.stepSecondsRemaining}s</span></span>
-          <button id="modalAmbientBtn" class="btn-small-pill" onclick="ResetModal.toggleAmbientSound()" style="font-size: 11px; padding: 4px 10px; cursor: pointer; border-color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--border-light)'}; color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--text-muted)'};">
-            ${SoundEngine.isAmbientPlaying ? '🔊 Sound: Playing' : '🔇 Muted'}
-          </button>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          <button class="sound-chip ${SoundEngine.ambientPreset === 'zen_bowl' ? 'active' : ''}" data-preset="zen_bowl" onclick="ResetModal.changeSoundPreset('zen_bowl')" title="Tibetan 432Hz bell + 136.1Hz Om (Grounding & calm)">🧘 432Hz Zen Bowl</button>
+          <button class="sound-chip ${SoundEngine.ambientPreset === 'binaural_alpha' ? 'active' : ''}" data-preset="binaural_alpha" onclick="ResetModal.changeSoundPreset('binaural_alpha')" title="10Hz difference wave for deep Alpha relaxation">🧠 10Hz Alpha Waves</button>
+          <button class="sound-chip ${SoundEngine.ambientPreset === 'ocean_waves' ? 'active' : ''}" data-preset="ocean_waves" onclick="ResetModal.changeSoundPreset('ocean_waves')" title="8-second natural coastal tide pacing">🌊 Ocean Breath Surf</button>
+          <button class="sound-chip ${SoundEngine.ambientPreset === 'forest_rain' ? 'active' : ''}" data-preset="forest_rain" onclick="ResetModal.changeSoundPreset('forest_rain')" title="Gentle rain and 528Hz mental clarity pad">🌧️ Forest Rain & 528Hz</button>
         </div>
       </div>
 
@@ -692,6 +771,15 @@ const ResetModal = {
       indicator.style.background = isPlaying ? "#10B981" : "#9CA3AF";
       indicator.style.boxShadow = isPlaying ? "0 0 8px rgba(16, 185, 129, 0.6)" : "none";
     }
+  },
+
+  changeSoundPreset(preset) {
+    SoundEngine.setPreset(preset);
+    document.querySelectorAll(".sound-chip").forEach(c => {
+      c.classList.toggle("active", c.dataset.preset === preset);
+    });
+    const titleEl = document.getElementById("activeSoundscapeTitle");
+    if (titleEl) titleEl.innerText = SoundEngine.getPresetName(preset);
   },
 
   nextStep(isAuto = false) {
