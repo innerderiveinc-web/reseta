@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="RESETA™ Enterprise",
-    description="B2B Mental Wellness & Stress Recovery Platform API",
+    description="B2B Mental Wellness & Stress Recovery Platform · Architected & Engineered by Qsura India Pvt. Ltd.",
     version=settings.APP_VERSION,
     docs_url="/api/docs",
     redoc_url="/api/redoc",
@@ -48,16 +48,13 @@ app.include_router(copilot.router)
 app.include_router(governance.router)
 app.include_router(scim.router)
 
-
-
-
-
 @app.get("/api/health")
 def health_check():
     return {
         "status": "HEALTHY",
         "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
+        "developer": settings.DEVELOPER_ENTITY,
         "environment": settings.ENVIRONMENT,
         "safety_firewall": "ACTIVE",
         "privacy_wall": "ENFORCED",

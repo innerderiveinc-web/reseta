@@ -4,6 +4,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     APP_NAME: str = "RESETA™ Enterprise"
+    DEVELOPER_ENTITY: str = "Qsura India Pvt. Ltd."
     APP_VERSION: str = "1.0.0"
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DATABASE_URL: str = os.getenv("DATABASE_URL", "sqlite:///./reseta.db")
