@@ -36,6 +36,11 @@ const App = {
 
   async loadCurrentPersona() {
     try {
+      if (!API.token) {
+        this.currentUser = null;
+        this.updateAuthState();
+        return;
+      }
       this.currentUser = await API.getCurrentUser();
       const selectEl = document.getElementById("personaSelect");
       if (selectEl) selectEl.value = this.currentUser.id;
@@ -46,9 +51,11 @@ const App = {
       const userRoleEl = document.getElementById("currentUserRole");
       if (userRoleEl) userRoleEl.innerText = this.currentUser.role.replace('_', ' ');
 
-      this.updateJwtBadge();
+      this.updateAuthState();
     } catch (err) {
       console.error("Error fetching current user:", err);
+      this.currentUser = null;
+      this.updateAuthState();
     }
   },
 
@@ -64,7 +71,7 @@ const App = {
       const selectEl = document.getElementById("personaSelect");
       if (selectEl) selectEl.value = this.currentUser.id;
 
-      this.updateJwtBadge();
+      this.updateAuthState();
 
       // Automatically pivot to the relevant surface if persona role changes
       if (this.currentUser.role === "EMPLOYEE") this.switchSurface("employee");
@@ -77,6 +84,55 @@ const App = {
     } catch (err) {
       alert("Error switching user persona: " + err.message);
     }
+  },
+
+  getRoleColor(role) {
+    switch (role) {
+      case "SUPER_ADMIN": return "#4f46e5";
+      case "HR_ADMIN": return "#0d9488";
+      case "MANAGER": return "#2563eb";
+      case "CLINICIAN": return "#e11d48";
+      case "AUDITOR": return "#b45309";
+      default: return "var(--brand-reset)";
+    }
+  },
+
+  updateAuthState() {
+    const hasToken = !!API.token && !!this.currentUser;
+    const outBox = document.getElementById("loggedOutControls");
+    const inBox = document.getElementById("loggedInControls");
+
+    if (hasToken) {
+      if (outBox) outBox.style.display = "none";
+      if (inBox) inBox.style.display = "flex";
+
+      const nameEl = document.getElementById("userDisplayName");
+      const roleEl = document.getElementById("userRoleBadge");
+      const avatarEl = document.getElementById("userAvatarImg");
+      const selectEl = document.getElementById("personaSelect");
+
+      if (nameEl) nameEl.innerText = this.currentUser.full_name;
+      if (roleEl) {
+        roleEl.innerText = this.currentUser.role.replace('_', ' ');
+        roleEl.style.background = this.getRoleColor(this.currentUser.role);
+      }
+      if (avatarEl) {
+        avatarEl.src = this.currentUser.avatar_url || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=60&auto=format&fit=crop&q=80";
+      }
+      if (selectEl) selectEl.value = this.currentUser.id;
+
+      this.updateJwtBadge();
+    } else {
+      if (outBox) outBox.style.display = "flex";
+      if (inBox) inBox.style.display = "none";
+    }
+  },
+
+  logout() {
+    API.setToken(null);
+    this.currentUser = null;
+    this.updateAuthState();
+    this.showToast("🔒 Signed out of enterprise session");
   },
 
   setupSurfaceNavigation() {
@@ -1174,7 +1230,7 @@ const App = {
       const selectEl = document.getElementById("personaSelect");
       if (selectEl) selectEl.value = this.currentUser.id;
 
-      this.updateJwtBadge();
+      this.updateAuthState();
       this.closeLoginModal();
 
       if (this.currentUser.role === "EMPLOYEE") this.switchSurface("employee");

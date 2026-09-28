@@ -43,18 +43,39 @@
         <span class="tenant-dot"></span>
         <span id="tenantOrgDisplay">TechNova India (850 Seats)</span>
       </div>
-      <div style="display: flex; align-items: center; gap: 10px;">
-        <span id="jwtAuthBadge" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(16, 185, 129, 0.25);" title="Click to view RFC 7519 JWT Cryptographic Details" onclick="App.showJwtDetails()">
-          <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981;"></span>
-          JWT Authenticated
+      <!-- State 1: Logged Out Controls -->
+      <div id="loggedOutControls" style="display: flex; align-items: center; gap: 8px;">
+        <span class="tenant-badge" style="background: rgba(0,0,0,0.04); font-size: 11px;">
+          🔒 SSO Portal
         </span>
-        <button id="openLoginModalBtn" class="btn-small-pill" onclick="App.openLoginModal()" style="font-size: 11px; padding: 5px 12px; font-weight: 600;">
+        <button id="openLoginModalBtn" class="btn-primary" onclick="App.openLoginModal()" style="font-size: 12px; padding: 6px 14px; font-weight: 600; background: var(--brand-reset);">
           🔑 Enterprise Sign-In
         </button>
-        <label for="personaSelect" style="font-size: 11px; color: var(--text-muted); font-weight: 600;">ACTIVE ROLE:</label>
-        <select id="personaSelect" class="persona-select">
-          <!-- Populated by App.loadPersonas() -->
-        </select>
+      </div>
+
+      <!-- State 2: Authenticated Session Controls (Unlocked post-login) -->
+      <div id="loggedInControls" style="display: none; align-items: center; gap: 10px;">
+        <span id="jwtAuthBadge" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(16, 185, 129, 0.25);" title="Click to view RFC 7519 JWT Cryptographic Details" onclick="App.showJwtDetails()">
+          <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981;"></span>
+          JWT Active
+        </span>
+
+        <div id="userProfileChip" style="display: flex; align-items: center; gap: 8px; padding: 3px 10px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px;">
+          <img id="userAvatarImg" src="" alt="Avatar" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;">
+          <span id="userDisplayName" style="font-size: 12px; font-weight: 700; color: var(--text-main);"></span>
+          <span id="userRoleBadge" class="brand-badge" style="font-size: 10px; padding: 2px 7px;"></span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <label for="personaSelect" style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Switch Role:</label>
+          <select id="personaSelect" class="persona-select" style="font-size: 11px; padding: 4px 8px;">
+            <!-- Populated by App.loadPersonas() -->
+          </select>
+        </div>
+
+        <button class="btn-small-pill" onclick="App.logout()" style="font-size: 11px; padding: 4px 10px; color: var(--text-muted); border-color: var(--border-light);" title="Sign out of enterprise session">
+          Sign Out
+        </button>
       </div>
     </div>
   </header>
