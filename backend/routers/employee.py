@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
 from backend.database import get_db
-from backend.models import User, CheckIn, InterventionSession, WorkplaceProgram, SafetyEvent
+from backend.models import User, CheckIn, InterventionSession, WorkplaceProgram, SafetyEvent, Consent, PersonalPattern
 from backend.schemas import (
     CheckInRequest, CheckInResponse, ResetIntentRequest,
     ResetSessionPlanResponse, CompleteResetRequest, CompleteResetResponse,
@@ -19,15 +19,19 @@ from backend.engines.state_engine import StateEngine
 from backend.engines.intervention_router import InterventionRouter
 from backend.engines.mental_load_unload import MentalLoadUnloadEngine
 from backend.engines.personalization_engine import PersonalizationEngine
+from backend.engines.autopilot_engine import AutopilotEngine
 from backend.engines.ai_gateway import AIGateway
-from backend.routers.auth import ACTIVE_USER_ID
+from backend.security import get_current_user
 
 router = APIRouter(prefix="/api/employee", tags=["Employee Experience"])
 
 @router.post("/checkin", response_model=CheckInResponse)
-def submit_checkin(req: CheckInRequest, db: Session = Depends(get_db)):
+def submit_checkin(
+    req: CheckInRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Hero check-in: 'How's your mind right now?'"""
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     time_of_day = req.time_of_day or "Midday"
 
     checkin = CheckIn(
@@ -59,24 +63,25 @@ def submit_checkin(req: CheckInRequest, db: Session = Depends(get_db)):
     )
 
 @router.post("/reset/plan", response_model=ResetSessionPlanResponse)
-def create_reset_session(req: ResetIntentRequest, db: Session = Depends(get_db)):
+def create_reset_session(
+    req: ResetIntentRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     🔴 RESET ME Engine:
     Step 1: Time (2/5/10 min)
     Step 2: What's going on (tap/type/speak)
     Step 3: Support goal -> Intervention Router -> Do It With Me™ steps + Mental Load Unload
     """
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     user_id = user.id if user else "user-emp-arjun"
     org_id = user.organization_id if user else "org-technova-01"
 
     # 1. Independent Safety Firewall Screen
     safety_tier, escalation_needed, crisis_info = SafetyFirewall.evaluate_input(req.raw_input or "")
 
-    # If RED tier, log safety event and return emergency crisis resources
     if safety_tier == "RED":
         safe_evt = SafetyEvent(
-            id=f"safe-{uuid.uuid4().hex[:8]}",
             organization_id=org_id,
             user_id_hash=f"anon-{uuid.uuid4().hex[:6]}",
             tier="RED",
@@ -144,19 +149,23 @@ def create_reset_session(req: ResetIntentRequest, db: Session = Depends(get_db))
         target_state=target_state,
         duration_minutes=req.time_choice_minutes,
         safety_tier=safety_tier,
-        escalation_needed=(safety_tier == "AMBER"),
-        crisis_resources=crisis_info if safety_tier == "AMBER" else None,
+        escalation_needed=(safety_tier == "RED"),
+        crisis_resources=crisis_info if safety_tier != "GREEN" else {},
         steps=routed["steps"],
         unload_result=unload_res,
-        closing_prompt="Reset complete. You don't need to solve everything today."
+        closing_prompt=routed.get("closing_prompt") or "You've created breathing room. Take a sip of water before returning to your work."
     )
 
 @router.post("/reset/complete", response_model=CompleteResetResponse)
-def complete_reset_session(req: CompleteResetRequest, db: Session = Depends(get_db)):
+def complete_reset_session(
+    req: CompleteResetRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Relief Check™ (Section 12):
-    Before: Stress 8/10 -> After: Stress 4/10 -> Did this help? Yes/A little/No.
-    Calculates Successful Recovery Moment for North Star metric.
+    Captures before/after stress rating (1-10) and helpfulness feedback.
+    Calculates Relief Delta and feeds Personal Relief Map™.
     """
     outcome = PersonalizationEngine.evaluate_relief(
         db=db,
@@ -180,20 +189,21 @@ def talk_it_out(req: TalkItOutRequest):
     """
     🎙 TALK IT OUT™ (Section 16):
     Voice or text stream -> Safety check -> Reflection -> Immediate actionable reset.
-    Supports natural Hinglish / Hindi / English phrases.
+    Supports natural Hinglish / Hindi / English phrases with pluggable LLM generation.
     """
     result = AIGateway.process_talk_it_out(req.transcript_or_text, preferred_language=req.language)
     return TalkItOutResponse(**result)
 
 @router.get("/personal-relief-map")
-def get_personal_relief_map(db: Session = Depends(get_db)):
+def get_personal_relief_map(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Personal Relief Map™ (Section 13) and Mind Mirror™ (Section 14).
     Private to the employee.
     """
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     user_id = user.id if user else "user-emp-arjun"
-
     mind_mirror = PersonalizationEngine.get_mind_mirror_insights(db, user_id=user_id)
 
     # Fetch recent personal sessions
@@ -221,93 +231,59 @@ def get_personal_relief_map(db: Session = Depends(get_db)):
     ]
 
     return {
-        "user_name": user.full_name if user else "Arjun Sharma",
+        "user_id": user_id,
         "mind_mirror": mind_mirror,
         "recent_history": history
     }
 
 @router.get("/programs")
 def list_workplace_programs(db: Session = Depends(get_db)):
-    """Workplace-specific programs (Section 18)"""
-    programs = db.query(WorkplaceProgram).all()
-    return [
-        {
-            "id": p.id,
-            "name": p.name,
-            "description": p.description,
-            "duration_days": p.duration_days,
-            "target_audience": p.target_audience,
-            "active_participants": p.active_participants,
-            "completion_rate_pct": int(p.completion_rate * 100),
-            "steps": p.steps
-        }
-        for p in programs
-    ]
+    """Workplace-specific Programs (Section 18)"""
+    return db.query(WorkplaceProgram).all()
 
 @router.get("/daily-recovery")
 def get_daily_recovery_prompt():
-    """Daily recovery routine prompts (Section 17)"""
-    now = datetime.datetime.now()
-    hour = now.hour
-
-    if hour < 12:
-        return {
-            "period": "Morning",
-            "headline": "How's your mind today?",
-            "subtext": "Set a calm, centered baseline before the day's meetings begin.",
-            "recommended_time": 2,
-            "suggested_action": "Take a 2-minute morning grounding breath."
-        }
-    elif hour < 17:
-        return {
-            "period": "Midday",
-            "headline": "Need a 2-minute reset?",
-            "subtext": "Decompress from morning discussions and sharpen focus for the afternoon.",
-            "recommended_time": 2,
-            "suggested_action": "Quick priority compression or shoulder release."
-        }
-    elif hour < 21:
-        return {
-            "period": "Evening",
-            "headline": "Unload today's mental baggage.",
-            "subtext": "Park tomorrow's tasks so your mind can fully step away from work.",
-            "recommended_time": 5,
-            "suggested_action": "End-of-day Mental Load Unload™."
-        }
+    """Daily Recovery Prompt (Section 17)"""
+    now_hour = datetime.datetime.now().hour
+    if now_hour < 12:
+        period = "Morning"
+        headline = "How's your headspace today?"
+        subtext = "Start clear. A 2-minute focus grounding sets your day's pace."
+        suggested_action = "2-Min Morning Grounding"
+    elif now_hour < 17:
+        period = "Midday"
+        headline = "Afternoon reset needed?"
+        subtext = "Clear meeting debris and reset your focus before the next block."
+        suggested_action = "5-Min Cognitive Defrag"
     else:
-        return {
-            "period": "Night",
-            "headline": "Ready to shut work out for today?",
-            "subtext": "Your evening recovery belongs to you. Close work loops for restorative sleep.",
-            "recommended_time": 5,
-            "suggested_action": "End-of-day Mental Shutdown™."
-        }
+        period = "Evening"
+        headline = "Ready to shut work out for today?"
+        subtext = "Unload uncompleted items so you don't carry them home tonight."
+        suggested_action = "3-Min End-of-Day Shutdown"
 
-@router.post("/send-a-reset")
-def send_a_reset(colleague_name: str = "Teammate"):
-    """
-    Section 60: Send a Reset
-    An employee sends a colleague a neutral, caring invite:
-    'Take 5 minutes. You don't have to fix everything right now.'
-    No sensitive or health information is shared.
-    """
     return {
-        "success": True,
-        "message": f"Reset invite generated for {colleague_name}.",
-        "invite_text": "Take 5 minutes. You don't have to fix everything right now.",
-        "invite_link": "/?action=reset_invite&from=colleague"
+        "period": period,
+        "headline": headline,
+        "subtext": subtext,
+        "suggested_action": suggested_action
     }
 
-# ==========================================================
-# Section 15: RESETA AUTOPILOT™ & Section 43: DPDP Rights
-# ==========================================================
-from backend.engines.autopilot_engine import AutopilotEngine
-from backend.models import Consent, PersonalPattern
+@router.post("/send-a-reset")
+def send_a_reset_invite(colleague_name: str):
+    """Peer Reset Invite Loop (Section 60)"""
+    return {
+        "success": True,
+        "colleague_name": colleague_name,
+        "invite_text": f"Hey {colleague_name}, take 5 minutes to reset. You don't have to fix everything right now."
+    }
 
 @router.get("/autopilot/prompt")
-def get_autopilot_prompt(meetings_today: int = 4, db: Session = Depends(get_db)):
+def get_autopilot_prompt(
+    meetings_today: int = 4,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Contextual JITAI reset prompt based on permissioned signals"""
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     return AutopilotEngine.evaluate_contextual_signal(
         db=db,
         user_id=user.id if user else "user-emp-arjun",
@@ -315,9 +291,11 @@ def get_autopilot_prompt(meetings_today: int = 4, db: Session = Depends(get_db))
     )
 
 @router.get("/dpdp/export")
-def export_employee_data_archive(db: Session = Depends(get_db)):
+def export_employee_data_archive(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Right to Data Portability (DPDP Act 2025)"""
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -361,9 +339,12 @@ class ConsentToggleRequest(BaseModel):
     granted: bool
 
 @router.post("/dpdp/consent-toggle")
-def toggle_consent(req: ConsentToggleRequest, db: Session = Depends(get_db)):
+def toggle_consent(
+    req: ConsentToggleRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Right to Withdraw Consent (DPDP Act 2025)"""
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     user_id = user.id if user else "user-emp-arjun"
 
     consent = db.query(Consent).filter(Consent.user_id == user_id, Consent.purpose == req.purpose).first()
@@ -379,9 +360,11 @@ def toggle_consent(req: ConsentToggleRequest, db: Session = Depends(get_db)):
     return {"success": True, "purpose": req.purpose, "granted": req.granted}
 
 @router.post("/dpdp/erasure")
-def request_personal_data_erasure(db: Session = Depends(get_db)):
+def request_personal_data_erasure(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Right to Erasure (DPDP Act 2025)"""
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -400,4 +383,3 @@ def request_personal_data_erasure(db: Session = Depends(get_db)):
         "success": True,
         "message": "All private reflections, unloads, and personal relief patterns have been permanently erased per DPDP Act 2025."
     }
-

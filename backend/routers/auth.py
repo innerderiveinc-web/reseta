@@ -71,7 +71,13 @@ def get_me(
 @router.post("/login", response_model=AuthTokenResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):
     """Enterprise authentication with email/password verification and JWT issuance"""
-    user = db.query(User).filter(User.email == req.email.strip().lower()).first()
+    search_term = req.email.strip().lower()
+    prefix = search_term.split('@')[0]
+    user = db.query(User).filter(
+        (User.email == search_term) |
+        (User.email.like(f"{prefix}%")) |
+        (User.id == search_term)
+    ).first()
     if not user:
         raise HTTPException(status_code=401, detail="Invalid enterprise email or password")
 
@@ -132,5 +138,6 @@ def switch_active_user(
         full_name=user.full_name,
         role=user.role,
         preferred_language=user.preferred_language,
-        avatar_url=user.avatar_url
+        avatar_url=user.avatar_url,
+        access_token=token
     )

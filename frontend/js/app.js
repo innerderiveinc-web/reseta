@@ -10,6 +10,7 @@ const App = {
 
     await this.loadPersonas();
     await this.loadCurrentPersona();
+    this.updateJwtBadge();
     this.setupSurfaceNavigation();
     this.setupEventListeners();
     this.refreshActiveSurface();
@@ -44,6 +45,8 @@ const App = {
 
       const userRoleEl = document.getElementById("currentUserRole");
       if (userRoleEl) userRoleEl.innerText = this.currentUser.role.replace('_', ' ');
+
+      this.updateJwtBadge();
     } catch (err) {
       console.error("Error fetching current user:", err);
     }
@@ -57,6 +60,11 @@ const App = {
 
       const userRoleEl = document.getElementById("currentUserRole");
       if (userRoleEl) userRoleEl.innerText = this.currentUser.role.replace('_', ' ');
+
+      const selectEl = document.getElementById("personaSelect");
+      if (selectEl) selectEl.value = this.currentUser.id;
+
+      this.updateJwtBadge();
 
       // Automatically pivot to the relevant surface if persona role changes
       if (this.currentUser.role === "EMPLOYEE") this.switchSurface("employee");
@@ -534,6 +542,7 @@ const App = {
           </table>
         `;
       }
+      await this.loadLlmConfig();
     } catch (err) {
       console.error("Error loading admin data:", err);
     }
@@ -1137,6 +1146,153 @@ const App = {
           </p>
         </div>
       `;
+    }
+  },
+
+  // 7. JWT Authentication & Persona Gateway
+  openLoginModal() {
+    const modal = document.getElementById("loginModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  closeLoginModal() {
+    const modal = document.getElementById("loginModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  async handleEmailLogin(e) {
+    if (e) e.preventDefault();
+    const email = document.getElementById("loginEmail").value;
+    const password = document.getElementById("loginPassword").value;
+    try {
+      const res = await API.login(email, password);
+      this.currentUser = res.user;
+      const userNameEl = document.getElementById("currentUserName");
+      if (userNameEl) userNameEl.innerText = this.currentUser.full_name;
+      const userRoleEl = document.getElementById("currentUserRole");
+      if (userRoleEl) userRoleEl.innerText = this.currentUser.role.replace('_', ' ');
+      const selectEl = document.getElementById("personaSelect");
+      if (selectEl) selectEl.value = this.currentUser.id;
+
+      this.updateJwtBadge();
+      this.closeLoginModal();
+
+      if (this.currentUser.role === "EMPLOYEE") this.switchSurface("employee");
+      else if (this.currentUser.role === "MANAGER") this.switchSurface("manager");
+      else if (this.currentUser.role === "HR_ADMIN") this.switchSurface("hr");
+      else if (this.currentUser.role === "SUPER_ADMIN" || this.currentUser.role === "AUDITOR") this.switchSurface("admin");
+      else if (this.currentUser.role === "CLINICIAN") this.switchSurface("care");
+
+      this.refreshActiveSurface();
+      alert(`Authenticated successfully as ${this.currentUser.full_name} (${this.currentUser.role}). Cryptographic JWT Bearer token issued.`);
+    } catch (err) {
+      alert("Sign-in failed: " + err.message);
+    }
+  },
+
+  async loginAsPersona(userId) {
+    this.closeLoginModal();
+    await this.switchPersona(userId);
+  },
+
+  updateJwtBadge() {
+    const badge = document.getElementById("jwtAuthBadge");
+    if (!badge) return;
+    const token = API.token;
+    if (token) {
+      badge.style.background = "rgba(16, 185, 129, 0.12)";
+      badge.style.color = "#059669";
+      badge.style.borderColor = "rgba(16, 185, 129, 0.25)";
+      badge.innerHTML = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#10B981;"></span> JWT Authenticated`;
+      badge.title = "RFC 7519 HMAC-SHA256 Token Active: Click to view claims";
+    } else {
+      badge.style.background = "rgba(239, 68, 68, 0.12)";
+      badge.style.color = "#dc2626";
+      badge.style.borderColor = "rgba(239, 68, 68, 0.25)";
+      badge.innerHTML = `<span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#ef4444;"></span> Token Missing`;
+      badge.title = "Click to authenticate";
+    }
+  },
+
+  showJwtDetails() {
+    const token = API.token;
+    if (!token) {
+      this.openLoginModal();
+      return;
+    }
+    try {
+      const parts = token.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(atob(parts[1]));
+        const expDate = new Date(payload.exp * 1000).toLocaleString();
+        alert(`RESETA™ RFC 7519 JWT Cryptographic Token\n\nAlgorithm: HS256 (HMAC-SHA256)\nSubject: ${payload.sub}\nRole: ${payload.role}\nOrganization: ${payload.org}\nExpires: ${expDate}\n\nAll subsequent requests automatically inject this Bearer token via Authorization header.`);
+      } else {
+        alert("Valid Bearer Token Active:\n" + token);
+      }
+    } catch (e) {
+      alert("Bearer Token Active: " + token);
+    }
+  },
+
+  // 8. AI Model Gateway Management (Section 31)
+  async loadLlmConfig() {
+    try {
+      const config = await API.getLlmConfig();
+      const nameEl = document.getElementById("llmActiveProviderName");
+      const descEl = document.getElementById("llmActiveProviderDesc");
+      const badgeEl = document.getElementById("adminLlmStatusBadge");
+
+      if (nameEl) nameEl.innerText = config.active_provider.replace(/_/g, ' ');
+      if (badgeEl) {
+        if (config.is_live_external) {
+          badgeEl.innerText = `🟢 Live ${config.active_provider}`;
+          badgeEl.style.background = "var(--recovery-emerald)";
+        } else {
+          badgeEl.innerText = "🛡️ Safety Fallback Engine";
+          badgeEl.style.background = "var(--recovery-teal)";
+        }
+      }
+      if (descEl) {
+        descEl.innerText = config.is_live_external
+          ? "Live cloud LLM inference active with strict non-diagnostic boundary."
+          : "Deterministic, zero-latency clinical safety engine (100% offline uptime).";
+      }
+    } catch (err) {
+      console.error("Error loading LLM config:", err);
+    }
+  },
+
+  async runLlmInferenceTest() {
+    const promptInput = document.getElementById("llmTestPrompt");
+    const resultBox = document.getElementById("llmTestResultBox");
+    const metaEl = document.getElementById("llmTestMeta");
+    const statusEl = document.getElementById("llmTestStatus");
+    const respEl = document.getElementById("llmTestResponse");
+
+    if (!promptInput || !resultBox) return;
+    const prompt = promptInput.value.trim();
+    if (!prompt) return;
+
+    resultBox.style.display = "block";
+    metaEl.innerText = "Querying Model Gateway...";
+    statusEl.innerText = "IN_PROGRESS";
+    statusEl.style.color = "var(--text-muted)";
+    respEl.innerText = "Generating recovery response...";
+
+    const t0 = performance.now();
+    try {
+      const res = await API.testLlmGeneration(prompt);
+      const elapsed = Math.round(performance.now() - t0);
+
+      metaEl.innerText = `Provider: ${res.provider} · Model: ${res.model} (${elapsed}ms)`;
+      statusEl.innerText = res.status;
+      statusEl.style.color = res.status === "LIVE_LLM_GENERATED" ? "var(--recovery-emerald)" : "var(--recovery-teal)";
+      respEl.innerText = res.text;
+    } catch (err) {
+      metaEl.innerText = "Gateway Error";
+      statusEl.innerText = "FAILED";
+      statusEl.style.color = "var(--red-crisis)";
+      respEl.innerText = "Error invoking model gateway: " + err.message;
     }
   },
 

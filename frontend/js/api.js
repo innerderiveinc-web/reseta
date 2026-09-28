@@ -41,7 +41,11 @@ const API = {
     if (res.access_token) API.setToken(res.access_token);
     return res;
   },
-  switchUser: (userId) => API.post('/api/auth/switch-user', { user_id: userId }),
+  switchUser: async (userId) => {
+    const res = await API.post('/api/auth/switch-user', { user_id: userId });
+    if (res.access_token) API.setToken(res.access_token);
+    return res;
+  },
 
   // Employee Surface
   checkIn: (state) => API.post('/api/employee/checkin', { state_reported: state }),
@@ -69,6 +73,8 @@ const API = {
   getRbacMatrix: () => API.get('/api/admin/rbac-matrix'),
   getDpdpStatus: () => API.get('/api/admin/dpdp-status'),
   getAuditLogs: () => API.get('/api/admin/audit-logs'),
+  getLlmConfig: () => API.get('/api/admin/llm-config'),
+  testLlmGeneration: (prompt) => API.post('/api/admin/llm-test', { prompt }),
 
   // Care Surface
   getCareResources: () => API.get('/api/care/resources'),

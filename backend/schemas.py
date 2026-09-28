@@ -14,6 +14,7 @@ class UserProfile(BaseModel):
     role: str
     preferred_language: str
     avatar_url: Optional[str] = None
+    access_token: Optional[str] = None
 
 class SwitchUserRequest(BaseModel):
     user_id: str
@@ -64,7 +65,7 @@ class ResetSessionPlanResponse(BaseModel):
     crisis_resources: Optional[Dict[str, Any]] = None
     steps: List[StepScript]
     unload_result: Optional[UnloadCategory] = None
-    closing_prompt: str
+    closing_prompt: Optional[str] = "You've created breathing room. Take a sip of water before returning to your work."
 
 class CompleteResetRequest(BaseModel):
     session_id: str

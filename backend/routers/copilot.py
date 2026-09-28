@@ -10,7 +10,7 @@ from backend.models import User
 from backend.engines.privacy_engine import PrivacyEngine
 from backend.engines.llm_provider import LLMProvider
 from backend.engines.safety_firewall import SafetyFirewall
-from backend.routers.auth import ACTIVE_USER_ID
+from backend.security import get_current_user
 
 router = APIRouter(prefix="/api/copilot", tags=["AI Copilots"])
 
@@ -18,14 +18,17 @@ class CopilotQueryRequest(BaseModel):
     query: str
 
 @router.post("/manager")
-def query_manager_copilot(req: CopilotQueryRequest, db: Session = Depends(get_db)):
+def query_manager_copilot(
+    req: CopilotQueryRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     RESETA Manager Copilot™ (Section 48):
     Provides leader conversation guidance, meeting-load ideas, and workload discussion prompts.
     STRICT PRIVACY GUARANTEE: Never discloses individual employee mental-health information.
     Powered by pluggable LLM provider with clinical heuristic safety fallback.
     """
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
 
     PrivacyEngine.audit_access(
         db=db,
@@ -90,12 +93,15 @@ def query_manager_copilot(req: CopilotQueryRequest, db: Session = Depends(get_db
     }
 
 @router.post("/hr")
-def query_hr_copilot(req: CopilotQueryRequest, db: Session = Depends(get_db)):
+def query_hr_copilot(
+    req: CopilotQueryRequest,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     RESETA Workforce Intelligence Copilot™ (Section 49):
     Provides HR leaders with aggregate theme insights, program performance, and workplace experiment ideas.
     """
-    user = db.query(User).filter(User.id == ACTIVE_USER_ID).first()
 
     PrivacyEngine.audit_access(
         db=db,

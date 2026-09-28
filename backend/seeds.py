@@ -148,10 +148,12 @@ def seed_database():
     db.add_all([user_emp, user_mgr, user_hr, user_admin, user_care, user_auditor] + extra_users)
 
     # 5. Consents (DPDP 2025 compliant)
-    for u in [user_emp, user_mgr, user_hr]:
+    all_users = [user_emp, user_mgr, user_hr, user_admin, user_care, user_auditor] + extra_users
+    for u in all_users:
         c1 = Consent(user_id=u.id, purpose="WELLNESS_INTERVENTIONS", granted=True, dpdp_notice_acknowledged=True)
         c2 = Consent(user_id=u.id, purpose="ANONYMIZED_WORKFORCE_AGGREGATION", granted=True, dpdp_notice_acknowledged=True)
-        db.add_all([c1, c2])
+        c3 = Consent(user_id=u.id, purpose="CONTEXTUAL_PROMPTS", granted=True, dpdp_notice_acknowledged=True)
+        db.add_all([c1, c2, c3])
 
     # 6. Interventions catalog from INTERVENTION_CATALOG
     for key, data in INTERVENTION_CATALOG.items():
@@ -305,14 +307,19 @@ def seed_database():
     db.add(safe1)
 
     # 13. Audit Log (Section 23, 42)
-    audit1 = AuditLog(
-        organization_id=org.id,
-        actor_id=user_hr.id,
-        actor_role="HR_ADMIN",
-        action="VIEW_AGGREGATE_REPORT",
-        details="Generated Q1 Workforce Wellbeing Intelligence summary. Strict k=5 anonymity enforced."
-    )
-    db.add(audit1)
+    audit_logs = [
+        AuditLog(organization_id=org.id, actor_id=user_hr.id, actor_role="HR_ADMIN",
+                 action="VIEW_AGGREGATE_REPORT", details="Generated Q1 Workforce Wellbeing Intelligence summary. Strict k=5 anonymity enforced."),
+        AuditLog(organization_id=org.id, actor_id=user_admin.id, actor_role="SUPER_ADMIN",
+                 action="SCIM_PROVISIONING_SYNC", details="SCIM 2.0 incremental directory sync completed. 20 identities reconciled."),
+        AuditLog(organization_id=org.id, actor_id=user_mgr.id, actor_role="MANAGER",
+                 action="VIEW_TEAM_AGGREGATE_INSIGHTS", details="Accessed Frontend Squad aggregate wellbeing themes (k=12)."),
+        AuditLog(organization_id=org.id, actor_id=user_auditor.id, actor_role="AUDITOR",
+                 action="EXPORT_DPDP_CONSENT_REGISTRY", details="Periodic verification of DPDP Act 2025 consent compliance."),
+        AuditLog(organization_id=org.id, actor_id=user_care.id, actor_role="CLINICIAN",
+                 action="TRIAGE_SAFETY_EVENT", details="Reviewed confidential tele-MANAS crisis referral queue. Zero PII exposed.")
+    ]
+    db.add_all(audit_logs)
 
     db.commit()
     print("Database seeding completed successfully!")

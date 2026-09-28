@@ -57,3 +57,46 @@ def test_llm_provider_offline_safe_fallback():
     assert "text" in res
     assert res["status"] in ["LIVE_LLM_GENERATED", "DETERMINISTIC_OFFLINE_SAFETY_FALLBACK"]
     assert res["provider"] in ["OPENAI_GPT4O", "GOOGLE_GEMINI", "RESETA_CLINICAL_HEURISTIC_ENGINE"]
+
+def test_login_endpoint_and_jwt_issuance():
+    res = client.post("/api/auth/login", json={"email": "arjun@technova.com", "password": "technova2026"})
+    assert res.status_code == 200
+    data = res.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+    assert data["user"]["email"] == "arjun.sharma@technova.com"
+    # Verify token decodes properly
+    payload = decode_access_token(data["access_token"])
+    assert payload["sub"] == data["user"]["id"]
+
+def test_admin_llm_config_and_inference():
+    token = create_access_token("user-admin-rahul", "SUPER_ADMIN", "org-technova-01")
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Test config
+    cfg = client.get("/api/admin/llm-config", headers=headers)
+    assert cfg.status_code == 200
+    cfg_data = cfg.json()
+    assert "active_provider" in cfg_data
+    assert "supported_providers" in cfg_data
+
+    # Test inference endpoint
+    inf = client.post("/api/admin/llm-test", json={"prompt": "How to decompress quickly?"}, headers=headers)
+    assert inf.status_code == 200
+    inf_data = inf.json()
+    assert "text" in inf_data
+    assert "provider" in inf_data
+
+def test_admin_dpdp_genuine_status():
+    token = create_access_token("user-admin-rahul", "SUPER_ADMIN", "org-technova-01")
+    headers = {"Authorization": f"Bearer {token}"}
+    res = client.get("/api/admin/dpdp-status", headers=headers)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["act_name"] == "Digital Personal Data Protection Act, 2023 / Rules 2025"
+    assert data["minimum_cohort_enforced"] == 5
+    assert data["privacy_wall_active"] is True
+    # Verify genuine non-padded counts
+    assert isinstance(data["consent_count"], int)
+    assert isinstance(data["audit_events_count"], int)
+

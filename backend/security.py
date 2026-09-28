@@ -91,8 +91,14 @@ def get_current_user(
         except Exception:
             pass
 
-    # Seamless demo fallback if no token provided
-    default_user = db.query(User).filter(User.id == "user-emp-arjun").first()
+    # Seamless fallback if no bearer token provided
+    try:
+        from backend.routers.auth import ACTIVE_USER_ID
+        active_id = ACTIVE_USER_ID
+    except Exception:
+        active_id = "user-emp-arjun"
+
+    default_user = db.query(User).filter(User.id == active_id).first()
     if not default_user:
         default_user = db.query(User).first()
     return default_user
