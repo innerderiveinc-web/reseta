@@ -266,6 +266,61 @@ const SoundEngine = {
 
 window.SoundEngine = SoundEngine;
 
+// ==========================================================
+// VoiceCoach: Soothing Audio Narration (Web Speech API)
+// Speaks instructions out loud so users can keep eyes closed!
+// ==========================================================
+const VoiceCoach = {
+  enabled: true,
+  currentUtterance: null,
+
+  speak(text) {
+    if (!this.enabled || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel(); // Stop any pending speech
+      const cleanText = text
+        .replace(/<[^>]*>/g, '')
+        .replace(/[\*\#\_]/g, '')
+        .trim();
+
+      if (!cleanText) return;
+
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 0.86; // calm, unhurried, mindful breathing pace
+      utterance.pitch = 0.98; // warm, grounded tone
+
+      const voices = window.speechSynthesis.getVoices();
+      if (voices && voices.length > 0) {
+        const preferredVoice = voices.find(v => 
+          v.lang.includes("en-IN") || v.lang.includes("hi-IN") || v.name.includes("Natural") || v.name.includes("Google") || v.name.includes("Samantha")
+        );
+        if (preferredVoice) utterance.voice = preferredVoice;
+      }
+
+      window.speechSynthesis.speak(utterance);
+      this.currentUtterance = utterance;
+    } catch (e) {
+      console.warn("VoiceCoach speech error:", e);
+    }
+  },
+
+  stop() {
+    if ('speechSynthesis' in window) {
+      try {
+        window.speechSynthesis.cancel();
+      } catch (e) {}
+    }
+  },
+
+  toggle() {
+    this.enabled = !this.enabled;
+    if (!this.enabled) this.stop();
+    return this.enabled;
+  }
+};
+
+window.VoiceCoach = VoiceCoach;
+
 // Unlock audio context on any user interaction with the document
 document.addEventListener("click", () => SoundEngine.unlock(), { once: false });
 document.addEventListener("keydown", () => SoundEngine.unlock(), { once: false });
@@ -278,6 +333,8 @@ const ResetModal = {
   currentSession: null,
   currentStepIndex: 0,
   stepTimer: null,
+  stepSecondsRemaining: 0,
+  isAutoPlay: true, // Hands-Free Auto-Step mode: active by default so eyes stay closed!
   selectedTime: 5,
   selectedState: "overloaded",
   stressBefore: 8,
@@ -301,6 +358,7 @@ const ResetModal = {
 
   close() {
     if (this.stepTimer) clearInterval(this.stepTimer);
+    VoiceCoach.stop();
     SoundEngine.stopAmbientSoundscape(0.3);
     this.modalEl.classList.remove("active");
   },
@@ -486,21 +544,51 @@ const ResetModal = {
       `;
     }
 
+    // 1. Spoken Audio Voice Narration (so user can keep eyes closed)
+    VoiceCoach.speak(`${step.title}. ${step.instruction}`);
+
+    // 2. Start Hands-Free auto countdown timer
+    this.startStepTimer(step.duration_seconds);
+
     this.containerEl.innerHTML = `
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
         <span class="brand-badge">${session.intervention_name}</span>
         <span style="font-size: 13px; font-weight: 600; color: var(--text-muted);">Step ${this.currentStepIndex + 1} of ${totalSteps}</span>
       </div>
 
+      <!-- Peaceful Eyes-Closed Mode Banner -->
+      <div style="background: rgba(13, 148, 136, 0.08); border: 1px solid rgba(13, 148, 136, 0.22); border-radius: var(--radius-sm); padding: 9px 12px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--recovery-teal); font-weight: 600;">
+          <span style="font-size: 16px;">🧘</span>
+          <span><strong>Eyes-Closed Mode:</strong> Voice coach instructions out loud & steps advance automatically.</span>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <button id="modalVoiceBtn" class="btn-small-pill" onclick="ResetModal.toggleVoiceGuide()" style="font-size: 11px; padding: 4px 8px; cursor: pointer; border-color: ${VoiceCoach.enabled ? 'var(--recovery-teal)' : 'var(--border-light)'}; color: ${VoiceCoach.enabled ? 'var(--recovery-teal)' : 'var(--text-muted)'};" title="Toggle audio voice narration">
+            ${VoiceCoach.enabled ? "🎙️ Voice: ON" : "🔇 Voice: OFF"}
+          </button>
+          <button id="autoPlayToggleBtn" class="btn-small-pill" onclick="ResetModal.toggleAutoPlay()" style="font-size: 11px; padding: 4px 8px; cursor: pointer; border-color: ${this.isAutoPlay ? 'var(--recovery-emerald)' : 'var(--border-light)'}; color: ${this.isAutoPlay ? 'var(--recovery-emerald)' : 'var(--text-muted)'};" title="Toggle hands-free auto advancing">
+            ${this.isAutoPlay ? "⏱️ Auto-Flow: ON" : "⏸️ Auto-Flow: PAUSED"}
+          </button>
+        </div>
+      </div>
+
       <!-- Continuous Mind-Refreshing Ambient Soundscape Bar -->
-      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(79, 70, 229, 0.07); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(79, 70, 229, 0.07); border: 1px solid rgba(79, 70, 229, 0.18); border-radius: var(--radius-sm); padding: 8px 12px; margin-bottom: 10px;">
         <div style="display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--brand-reset);">
           <span id="modalAmbientIndicator" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ${SoundEngine.isAmbientPlaying ? '#10B981' : '#9CA3AF'}; box-shadow: ${SoundEngine.isAmbientPlaying ? '0 0 8px rgba(16, 185, 129, 0.6)' : 'none'}; animation: breathePaced 4s infinite;"></span>
-          <span>Continuous Mind Refresh: <strong>432Hz Zen Bowl & Ocean Rhythm</strong></span>
+          <span>Soundscape: <strong>432Hz Zen Bowl & Ocean Rhythm</strong></span>
         </div>
-        <button id="modalAmbientBtn" class="btn-small-pill" onclick="ResetModal.toggleAmbientSound()" style="font-size: 11px; padding: 4px 10px; cursor: pointer; border-color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--border-light)'}; color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--text-muted)'};" title="Toggle continuous ambient sound">
-          ${SoundEngine.isAmbientPlaying ? '🔊 Sound: Playing' : '🔇 Sound: Muted'}
-        </button>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 11px; color: var(--text-muted); font-weight: 700;">Next in: <span id="stepTimerDisplay" style="color: var(--brand-reset);">${this.stepSecondsRemaining}s</span></span>
+          <button id="modalAmbientBtn" class="btn-small-pill" onclick="ResetModal.toggleAmbientSound()" style="font-size: 11px; padding: 4px 10px; cursor: pointer; border-color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--border-light)'}; color: ${SoundEngine.isAmbientPlaying ? 'var(--brand-reset)' : 'var(--text-muted)'};">
+            ${SoundEngine.isAmbientPlaying ? '🔊 Sound: Playing' : '🔇 Muted'}
+          </button>
+        </div>
+      </div>
+
+      <!-- Step Countdown Progress Bar -->
+      <div style="width: 100%; height: 4px; background: var(--border-light); border-radius: 2px; overflow: hidden; margin-bottom: 16px;">
+        <div id="stepProgressBar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--brand-reset), var(--recovery-teal)); transition: width 0.9s linear;"></div>
       </div>
 
       <div class="breath-container">
@@ -516,7 +604,7 @@ const ResetModal = {
 
       <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
         <div style="font-size: 12px; color: var(--text-muted);">
-          ⏱ Duration: ~${step.duration_seconds}s
+          ⏱ Step Duration: ~${step.duration_seconds}s (Auto-advancing hands-free)
         </div>
         <div>
           ${this.currentStepIndex < totalSteps - 1 
@@ -526,6 +614,69 @@ const ResetModal = {
         </div>
       </div>
     `;
+  },
+
+  startStepTimer(durationSeconds) {
+    if (this.stepTimer) clearInterval(this.stepTimer);
+    this.stepSecondsRemaining = Math.max(10, durationSeconds || 15);
+    this.updateTimerDisplay();
+
+    if (!this.isAutoPlay) return;
+
+    this.stepTimer = setInterval(() => {
+      this.stepSecondsRemaining--;
+      this.updateTimerDisplay();
+
+      if (this.stepSecondsRemaining <= 0) {
+        clearInterval(this.stepTimer);
+        this.stepTimer = null;
+        this.nextStep(true); // Automatically advance hands-free!
+      }
+    }, 1000);
+  },
+
+  updateTimerDisplay() {
+    const timeEl = document.getElementById("stepTimerDisplay");
+    const barEl = document.getElementById("stepProgressBar");
+    if (timeEl) {
+      timeEl.innerText = `${this.stepSecondsRemaining}s`;
+    }
+    if (barEl && this.currentSession && this.currentSession.steps) {
+      const step = this.currentSession.steps[this.currentStepIndex];
+      const total = Math.max(10, (step ? step.duration_seconds : 15));
+      const pct = Math.max(0, Math.min(100, ((total - this.stepSecondsRemaining) / total) * 100));
+      barEl.style.width = `${pct}%`;
+    }
+  },
+
+  toggleAutoPlay() {
+    this.isAutoPlay = !this.isAutoPlay;
+    if (this.isAutoPlay) {
+      const step = this.currentSession.steps[this.currentStepIndex];
+      this.startStepTimer(this.stepSecondsRemaining || (step ? step.duration_seconds : 15));
+    } else {
+      if (this.stepTimer) clearInterval(this.stepTimer);
+    }
+    const btn = document.getElementById("autoPlayToggleBtn");
+    if (btn) {
+      btn.innerHTML = this.isAutoPlay ? "⏱️ Auto-Flow: ON" : "⏸️ Auto-Flow: PAUSED";
+      btn.style.color = this.isAutoPlay ? "var(--recovery-emerald)" : "var(--text-muted)";
+      btn.style.borderColor = this.isAutoPlay ? "var(--recovery-emerald)" : "var(--border-light)";
+    }
+  },
+
+  toggleVoiceGuide() {
+    const isVoiceOn = VoiceCoach.toggle();
+    const btn = document.getElementById("modalVoiceBtn");
+    if (btn) {
+      btn.innerHTML = isVoiceOn ? "🎙️ Voice: ON" : "🔇 Voice: OFF";
+      btn.style.color = isVoiceOn ? "var(--recovery-teal)" : "var(--text-muted)";
+      btn.style.borderColor = isVoiceOn ? "var(--recovery-teal)" : "var(--border-light)";
+    }
+    if (isVoiceOn && this.currentSession && this.currentSession.steps) {
+      const step = this.currentSession.steps[this.currentStepIndex];
+      VoiceCoach.speak(`${step.title}. ${step.instruction}`);
+    }
   },
 
   toggleAmbientSound() {
@@ -543,7 +694,12 @@ const ResetModal = {
     }
   },
 
-  nextStep() {
+  nextStep(isAuto = false) {
+    if (this.stepTimer) {
+      clearInterval(this.stepTimer);
+      this.stepTimer = null;
+    }
+    VoiceCoach.stop();
     SoundEngine.playStepTick();
     if (this.currentStepIndex < this.currentSession.steps.length - 1) {
       this.currentStepIndex++;
@@ -555,6 +711,11 @@ const ResetModal = {
 
   // Step 4: Relief Check™ (Section 12)
   renderReliefCheck() {
+    if (this.stepTimer) {
+      clearInterval(this.stepTimer);
+      this.stepTimer = null;
+    }
+    VoiceCoach.speak("Reset session complete. You can gently open your eyes. Take a breath and let us check your relief.");
     const initialDelta = Math.max(0, this.stressBefore - this.stressAfter);
     this.containerEl.innerHTML = `
       <div class="relief-check-container">
@@ -654,6 +815,8 @@ const ResetModal = {
   },
 
   async submitCompletion() {
+    if (this.stepTimer) clearInterval(this.stepTimer);
+    VoiceCoach.stop();
     SoundEngine.stopAmbientSoundscape(1.0);
     SoundEngine.playReliefChime();
     try {
