@@ -20,7 +20,7 @@
     <!-- Surface Navigation Switcher (7 Core Surfaces) -->
     <nav class="surface-nav">
       <button class="surface-tab active" data-surface="employee">🌿 Employee</button>
-      <button class="surface-tab" data-surface="teams-slack">💬 Teams & Slack</button>
+      <button class="surface-tab" data-surface="teams-slack">💬 Workplace Chat</button>
       <button class="surface-tab" data-surface="manager">👥 Manager Coach</button>
       <button class="surface-tab" data-surface="hr">📊 HR Wellbeing</button>
       <button class="surface-tab" data-surface="admin">⚙️ Admin Console</button>
@@ -252,18 +252,23 @@
     </section>
 
     <!-- ========================================================
-         SURFACE 2: TEAMS & SLACK WORKPLACE SIMULATOR (Section 34)
+         SURFACE 2: WORKPLACE CHAT INTEGRATION (Section 34)
          ======================================================== -->
     <section id="view-teams-slack" class="view-panel">
       <div class="content-card">
-        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 8px;">💬 Workplace In-Flow Experience</h2>
-        <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
-          RESETA lives directly inside Microsoft Teams and Slack so employees don't have to remember to open another separate portal when pressure hits.
-        </p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+          <div>
+            <h2 style="font-size: 22px; font-weight: 700; margin: 0;">💬 Workplace In-Flow Chat Integration</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-top: 4px;">
+              RESETA integrates into standard workplace messaging platforms so employees can access in-the-moment relief without context switching.
+            </p>
+          </div>
+          <span class="cert-pill" style="font-size: 11px; white-space: nowrap;">⚡ Compatible with Slack® & Teams® webhooks</span>
+        </div>
 
         <div class="workplace-chat-frame">
           <div style="border-bottom: 1px solid #383a40; padding-bottom: 12px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; color: #fff;"># engineering-sprint · Slack / Teams Simulator</span>
+            <span style="font-weight: 700; color: #fff;"># engineering-sprint · Workplace Chat Webhook Sandbox</span>
             <span style="font-size: 12px; color: #949ba4;">Type <code>/reset</code> anywhere</span>
           </div>
 
@@ -826,10 +831,30 @@
       </div>
     </div>
 
+    <!-- Legal Safe Harbor, Third-Party Trademarks & Statutory Disclaimers -->
+    <div style="background: var(--bg-subtle); border-top: 1px solid var(--border-light); padding: 16px 24px; font-size: 11px; color: var(--text-muted); line-height: 1.6;">
+      <div style="margin-bottom: 8px;">
+        <strong style="color: var(--text-main);">Third-Party Trademarks & Fair Use Notice:</strong>
+        Slack® is a registered trademark of Slack Technologies, Inc. / Salesforce, Inc. Microsoft Teams® and Microsoft Entra ID® are registered trademarks of Microsoft Corporation. Okta® is a registered trademark of Okta, Inc. Workday®, BambooHR®, and Darwinbox® are trademarks of their respective holders. All product and service names used on this site are for identification and technical compatibility purposes only. Use of these names, logos, or brands does not imply endorsement, affiliation, or sponsorship.
+      </div>
+      <div style="margin-bottom: 8px;">
+        <strong style="color: var(--text-main);">Fictitious Demonstration Tenant Disclaimer:</strong>
+        TechNova Solutions India Pvt. Ltd. (Org ID: <code>org-technova-01</code>) is a fictional corporate entity and demonstration tenant used solely for illustrative and sandbox simulation purposes. Any resemblance to real companies, living persons, or actual corporate entities is purely coincidental.
+      </div>
+      <div style="margin-bottom: 8px;">
+        <strong style="color: var(--text-main);">Public Crisis Helplines Directory Notice:</strong>
+        Tele-MANAS (14416 / 1800-89-14416) is operated by the Ministry of Health & Family Welfare, Govt. of India. Vandrevala Foundation (+91 9999 666 555) is an independent non-profit crisis line. RESETA™ is an independent software application and is not directly affiliated with, operated by, or an agent of these emergency services. All crisis helplines are provided as a duty-of-care public service directory for immediate assistance in acute distress.
+      </div>
+      <div>
+        <strong style="color: var(--text-main);">Statutory Clinical & Medical Disclaimer:</strong>
+        RESETA™ is an in-the-moment cognitive recovery and workplace stress triage software platform. It does NOT provide medical advice, psychiatric diagnosis, clinical therapy, or mental illness treatment, and is not a medical device. It must not be used as a replacement for professional clinical care.
+      </div>
+    </div>
+
     <!-- Copyright & Trademark Disclaimers -->
     <div class="footer-bottom-row">
       <div>
-        © 2026 RESETA™ Enterprise Inc. and TechNova Solutions. All rights reserved.
+        © 2026 RESETA™ Enterprise Inc. All rights reserved.
         RELIEFLOOP™, Do It With Me™, and Mental Load Unload™ are proprietary trademarks.
       </div>
       <div style="display: flex; gap: 16px;">
