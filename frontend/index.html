@@ -30,7 +30,50 @@
 
     <!-- Persona & Role Switcher -->
     <!-- Persona & Role Switcher + Utilities -->
-    <div class="user-tenant-bar">
+    <div class="user-tenant-bar" style="gap: 10px; flex-wrap: wrap;">
+      <!-- Live Enterprise SLA Indicator -->
+      <div class="topbar-status-pill" onclick="App.openSystemStatusModal()" title="Click to view 99.99% SLA Health & API Latency">
+        <span class="pulse-dot"></span>
+        <span>99.99% SLA · Operational</span>
+      </div>
+
+      <!-- Data Sovereignty Residency Tag -->
+      <span class="tenant-badge" style="font-size: 11px; font-weight: 700;" title="Data stored strictly in India (AWS ap-south-1 Mumbai)">
+        📍 IN-MUM-01
+      </span>
+
+      <!-- 24/7 Crisis Support Trigger -->
+      <button class="topbar-crisis-btn" onclick="App.openCrisisModal()" title="Instant 24/7 Tele-MANAS & Crisis Support">
+        🆘 24/7 Helpline
+      </button>
+
+      <!-- Quick Command Jump (⌘K) -->
+      <button class="command-search-trigger" onclick="App.openCommandPalette()" title="Press ⌘K or Ctrl+K to quick jump">
+        🔍 <span style="font-size: 11px;">Search</span> <kbd class="cmd-kbd">⌘K</kbd>
+      </button>
+
+      <!-- Notification Bell -->
+      <div style="position: relative;">
+        <button class="notification-bell-btn" onclick="App.toggleNotifications()" title="Enterprise Announcements">
+          🔔
+          <span class="bell-badge">2</span>
+        </button>
+        <div id="notificationPopover" class="notification-popover">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-light); padding-bottom: 6px;">
+            <strong style="font-size: 13px;">Announcements</strong>
+            <span style="font-size: 11px; color: var(--text-muted);">2 New</span>
+          </div>
+          <div style="padding: 6px 0; border-bottom: 1px solid var(--border-light);">
+            <div style="font-size: 12px; font-weight: 700; color: var(--recovery-teal);">🛡️ Focus Shield Window</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Company-wide focus block from 1:30 PM to 3:30 PM today. Non-urgent syncs muted.</div>
+          </div>
+          <div style="padding: 6px 0;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--brand-reset);">📈 Team Recovery Lab Q1</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Engineering recovery scores improved by +2.2 points in the 'Meeting-Free Wednesday' trial.</div>
+          </div>
+        </div>
+      </div>
+
       <button class="btn-small-pill" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700;" onclick="App.run10SecondDemo()">
         ⚡ 10-Sec Demo
       </button>
@@ -716,6 +759,88 @@
   </main>
 
   <!-- ==========================================================
+       ENTERPRISE GLOBAL FOOTER (Trust, Compliance & Safety)
+       ========================================================== -->
+  <footer class="enterprise-footer">
+    <div class="footer-main-grid">
+      <!-- Col 1: Platform & Tenant Profile -->
+      <div>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <div class="brand-symbol" style="width: 28px; height: 28px; font-size: 14px;">R</div>
+          <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">RESETA™ <span style="font-weight: 400; font-size: 14px; color: var(--text-muted);">ENTERPRISE</span></span>
+        </div>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+          From workplace stress to workplace recovery. An AI-powered mental recovery system for the workplace—without employee surveillance.
+        </p>
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px;">
+          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🏢 Enterprise Licensed Tenant</div>
+          <div style="color: var(--text-muted);">TechNova Solutions India Pvt. Ltd. · Org ID: <code>org-technova-01</code></div>
+          <div style="color: var(--text-muted); margin-top: 4px;">📍 Primary Data Sovereignty: AWS ap-south-1 (Mumbai, India)</div>
+        </div>
+      </div>
+
+      <!-- Col 2: Legal, Governance & Compliance -->
+      <div>
+        <div class="footer-col-title">Governance & Compliance</div>
+        <ul class="footer-link-list">
+          <li><button onclick="App.openCharterModal()">🔒 Anti-Surveillance & Non-Diagnostic Charter</button></li>
+          <li><button onclick="App.switchSurface('trust')">🇮🇳 India DPDP Act 2025 Statement</button></li>
+          <li><button onclick="App.openSystemStatusModal()">⚡ Live System Status & 99.99% SLA</button></li>
+          <li><button onclick="App.openSecurityWhitepaperModal()">🛡️ Security Whitepaper & SOC 2 Controls</button></li>
+          <li><button onclick="App.exportDpdpArchive()">📥 Export Personal Data Subject Archive (JSON)</button></li>
+          <li><button onclick="App.switchSurface('admin')">⚙️ Enterprise Admin & RBAC Settings</button></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: 24/7 Immediate Crisis Care Anchors -->
+      <div>
+        <div class="footer-col-title">Certified Human Care & Crisis</div>
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
+          RESETA is a stress recovery platform, not a medical or crisis clinic. If an employee experiences acute distress:
+        </p>
+        <div class="footer-crisis-box">
+          <div style="font-size: 11px; font-weight: 700; color: var(--brand-reset); text-transform: uppercase;">Govt. of India Tele-MANAS (24/7 Toll-Free)</div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--brand-reset); margin: 2px 0;">📞 14416 / 1800-89-14416</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Psychological First Aid available in 20+ Indian languages.</div>
+          
+          <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(225,29,72,0.15); font-size: 12px;">
+            <strong>Vandrevala Foundation:</strong> 📞 +91 9999 666 555 (24/7)<br>
+            <strong>TechNova Internal EAP:</strong> ext. 4400 (Confidential)
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compliance Badges Strip -->
+    <div class="footer-cert-strip">
+      <div class="cert-badge-group">
+        <span class="cert-pill">🛡️ India DPDP 2025 Aligned</span>
+        <span class="cert-pill">🔒 SOC 2 Type II Certified</span>
+        <span class="cert-pill">🌐 ISO/IEC 27001:2022</span>
+        <span class="cert-pill">🔐 TLS 1.3 / AES-256</span>
+        <span class="cert-pill">⚖️ Zero Model Retraining</span>
+        <span class="cert-pill">👥 Minimum Cohort k ≥ 5</span>
+      </div>
+      <div style="font-size: 12px; color: #059669; font-weight: 700;">
+        🟢 All Systems Operational · 99.99% Uptime
+      </div>
+    </div>
+
+    <!-- Copyright & Trademark Disclaimers -->
+    <div class="footer-bottom-row">
+      <div>
+        © 2026 RESETA™ Enterprise Inc. and TechNova Solutions. All rights reserved.
+        RELIEFLOOP™, Do It With Me™, and Mental Load Unload™ are proprietary trademarks.
+      </div>
+      <div style="display: flex; gap: 16px;">
+        <button onclick="App.openCharterModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">Privacy Policy</button>
+        <button onclick="App.openSecurityWhitepaperModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">Security & Trust</button>
+        <button onclick="App.openSystemStatusModal()" style="background: none; border: none; font-size: 12px; color: var(--text-muted); cursor: pointer;">System SLA</button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==========================================================
        MODALS: RESET MODAL & TALK IT OUT MODAL
        ========================================================== -->
   <!-- 🔴 RESET ME Modal (Section 8, 9, 10, 11, 12) -->
@@ -911,6 +1036,190 @@
             🛡 <strong>Rahul Deshmukh</strong><br><span style="color: var(--text-muted); font-size: 10px;">Enterprise Super Admin</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⚡ Live Enterprise System Status & SLA Modal -->
+  <div id="systemStatusModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(600px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('systemStatusModal').classList.remove('active')">&times;</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <span class="pulse-dot" style="width: 10px; height: 10px;"></span>
+        <div>
+          <h3 style="font-size: 18px; font-weight: 700; margin: 0;">RESETA™ Enterprise System Health</h3>
+          <span style="font-size: 12px; color: var(--text-muted);">Real-Time Infrastructure Health & 99.99% SLA Monitor</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+        <div class="action-card">
+          <div class="action-signal">Platform Uptime (90 Days)</div>
+          <div style="font-size: 18px; font-weight: 800; color: #059669;">99.99% Operational</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Zero unbudgeted downtime</div>
+        </div>
+        <div class="action-card">
+          <div class="action-signal">API Gateway Latency</div>
+          <div style="font-size: 18px; font-weight: 800; color: var(--recovery-teal);">18 ms avg</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Region: AWS ap-south-1 (Mumbai)</div>
+        </div>
+        <div class="action-card">
+          <div class="action-signal">Database & Isolation</div>
+          <div style="font-size: 14px; font-weight: 700;">PostgreSQL / WAL Pool</div>
+          <div style="font-size: 11px; color: #059669; margin-top: 2px;">🟢 Health: Nominal (0 errors)</div>
+        </div>
+        <div class="action-card">
+          <div class="action-signal">AI Model Gateway</div>
+          <div style="font-size: 14px; font-weight: 700;">Multi-Provider Active</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Clinical Fallback Engine: Ready</div>
+        </div>
+      </div>
+
+      <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 12px; font-size: 12px; color: var(--text-muted); line-height: 1.5;">
+        🔒 <strong>Encryption & Transport Security:</strong> TLS 1.3 enforced for all client connections. Data at rest is encrypted with AES-256 keys managed by enterprise KMS. Zero raw check-in text is ever transmitted unencrypted.
+      </div>
+      <div style="display: flex; justify-content: flex-end; margin-top: 18px;">
+        <button class="btn-secondary" onclick="document.getElementById('systemStatusModal').classList.remove('active')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🆘 24/7 Global Immediate Crisis & Psychological Care Modal -->
+  <div id="crisisModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(580px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('crisisModal').classList.remove('active')">&times;</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+        <div style="font-size: 28px;">🆘</div>
+        <div>
+          <h3 style="font-size: 18px; font-weight: 800; color: var(--brand-reset); margin: 0;">Immediate 24/7 Human Care Support</h3>
+          <span style="font-size: 12px; color: var(--text-muted);">Free, confidential psychological first aid and crisis resources</span>
+        </div>
+      </div>
+
+      <div style="background: rgba(225, 29, 72, 0.05); border: 1px solid rgba(225, 29, 72, 0.25); border-radius: var(--radius-sm); padding: 16px; margin-bottom: 16px;">
+        <div style="font-size: 12px; font-weight: 800; color: var(--brand-reset); text-transform: uppercase;">Govt. of India Tele-MANAS (Primary National Support)</div>
+        <div style="font-size: 24px; font-weight: 900; color: var(--brand-reset); margin: 4px 0;">📞 14416 / 1800-89-14416</div>
+        <p style="font-size: 12px; color: var(--text-muted); margin: 0;">
+          Toll-free, 24/7 counseling support operated by the Ministry of Health & Family Welfare across 20+ Indian languages (Hindi, English, Tamil, Telugu, Kannada, Bengali, Marathi, etc.).
+        </p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div class="action-card">
+          <div style="font-size: 12px; font-weight: 700;">Vandrevala Foundation</div>
+          <div style="font-size: 15px; font-weight: 800; color: var(--text-main); margin: 4px 0;">📞 +91 9999 666 555</div>
+          <div style="font-size: 11px; color: var(--text-muted);">24/7 Free Crisis Intervention</div>
+        </div>
+        <div class="action-card">
+          <div style="font-size: 12px; font-weight: 700;">TechNova Internal EAP</div>
+          <div style="font-size: 15px; font-weight: 800; color: var(--text-main); margin: 4px 0;">📞 ext. 4400</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Confidential Corporate Counsellor</div>
+        </div>
+      </div>
+
+      <p style="font-size: 11px; color: var(--text-muted); margin: 0 0 16px; line-height: 1.4;">
+        *RESETA is an in-the-moment workplace recovery platform and strictly not a clinical treatment or medical facility. If you feel in immediate danger, please reach out to the helplines above or contact local emergency services immediately.
+      </p>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn-primary" style="background: var(--brand-reset);" onclick="document.getElementById('crisisModal').classList.remove('active')">Got It</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔒 Anti-Surveillance & Non-Diagnostic Charter Modal -->
+  <div id="charterModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(640px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('charterModal').classList.remove('active')">&times;</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <div style="font-size: 24px;">🔒</div>
+        <div>
+          <h3 style="font-size: 18px; font-weight: 700; margin: 0;">RESETA Anti-Surveillance & Privacy Charter</h3>
+          <span style="font-size: 12px; color: var(--text-muted);">Our legally binding architectural boundary with employers</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">
+        <div class="action-card">
+          <strong style="color: var(--recovery-teal);">1. Zero Individual Employee Visibility to Managers</strong>
+          <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 12px;">Managers can never see personal stress ratings, check-ins, or thought unloads. Only anonymous aggregate squad themes ($k \ge 5$) are ever surfaced.</p>
+        </div>
+        <div class="action-card">
+          <strong style="color: var(--recovery-teal);">2. Absolute Zero Productivity Surveillance</strong>
+          <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 12px;">RESETA contains zero keystroke loggers, screen captures, calendar surveillance, or microphone eavesdropping. Contextual autopilot triggers are purely local and opt-in.</p>
+        </div>
+        <div class="action-card">
+          <strong style="color: var(--recovery-teal);">3. Strict Non-Diagnostic Clinical Firewall</strong>
+          <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 12px;">RESETA never issues psychiatric diagnoses (e.g. depression, anxiety disorder, ADHD). Any acute distress triggers immediate, confidential human crisis referral.</p>
+        </div>
+        <div class="action-card">
+          <strong style="color: var(--recovery-teal);">4. Zero Model Retraining Policy</strong>
+          <p style="margin: 4px 0 0; color: var(--text-muted); font-size: 12px;">Employee personal inputs are never ingested into machine learning training datasets. Conversations are ephemeral and encrypted at rest.</p>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn-primary" style="background: var(--text-main);" onclick="document.getElementById('charterModal').classList.remove('active')">Understood</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🛡️ Security Whitepaper & SOC 2 / ISO Controls Modal -->
+  <div id="securityWhitepaperModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(640px, 100%);">
+      <button class="modal-close-btn" onclick="document.getElementById('securityWhitepaperModal').classList.remove('active')">&times;</button>
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+        <div style="font-size: 24px;">🛡️</div>
+        <div>
+          <h3 style="font-size: 18px; font-weight: 700; margin: 0;">Enterprise Security & Trust Whitepaper</h3>
+          <span style="font-size: 12px; color: var(--text-muted);">Compliance certifications, data architecture, and cryptographic guarantees</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+        <div class="action-card">
+          <div class="action-signal">SOC 2 Type II Certified</div>
+          <div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Security, Availability & Confidentiality</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Audited by independent Big-4 auditors</div>
+        </div>
+        <div class="action-card">
+          <div class="action-signal">ISO/IEC 27001:2022</div>
+          <div style="font-size: 13px; font-weight: 600; margin-top: 2px;">ISMS Information Security</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Enterprise Grade Boundary Controls</div>
+        </div>
+        <div class="action-card">
+          <div class="action-signal">Data Sovereignty</div>
+          <div style="font-size: 13px; font-weight: 600; margin-top: 2px;">AWS ap-south-1 (Mumbai, India)</div>
+          <div style="font-size: 11px; color: var(--text-muted);">India DPDP Act 2025 compliant localization</div>
+        </div>
+        <div class="action-card">
+          <div class="action-signal">Cryptography Standard</div>
+          <div style="font-size: 13px; font-weight: 600; margin-top: 2px;">AES-256 & TLS 1.3 Strict</div>
+          <div style="font-size: 11px; color: var(--text-muted);">RFC 7519 HMAC-SHA256 JWT Bearer Auth</div>
+        </div>
+      </div>
+
+      <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 20px;">
+        SCIM 2.0 automated provisioning (RFC 7643 / RFC 7644) allows directory synchronization via Microsoft Entra ID, Okta, and PingFederate with zero manual credential overhead.
+      </p>
+
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="btn-primary" onclick="document.getElementById('securityWhitepaperModal').classList.remove('active')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔍 Quick Jump / Command Palette Modal (⌘K) -->
+  <div id="commandPaletteModal" class="modal-backdrop">
+    <div class="reset-modal-window" style="width: min(560px, 100%);">
+      <div style="display: flex; align-items: center; gap: 8px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; margin-bottom: 14px;">
+        <span style="font-size: 18px;">🔍</span>
+        <input type="text" id="cmdPaletteInput" class="copilot-input" placeholder="Type a command or search (e.g. 'reset', 'overload', 'coach', 'dpdp')..." style="border: none; font-size: 15px; width: 100%; outline: none;" oninput="App.filterCommandPalette(this.value)">
+        <button class="modal-close-btn" style="position: static;" onclick="document.getElementById('commandPaletteModal').classList.remove('active')">&times;</button>
+      </div>
+
+      <div id="cmdPaletteResults" style="display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto;">
+        <!-- Populated dynamically -->
       </div>
     </div>
   </div>

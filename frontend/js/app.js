@@ -215,6 +215,29 @@ const App = {
         }
       });
     }
+
+    // Global Keyboard Shortcuts (⌘K for Command Palette, Esc for Modals)
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        this.openCommandPalette();
+      } else if (e.key === "Escape") {
+        document.querySelectorAll(".modal-backdrop.active").forEach(m => m.classList.remove("active"));
+        const popover = document.getElementById("notificationPopover");
+        if (popover) popover.classList.remove("active");
+      }
+    });
+
+    // Close notifications popover when clicking outside
+    document.addEventListener("click", (e) => {
+      const popover = document.getElementById("notificationPopover");
+      const bell = document.querySelector(".notification-bell-btn");
+      if (popover && popover.classList.contains("active")) {
+        if (!popover.contains(e.target) && !bell?.contains(e.target)) {
+          popover.classList.remove("active");
+        }
+      }
+    });
   },
 
   // 1. Employee Surface Data
@@ -1350,6 +1373,228 @@ const App = {
       statusEl.style.color = "var(--red-crisis)";
       respEl.innerText = "Error invoking model gateway: " + err.message;
     }
+  },
+
+  // 21. Enterprise Global Modals & Utilities
+  openSystemStatusModal() {
+    const modal = document.getElementById("systemStatusModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  closeSystemStatusModal() {
+    const modal = document.getElementById("systemStatusModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  openCrisisModal() {
+    const modal = document.getElementById("crisisModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  closeCrisisModal() {
+    const modal = document.getElementById("crisisModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  openCharterModal() {
+    const modal = document.getElementById("charterModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  closeCharterModal() {
+    const modal = document.getElementById("charterModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  openSecurityWhitepaperModal() {
+    const modal = document.getElementById("securityWhitepaperModal");
+    if (modal) modal.classList.add("active");
+  },
+
+  closeSecurityWhitepaperModal() {
+    const modal = document.getElementById("securityWhitepaperModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  toggleNotifications() {
+    const popover = document.getElementById("notificationPopover");
+    if (popover) {
+      popover.classList.toggle("active");
+    }
+  },
+
+  async exportDpdpArchive() {
+    const modal = document.getElementById("dpdpExportModal");
+    if (modal) {
+      this.openDpdpExport();
+    } else {
+      try {
+        const data = await API.exportDpdpArchive();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `reseta_dpdp_export_${data.data_subject?.name?.replace(/\\s+/g, '_') || 'user'}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        this.showToast("📥 DPDP Archive downloaded as JSON");
+      } catch (err) {
+        alert("Failed to export DPDP archive: " + err.message);
+      }
+    }
+  },
+
+  // 22. Command Palette (⌘K)
+  _commandPaletteItems: [
+    {
+      icon: "⚡",
+      title: "Start 2-Minute Quick Reset",
+      desc: "Instant autonomic down-regulation & sensory calm",
+      category: "Employee Recovery",
+      action: "ResetModal.open('work_pressure')"
+    },
+    {
+      icon: "🌿",
+      title: "Start 5-Minute Deep Reset",
+      desc: "Cognitive defusion & somatic unwind",
+      category: "Employee Recovery",
+      action: "ResetModal.open('overloaded')"
+    },
+    {
+      icon: "🎙️",
+      title: "Talk It Out Session",
+      desc: "Confidential reflective audio/text venting",
+      category: "Employee Recovery",
+      action: "TalkItOut.open()"
+    },
+    {
+      icon: "📋",
+      title: "Mental Load Unload",
+      desc: "Deconstruct mental clutter into 1 micro-step",
+      category: "Employee Recovery",
+      action: "ResetModal.open('cant_start')"
+    },
+    {
+      icon: "🎯",
+      title: "5-Minute Manager Recovery Coach",
+      desc: "Practice handling team burnout & workload strain",
+      category: "Manager Surface",
+      action: "App.switchSurface('manager')"
+    },
+    {
+      icon: "📊",
+      title: "HR Workforce Strain Heatmap",
+      desc: "Anonymized aggregate strain & recovery metrics",
+      category: "HR Surface",
+      action: "App.switchSurface('hr')"
+    },
+    {
+      icon: "💬",
+      title: "Slack & Teams Simulator",
+      desc: "Test in-flow /reset command and focus shield",
+      category: "Workplace Integrations",
+      action: "App.switchSurface('teams-slack')"
+    },
+    {
+      icon: "🛡️",
+      title: "Trust Center & DPDP Controls",
+      desc: "India DPDP Act 2025 data portability and consent",
+      category: "Governance",
+      action: "App.switchSurface('trust')"
+    },
+    {
+      icon: "🔒",
+      title: "Anti-Surveillance & Privacy Charter",
+      desc: "View our legally binding non-diagnostic boundaries",
+      category: "Governance",
+      action: "App.openCharterModal()"
+    },
+    {
+      icon: "📑",
+      title: "Security & SOC 2 Whitepaper",
+      desc: "Inspect ISO 27001, AWS Mumbai residency, and TLS 1.3",
+      category: "Security & Compliance",
+      action: "App.openSecurityWhitepaperModal()"
+    },
+    {
+      icon: "⚡",
+      title: "Live System Health & 99.99% SLA",
+      desc: "Inspect database pool, model gateway, and latency",
+      category: "Platform Health",
+      action: "App.openSystemStatusModal()"
+    },
+    {
+      icon: "🆘",
+      title: "24/7 Immediate Crisis Support",
+      desc: "Direct toll-free access to Tele-MANAS (14416) & Vandrevala",
+      category: "Immediate Care",
+      action: "App.openCrisisModal()"
+    }
+  ],
+
+  openCommandPalette() {
+    const modal = document.getElementById("commandPaletteModal");
+    const input = document.getElementById("cmdPaletteInput");
+    if (!modal) return;
+    modal.classList.add("active");
+    if (input) {
+      input.value = "";
+      setTimeout(() => input.focus(), 50);
+    }
+    this.filterCommandPalette("");
+  },
+
+  closeCommandPalette() {
+    const modal = document.getElementById("commandPaletteModal");
+    if (modal) modal.classList.remove("active");
+  },
+
+  filterCommandPalette(query) {
+    const resultsContainer = document.getElementById("cmdPaletteResults");
+    if (!resultsContainer) return;
+    const q = (query || "").toLowerCase().trim();
+
+    const matches = this._commandPaletteItems.filter(item => {
+      if (!q) return true;
+      return (
+        item.title.toLowerCase().includes(q) ||
+        item.desc.toLowerCase().includes(q) ||
+        item.category.toLowerCase().includes(q)
+      );
+    });
+
+    if (matches.length === 0) {
+      resultsContainer.innerHTML = `
+        <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          No matching commands found for "${query}". Try "reset", "coach", "dpdp", or "status".
+        </div>
+      `;
+      return;
+    }
+
+    resultsContainer.innerHTML = matches.map((item) => `
+      <div class="cmd-result-item" onclick="App.closeCommandPalette(); ${item.action};" style="display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-radius: var(--radius-sm); cursor: pointer; transition: background 0.15s ease; border: 1px solid transparent;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <span style="font-size: 18px; width: 24px; text-align: center;">${item.icon}</span>
+          <div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--text-main);">${item.title}</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${item.desc}</div>
+          </div>
+        </div>
+        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); background: var(--bg-subtle); padding: 2px 8px; border-radius: 4px; letter-spacing: 0.5px;">${item.category}</span>
+      </div>
+    `).join('');
+
+    resultsContainer.querySelectorAll(".cmd-result-item").forEach(el => {
+      el.addEventListener("mouseenter", () => {
+        el.style.background = "var(--bg-subtle)";
+        el.style.borderColor = "var(--border-light)";
+      });
+      el.addEventListener("mouseleave", () => {
+        el.style.background = "transparent";
+        el.style.borderColor = "transparent";
+      });
+    });
   },
 
   playCalmSound(freq = 432) {
