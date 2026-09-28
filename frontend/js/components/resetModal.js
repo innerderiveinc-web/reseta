@@ -1,20 +1,104 @@
 // RESETA™ ResetModal Component: 🔴 RESET ME & RELIEFLOOP™
-function playCalmBell(freq = 432) {
-  try {
-    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.4);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 1.4);
-  } catch (e) {
-    // Graceful fallback if AudioContext is blocked
+// Enterprise Web Audio Harmonic Sound Engine (Tibetan Singing Bowl & Solfeggio Frequencies)
+const SoundEngine = {
+  ctx: null,
+  enabled: true,
+
+  unlock() {
+    try {
+      if (!this.ctx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          this.ctx = new AudioContextClass();
+        }
+      }
+      if (this.ctx && this.ctx.state === "suspended") {
+        this.ctx.resume();
+      }
+    } catch (e) {
+      console.warn("Audio unlock warning:", e);
+    }
+  },
+
+  playBell(freq = 432, duration = 2.2) {
+    if (!this.enabled) return;
+    this.unlock();
+    try {
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      // Primary oscillator (Fundamental frequency)
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = "sine";
+      osc1.frequency.setValueAtTime(freq, now);
+
+      // Secondary overtone oscillator (Harmonic fifth for acoustic resonance)
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = "sine";
+      osc2.frequency.setValueAtTime(freq * 1.5, now);
+
+      // Natural acoustic bell envelope (soft attack, warm decay)
+      gain1.gain.setValueAtTime(0.001, now);
+      gain1.gain.linearRampToValueAtTime(0.28, now + 0.04);
+      gain1.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+      gain2.gain.setValueAtTime(0.001, now);
+      gain2.gain.linearRampToValueAtTime(0.08, now + 0.04);
+      gain2.gain.exponentialRampToValueAtTime(0.0001, now + (duration * 0.7));
+
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + duration);
+      osc2.stop(now + duration);
+    } catch (err) {
+      console.warn("SoundEngine playBell error:", err);
+    }
+  },
+
+  playStepTick() {
+    if (!this.enabled) return;
+    this.unlock();
+    try {
+      const ctx = this.ctx;
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, now); // D5 soft chime
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.12, now + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.35);
+    } catch (e) {}
+  },
+
+  playReliefChime() {
+    if (!this.enabled) return;
+    this.playBell(528, 2.4); // 528Hz Solfeggio frequency
+    setTimeout(() => this.playBell(660, 1.8), 220);
   }
+};
+
+window.SoundEngine = SoundEngine;
+
+// Unlock audio context on any user interaction with the document
+document.addEventListener("click", () => SoundEngine.unlock(), { once: false });
+document.addEventListener("keydown", () => SoundEngine.unlock(), { once: false });
+
+function playCalmBell(freq = 432) {
+  SoundEngine.playBell(freq);
 }
 
 const ResetModal = {
@@ -73,7 +157,10 @@ const ResetModal = {
         </div>
       </div>
 
-      <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 24px;">
+        <button type="button" class="btn-small-pill" onclick="SoundEngine.playBell(432); window.App?.showToast('🔔 Tibetan singing bowl bell (432Hz) playing');" style="display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; border-color: var(--recovery-teal); color: var(--recovery-teal);" title="Test audio playback">
+          🔊 <span>Test Bell Sound</span>
+        </button>
         <button class="btn-primary" onclick="ResetModal.renderStep2()">Next: What's Going On? →</button>
       </div>
     `;
@@ -81,6 +168,7 @@ const ResetModal = {
 
   setTime(minutes) {
     this.selectedTime = minutes;
+    SoundEngine.playStepTick();
     document.querySelectorAll(".time-btn").forEach(btn => btn.classList.remove("selected"));
     event.currentTarget.classList.add("selected");
   },
@@ -117,11 +205,15 @@ const ResetModal = {
 
   selectState(stateName, el) {
     this.selectedState = stateName.toLowerCase().replace(/ /g, '_').replace("'", "");
+    SoundEngine.playStepTick();
     document.querySelectorAll(".state-chip").forEach(c => c.classList.remove("selected"));
     el.classList.add("selected");
   },
 
   async launchSession() {
+    // Unlock and play bell synchronously on click gesture
+    SoundEngine.playBell(432, 2.4);
+
     const rawInputEl = document.getElementById("resetRawInput");
     const rawInput = rawInputEl ? rawInputEl.value : "";
 
@@ -152,7 +244,6 @@ const ResetModal = {
       }
 
       this.currentStepIndex = 0;
-      playCalmBell(432);
       this.renderGuidedStep();
     } catch (err) {
       alert("Error starting reset: " + err.message);
@@ -248,6 +339,7 @@ const ResetModal = {
   },
 
   nextStep() {
+    SoundEngine.playStepTick();
     if (this.currentStepIndex < this.currentSession.steps.length - 1) {
       this.currentStepIndex++;
       this.renderGuidedStep();
@@ -357,6 +449,7 @@ const ResetModal = {
   },
 
   async submitCompletion() {
+    SoundEngine.playReliefChime();
     try {
       const res = await API.completeReset({
         session_id: this.currentSession.session_id,
@@ -364,8 +457,6 @@ const ResetModal = {
         stress_after: this.stressAfter,
         did_this_help: this.selectedHelped
       });
-
-      playCalmBell(528);
 
       this.containerEl.innerHTML = `
         <div style="text-align: center; padding: 30px 10px;">

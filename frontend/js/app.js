@@ -1733,19 +1733,38 @@ const App = {
   },
 
   playCalmSound(freq = 432) {
-    try {
-      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + 1.2);
-    } catch (e) {}
+    if (window.SoundEngine) {
+      window.SoundEngine.playBell(freq, 2.2);
+    } else {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.8);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 1.8);
+      } catch (e) {}
+    }
+  },
+
+  toggleSound() {
+    if (window.SoundEngine) {
+      window.SoundEngine.enabled = !window.SoundEngine.enabled;
+      const btn = document.getElementById("soundToggleBtn");
+      if (btn) btn.innerHTML = window.SoundEngine.enabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+      if (window.SoundEngine.enabled) {
+        window.SoundEngine.playBell(528, 1.8);
+        this.showToast("🔊 Audio chimes enabled");
+      } else {
+        this.showToast("🔇 Audio chimes muted");
+      }
+    }
   }
 };
 
