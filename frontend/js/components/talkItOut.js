@@ -158,6 +158,8 @@ const TalkItOut = {
         audio_present: true
       });
 
+      this.lastText = text;
+
       this.contentEl.innerHTML = `
         <div style="text-align: left;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
@@ -176,7 +178,7 @@ const TalkItOut = {
 
           <div style="display: flex; justify-content: flex-end; gap: 12px;">
             <button class="btn-secondary" onclick="TalkItOut.renderInitial()">Speak Again</button>
-            <button class="btn-reset-hero" style="padding: 12px 28px; font-size: 14px;" onclick="TalkItOut.launchFromTalk('${res.detected_state}', \`${text.replace(/`/g, '')}\`)">
+            <button class="btn-reset-hero" style="padding: 12px 28px; font-size: 14px;" onclick="TalkItOut.launchFromTalk('${res.detected_state}')">
               Start 5-Min Reset 🔴
             </button>
           </div>
@@ -189,11 +191,12 @@ const TalkItOut = {
   },
 
   launchFromTalk(state, text) {
+    const rawText = text || this.lastText || "";
     this.close();
     ResetModal.open(state);
     setTimeout(() => {
       const input = document.getElementById("resetRawInput");
-      if (input) input.value = text;
+      if (input) input.value = rawText;
     }, 100);
   }
 };

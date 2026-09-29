@@ -17,10 +17,25 @@ const API = {
     return headers;
   },
 
+  async _handleResponse(res) {
+    if (!res.ok) {
+      let detail = '';
+      try {
+        const errJson = await res.json();
+        detail = errJson.detail || errJson.message || '';
+      } catch (e) {}
+      const msg = detail || `HTTP ${res.status}: ${res.statusText || 'Request failed'}`;
+      const err = new Error(msg);
+      err.status = res.status;
+      err.detail = detail;
+      throw err;
+    }
+    return res.json();
+  },
+
   async get(url) {
     const res = await fetch(url, { headers: this.getHeaders() });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    return res.json();
+    return this._handleResponse(res);
   },
 
   async post(url, data) {
@@ -29,8 +44,7 @@ const API = {
       headers: this.getHeaders(),
       body: JSON.stringify(data)
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-    return res.json();
+    return this._handleResponse(res);
   },
 
   // Auth & Personas

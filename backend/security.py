@@ -12,11 +12,11 @@ from fastapi import Header, HTTPException, Depends
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User
+from backend.config import settings
 
-# Load JWT secret from environment; fallback is safe only for local demo/pilot.
-# In production, always set SECRET_KEY env variable to a cryptographically random value.
-JWT_SECRET_KEY = os.environ.get("SECRET_KEY", "reseta-enterprise-production-signing-key-dpdp-2026")
-JWT_ALGORITHM = "HS256"
+# Unified JWT secret & algorithm from application settings
+JWT_SECRET_KEY = settings.SECRET_KEY
+JWT_ALGORITHM = settings.ALGORITHM
 ACCESS_TOKEN_EXPIRE_SECONDS = 86400 * 7 # 7 days validity
 
 def hash_password(password: str, salt: Optional[str] = None) -> str:

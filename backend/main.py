@@ -36,6 +36,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Enterprise Security Headers Middleware (DPDP Act 2023 / OWASP Best Practices)
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
 # Include API Routers
 app.include_router(auth.router)
 app.include_router(employee.router)

@@ -222,6 +222,23 @@ def test_rbac_forbidden_and_allowed_access():
     care_ok = client.get("/api/care/triage-queue")
     assert care_ok.status_code == 200
 
+def test_dpdp_erasure_endpoint():
+    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    res = client.post("/api/employee/dpdp/erasure")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert "erased" in data["message"].lower()
+
+def test_enterprise_security_headers():
+    res = client.get("/api/health")
+    assert res.status_code == 200
+    assert res.headers.get("X-Content-Type-Options") == "nosniff"
+    assert res.headers.get("X-Frame-Options") == "SAMEORIGIN"
+    assert res.headers.get("X-XSS-Protection") == "1; mode=block"
+    assert res.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+
 
 
 
