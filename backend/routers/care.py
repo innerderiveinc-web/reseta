@@ -5,11 +5,14 @@ from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
 from backend.database import get_db
-from backend.models import SafetyEvent
+from backend.models import SafetyEvent, User
 from backend.schemas import CareEscalationItem
 from backend.engines.safety_firewall import EMERGENCY_RESOURCES
+from backend.security import require_roles
 
 router = APIRouter(prefix="/api/care", tags=["RESETA Care™ Console"])
+
+care_guard = require_roles(["CLINICIAN", "SUPER_ADMIN"])
 
 @router.get("/resources")
 def get_care_resources():
@@ -30,7 +33,7 @@ def get_care_resources():
     }
 
 @router.get("/triage-queue", response_model=List[CareEscalationItem])
-def get_care_triage_queue(db: Session = Depends(get_db)):
+def get_care_triage_queue(db: Session = Depends(get_db), current_user: User = Depends(care_guard)):
     """Safety and escalation queue for certified clinical staff (Section 26, 27)"""
     events = db.query(SafetyEvent).order_by(SafetyEvent.created_at.desc()).limit(10).all()
     return [

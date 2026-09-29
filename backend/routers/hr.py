@@ -12,12 +12,14 @@ from backend.models import User, InterventionSession, Department, TeamRecoveryEx
 from backend.schemas import WorkforceMetricsResponse, CreateExperimentRequest, CreateCampaignRequest
 from backend.engines.privacy_engine import PrivacyEngine
 from backend.engines.action_engine import ActionEngine
-from backend.security import get_current_user
+from backend.security import require_roles
 
 router = APIRouter(prefix="/api/hr", tags=["HR & People Dashboard"])
 
+hr_guard = require_roles(["HR_ADMIN", "SUPER_ADMIN"])
+
 @router.get("/workforce-metrics", response_model=WorkforceMetricsResponse)
-def get_workforce_metrics(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_workforce_metrics(db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
     """
     Workforce Wellbeing Intelligence (Section 21, 51):
     North Star metric: Successful Recovery Moments.
@@ -101,14 +103,14 @@ def get_workforce_metrics(db: Session = Depends(get_db), current_user: User = De
     )
 
 @router.get("/experiments")
-def get_experiments(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_experiments(db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
     """Team Recovery Lab™ Experiments (Section 25)"""
     user = current_user
     org_id = user.organization_id if user else "org-technova-01"
     return ActionEngine.get_recovery_lab_experiments(db, organization_id=org_id)
 
 @router.post("/experiments")
-def create_experiment(req: CreateExperimentRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_experiment(req: CreateExperimentRequest, db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
     """Create a new Team Recovery Lab experiment (Section 25)"""
     user = current_user
     org_id = user.organization_id if user else "org-technova-01"
@@ -134,7 +136,7 @@ def create_experiment(req: CreateExperimentRequest, db: Session = Depends(get_db
     return {"success": True, "experiment_id": exp_id, "message": "Experiment launched successfully"}
 
 @router.get("/campaigns")
-def list_campaigns(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def list_campaigns(db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
     """HR Campaign Engine (Section 35)"""
     campaigns = db.query(HRCampaign).all()
     return [
@@ -152,7 +154,7 @@ def list_campaigns(db: Session = Depends(get_db), current_user: User = Depends(g
     ]
 
 @router.post("/campaigns")
-def create_campaign(req: CreateCampaignRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def create_campaign(req: CreateCampaignRequest, db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
     """Launch a new HR Wellbeing Campaign (Section 35)"""
     user = current_user
     org_id = user.organization_id if user else "org-technova-01"
@@ -174,7 +176,7 @@ def create_campaign(req: CreateCampaignRequest, db: Session = Depends(get_db), c
     return {"success": True, "campaign_id": camp_id, "message": "Campaign activated across configured channels"}
 
 @router.get("/pilot-report")
-def generate_workplace_recovery_report(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def generate_workplace_recovery_report(db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
     """
     Section 58: RESETA WORKPLACE RECOVERY REPORT
     Generates the comprehensive 9-section executive pilot conversion report.

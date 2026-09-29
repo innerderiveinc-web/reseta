@@ -81,7 +81,7 @@ Converts cluttered thoughts into clear buckets:
 * **Backend**: Python 3.9+ · FastAPI · SQLAlchemy · Pydantic V2 · Uvicorn
 * **Database**: SQLite (WAL mode) / PostgreSQL + pgvector ready
 * **Frontend**: Vanilla ES6+ SPA · Actionable Calm Design System (Apple simplicity + Headspace warmth + Notion clarity)
-* **Security**: Role-Based Access Control (7 roles), DPDP 2025 audit logging, CSRF/XSS hardened
+* **Security**: Role-Based Access Control (7 roles), DPDP 2023 audit logging, CSRF/XSS hardened
 
 ---
 

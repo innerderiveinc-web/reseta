@@ -68,6 +68,7 @@ def test_talk_it_out_endpoint():
     assert len(data["reflection"]) > 10
 
 def test_hr_workforce_metrics():
+    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
     res = client.get("/api/hr/workforce-metrics")
     assert res.status_code == 200
     data = res.json()
@@ -76,6 +77,7 @@ def test_hr_workforce_metrics():
     assert len(data["aggregate_themes"]) > 0
 
 def test_manager_copilot_endpoint():
+    client.post("/api/auth/switch-user", json={"user_id": "user-mgr-priya"})
     res = client.post("/api/copilot/manager", json={
         "query": "My team is overloaded with sprint deadlines. What should I do?"
     })
@@ -86,6 +88,7 @@ def test_manager_copilot_endpoint():
     assert "No employee-level check-ins" in data["privacy_guarantee"]
 
 def test_hr_copilot_endpoint():
+    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
     res = client.post("/api/copilot/hr", json={
         "query": "What themes are increasing this quarter?"
     })
@@ -95,6 +98,7 @@ def test_hr_copilot_endpoint():
     assert len(data["answer"]) > 50
 
 def test_pilot_report_endpoint():
+    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
     res = client.get("/api/hr/pilot-report")
     assert res.status_code == 200
     report = res.json()
@@ -193,6 +197,31 @@ def test_modular_enterprise_pages():
         resp = client.get(route)
         assert resp.status_code == 200, f"Route {route} failed with status {resp.status_code}"
         assert expected_text in resp.text, f"Expected '{expected_text}' not found in {route}"
+
+def test_rbac_forbidden_and_allowed_access():
+    # 1. Switch to normal employee
+    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+
+    # Employee attempting privileged operations -> 403 Forbidden
+    admin_res = client.get("/api/admin/organization-settings")
+    assert admin_res.status_code == 403, f"Expected 403 for employee on admin, got {admin_res.status_code}"
+
+    hr_res = client.get("/api/hr/workforce-metrics")
+    assert hr_res.status_code == 403, f"Expected 403 for employee on hr, got {hr_res.status_code}"
+
+    care_res = client.get("/api/care/triage-queue")
+    assert care_res.status_code == 403, f"Expected 403 for employee on care, got {care_res.status_code}"
+
+    # 2. Switch to Super Admin -> 200 OK across admin
+    client.post("/api/auth/switch-user", json={"user_id": "user-admin-rahul"})
+    admin_ok = client.get("/api/admin/organization-settings")
+    assert admin_ok.status_code == 200
+
+    # 3. Switch to Clinician -> 200 OK on care triage
+    client.post("/api/auth/switch-user", json={"user_id": "user-care-ananya"})
+    care_ok = client.get("/api/care/triage-queue")
+    assert care_ok.status_code == 200
+
 
 
 

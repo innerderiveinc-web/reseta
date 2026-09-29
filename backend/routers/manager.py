@@ -8,9 +8,11 @@ from backend.database import get_db
 from backend.models import User, Team
 from backend.schemas import TeamInsightResponse, ManagerCoachScenario
 from backend.engines.privacy_engine import PrivacyEngine
-from backend.security import get_current_user
+from backend.security import require_roles
 
 router = APIRouter(prefix="/api/manager", tags=["Manager Experience"])
+
+manager_guard = require_roles(["MANAGER", "SUPER_ADMIN"])
 
 MANAGER_COACH_SCENARIOS = [
     {
@@ -65,7 +67,7 @@ MANAGER_COACH_SCENARIOS = [
 ]
 
 @router.get("/team-wellbeing", response_model=TeamInsightResponse)
-def get_team_wellbeing(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_team_wellbeing(db: Session = Depends(get_db), current_user: User = Depends(manager_guard)):
     """
     Privacy-Safe Team Wellbeing Dashboard (Section 20).
     Guarantees that NO individual user stress ratings or conversations are shown to managers.

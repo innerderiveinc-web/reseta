@@ -4,6 +4,7 @@ import hmac
 import hashlib
 import base64
 import json
+import os
 import time
 import secrets
 from typing import Optional, Dict, Any
@@ -12,7 +13,9 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User
 
-JWT_SECRET_KEY = "reseta-enterprise-production-signing-key-dpdp-2026"
+# Load JWT secret from environment; fallback is safe only for local demo/pilot.
+# In production, always set SECRET_KEY env variable to a cryptographically random value.
+JWT_SECRET_KEY = os.environ.get("SECRET_KEY", "reseta-enterprise-production-signing-key-dpdp-2026")
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_SECONDS = 86400 * 7 # 7 days validity
 
@@ -102,3 +105,20 @@ def get_current_user(
     if not default_user:
         default_user = db.query(User).first()
     return default_user
+
+def require_roles(allowed_roles: list):
+    """Dependency factory enforcing Role-Based Access Control (RBAC). Returns 403 Forbidden on role mismatch."""
+    def role_checker(
+        authorization: Optional[str] = Header(None),
+        db: Session = Depends(get_db)
+    ) -> User:
+        user = get_current_user(authorization=authorization, db=db)
+        if not user or user.role not in allowed_roles:
+            role_name = user.role if user else "ANONYMOUS"
+            raise HTTPException(
+                status_code=403,
+                detail=f"Forbidden: Access requires one of {allowed_roles} roles. Current role: '{role_name}'."
+            )
+        return user
+    return role_checker
+

@@ -1,24 +1,25 @@
 # RESETA™ Enterprise Admin Console Router
-# Section 36, 37, 38, 41, 42, 43: Multi-tenant settings, RBAC, SSO/SCIM status, DPDP Act 2025 compliance
+# Section 36, 37, 38, 41, 42, 43: Multi-tenant settings, RBAC, SSO/SCIM status, DPDP Act 2023 compliance
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 
 from backend.database import get_db
-from backend.database import get_db
 from backend.models import Organization, OrganizationSetting, User, AuditLog, Consent
 from backend.schemas import DPDPStatusResponse
-from backend.security import get_current_user
+from backend.security import require_roles
 from backend.engines.llm_provider import LLMProvider
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/admin", tags=["Enterprise Admin Console"])
 
+admin_guard = require_roles(["SUPER_ADMIN", "AUDITOR"])
+
 class LLMTestRequest(BaseModel):
     prompt: str = "Suggest a 2-minute workplace decompression strategy for meeting fatigue."
 
 @router.get("/organization-settings")
-def get_organization_settings(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_organization_settings(db: Session = Depends(get_db), current_user: User = Depends(admin_guard)):
     """Organization profile, SSO, SCIM and plan information (Section 36, 37)"""
     org = db.query(Organization).first()
     settings = db.query(OrganizationSetting).first()
@@ -40,7 +41,7 @@ def get_organization_settings(db: Session = Depends(get_db), current_user: User 
     }
 
 @router.get("/rbac-matrix")
-def get_rbac_matrix(current_user: User = Depends(get_current_user)):
+def get_rbac_matrix(current_user: User = Depends(admin_guard)):
     """RBAC Role Permissions Matrix (Section 38)"""
     return [
         {"role": "Super Admin", "scope": "Entire organization infrastructure, billing, integrations, SCIM"},
@@ -53,8 +54,8 @@ def get_rbac_matrix(current_user: User = Depends(get_current_user)):
     ]
 
 @router.get("/dpdp-status", response_model=DPDPStatusResponse)
-def get_dpdp_status(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    """India DPDP 2025 Compliance status and consent metrics (Section 43)"""
+def get_dpdp_status(db: Session = Depends(get_db), current_user: User = Depends(admin_guard)):
+    """India DPDP Act 2023 Compliance status and consent metrics (Section 43)"""
     consent_count = db.query(Consent).filter(Consent.granted == True).count()
     withdrawn_count = db.query(Consent).filter(Consent.granted == False).count()
     audit_events_count = db.query(AuditLog).count()
@@ -70,7 +71,7 @@ def get_dpdp_status(db: Session = Depends(get_db), current_user: User = Depends(
     )
 
 @router.get("/llm-config")
-def get_llm_config(current_user: User = Depends(get_current_user)):
+def get_llm_config(current_user: User = Depends(admin_guard)):
     """Enterprise Model Gateway status and provider configuration (Section 31)"""
     provider = LLMProvider.get_configured_provider()
     return {
@@ -82,7 +83,7 @@ def get_llm_config(current_user: User = Depends(get_current_user)):
     }
 
 @router.post("/llm-test")
-def test_llm_generation(req: LLMTestRequest, current_user: User = Depends(get_current_user)):
+def test_llm_generation(req: LLMTestRequest, current_user: User = Depends(admin_guard)):
     """Test model gateway inference live"""
     sys_prompt = "You are RESETA Enterprise Recovery Copilot. Provide an actionable, non-clinical 2-minute reset."
     fallback = "Take 3 deep physiological sighs (two quick inhales through the nose, one long exhale through the mouth). Step back from your screen for 60 seconds."
@@ -94,7 +95,7 @@ def test_llm_generation(req: LLMTestRequest, current_user: User = Depends(get_cu
     return result
 
 @router.get("/audit-logs")
-def get_audit_logs(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_audit_logs(db: Session = Depends(get_db), current_user: User = Depends(admin_guard)):
     """Immutable audit logs for privileged analytics queries (Section 23, 42)"""
     logs = db.query(AuditLog).order_by(AuditLog.timestamp.desc()).limit(15).all()
     return [

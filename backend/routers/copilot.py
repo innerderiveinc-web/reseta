@@ -10,9 +10,13 @@ from backend.models import User
 from backend.engines.privacy_engine import PrivacyEngine
 from backend.engines.llm_provider import LLMProvider
 from backend.engines.safety_firewall import SafetyFirewall
-from backend.security import get_current_user
+from backend.security import get_current_user, require_roles
 
 router = APIRouter(prefix="/api/copilot", tags=["AI Copilots"])
+
+# Role guards
+manager_copilot_guard = require_roles(["MANAGER", "SUPER_ADMIN"])
+hr_copilot_guard = require_roles(["HR_ADMIN", "SUPER_ADMIN"])
 
 class CopilotQueryRequest(BaseModel):
     query: str
@@ -20,7 +24,7 @@ class CopilotQueryRequest(BaseModel):
 @router.post("/manager")
 def query_manager_copilot(
     req: CopilotQueryRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(manager_copilot_guard),
     db: Session = Depends(get_db)
 ):
     """
@@ -96,7 +100,7 @@ def query_manager_copilot(
 @router.post("/hr")
 def query_hr_copilot(
     req: CopilotQueryRequest,
-    user: User = Depends(get_current_user),
+    user: User = Depends(hr_copilot_guard),
     db: Session = Depends(get_db)
 ):
     """

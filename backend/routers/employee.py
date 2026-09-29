@@ -295,7 +295,7 @@ def export_employee_data_archive(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Right to Data Portability (DPDP Act 2025)"""
+    """Right to Data Portability (Digital Personal Data Protection Act, 2023)"""
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -344,7 +344,7 @@ def toggle_consent(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Right to Withdraw Consent (DPDP Act 2025)"""
+    """Right to Withdraw Consent (Digital Personal Data Protection Act, 2023)"""
     user_id = user.id if user else "user-emp-arjun"
 
     consent = db.query(Consent).filter(Consent.user_id == user_id, Consent.purpose == req.purpose).first()
@@ -364,7 +364,7 @@ def request_personal_data_erasure(
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Right to Erasure (DPDP Act 2025)"""
+    """Right to Erasure (Digital Personal Data Protection Act, 2023)"""
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
 
