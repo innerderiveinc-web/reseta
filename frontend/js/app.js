@@ -126,6 +126,8 @@ const App = {
       if (outBox) outBox.style.display = "flex";
       if (inBox) inBox.style.display = "none";
     }
+
+    this.checkSurfaceAuth(this.activeSurface);
   },
 
   logout() {
@@ -133,6 +135,128 @@ const App = {
     this.currentUser = null;
     this.updateAuthState();
     this.showToast("🔒 Signed out of enterprise session");
+    this.checkSurfaceAuth(this.activeSurface);
+  },
+
+  hasRolePermission(surfaceId) {
+    if (!this.currentUser) return false;
+    const r = this.currentUser.role;
+    if (surfaceId === "manager") return ["MANAGER", "SUPER_ADMIN"].includes(r);
+    if (surfaceId === "hr") return ["HR_ADMIN", "SUPER_ADMIN"].includes(r);
+    if (surfaceId === "admin") return ["SUPER_ADMIN", "AUDITOR"].includes(r);
+    if (surfaceId === "care") return ["CLINICIAN", "SUPER_ADMIN"].includes(r);
+    return true;
+  },
+
+  checkSurfaceAuth(surfaceId) {
+    const isProtected = ["manager", "hr", "admin", "care"].includes(surfaceId);
+    if (!isProtected) return true;
+
+    const hasAccess = this.hasRolePermission(surfaceId);
+    const gateEl = document.getElementById(`${surfaceId}AuthGate`);
+    const contentEl = document.getElementById(`${surfaceId}ProtectedContent`);
+
+    if (!hasAccess) {
+      if (gateEl) {
+        gateEl.innerHTML = this.renderAuthGate(surfaceId);
+        gateEl.style.display = "block";
+      }
+      if (contentEl) contentEl.style.display = "none";
+      return false;
+    } else {
+      if (gateEl) gateEl.style.display = "none";
+      if (contentEl) contentEl.style.display = "block";
+      return true;
+    }
+  },
+
+  renderAuthGate(surfaceId) {
+    const configs = {
+      manager: {
+        icon: "👥",
+        title: "Role-Protected: Team Wellbeing Intelligence",
+        roleRequired: "Manager or Super Admin",
+        desc: "Cohort aggregate wellbeing telemetry and 5-Minute Manager Recovery Coach™ scenarios are restricted to authenticated team leaders to ensure cohort psychological safety.",
+        personaName: "Priya Sharma",
+        personaRole: "Engineering Manager",
+        personaId: "user-mgr-priya"
+      },
+      hr: {
+        icon: "📊",
+        title: "Role-Protected: Workforce Wellbeing Intelligence",
+        roleRequired: "HR Admin or Super Admin",
+        desc: "Organization-wide burnout telemetry, departmental stress metrics, and strategic executive pilot reporting are restricted to People & HR Leadership.",
+        personaName: "Kavita Patel",
+        personaRole: "Chief People Officer / HR Admin",
+        personaId: "user-hr-kavita"
+      },
+      admin: {
+        icon: "⚙️",
+        title: "Role-Protected: Enterprise Admin Console",
+        roleRequired: "Super Admin or Auditor",
+        desc: "Single Sign-On (SSO) gateways, SCIM directory connectors, DPDP Act 2023 audit registry, and AI Model guardrail testing are restricted to enterprise IT administrators.",
+        personaName: "Rahul Deshmukh",
+        personaRole: "Super Admin / IT Director",
+        personaId: "user-admin-rahul"
+      },
+      care: {
+        icon: "🩺",
+        title: "Role-Protected: RESETA Care™ Console",
+        roleRequired: "Clinician or Super Admin",
+        desc: "Safety escalation queues, Tele-MANAS protocol dispatch, and clinical triage records are strictly restricted to licensed workplace clinicians.",
+        personaName: "Dr. Ananya Ray",
+        personaRole: "Workplace Clinical Psychologist",
+        personaId: "user-care-ananya"
+      }
+    };
+
+    const cfg = configs[surfaceId] || {
+      icon: "🔒",
+      title: "Confidential Enterprise Surface",
+      roleRequired: "Authenticated Enterprise Role",
+      desc: "This dashboard contains confidential organizational telemetry and requires elevated enterprise permissions.",
+      personaName: "Authorized User",
+      personaRole: "Admin",
+      personaId: "user-admin-rahul"
+    };
+
+    const isUserLoggedIn = !!this.currentUser;
+    const currentRoleName = isUserLoggedIn ? (this.currentUser.role || "").replace(/_/g, " ") : "";
+
+    return `
+      <div class="auth-gate-card">
+        <div class="auth-gate-icon">${cfg.icon}</div>
+        <span class="brand-badge" style="background: rgba(225, 29, 72, 0.12); color: var(--brand-reset); margin-bottom: 12px; display: inline-block;">
+          Confidential Dashboard · RBAC Guard Active
+        </span>
+        <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 10px; color: var(--text-dark);">${cfg.title}</h3>
+        <p style="font-size: 14px; color: var(--text-muted); max-width: 540px; margin: 0 auto 20px; line-height: 1.6;">
+          ${cfg.desc}
+        </p>
+
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 14px 20px; max-width: 480px; margin: 0 auto 24px; text-align: left; font-size: 13px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="color: var(--text-muted);">Required Privileges:</span>
+            <strong style="color: var(--brand-reset);">${cfg.roleRequired}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--text-muted);">Current Session:</span>
+            <strong style="color: ${isUserLoggedIn ? '#059669' : '#dc2626'};">
+              ${isUserLoggedIn ? `${this.currentUser.full_name} (${currentRoleName})` : 'Unauthenticated (No Token)'}
+            </strong>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <button class="btn-primary" style="background: var(--brand-reset); font-weight: 700; padding: 10px 20px;" onclick="App.openLoginModal('signin')">
+            🔑 Enterprise Sign-In
+          </button>
+          <button class="btn-primary" style="background: var(--recovery-teal); font-weight: 700; padding: 10px 20px;" onclick="App.loginAsPersona('${cfg.personaId}')">
+            ⚡ Evaluate as ${cfg.personaName} (${cfg.personaRole.split('/')[0].trim()})
+          </button>
+        </div>
+      </div>
+    `;
   },
 
   setupSurfaceNavigation() {
@@ -166,6 +290,12 @@ const App = {
   },
 
   refreshActiveSurface() {
+    const isProtected = ["manager", "hr", "admin", "care"].includes(this.activeSurface);
+    if (isProtected) {
+      const allowed = this.checkSurfaceAuth(this.activeSurface);
+      if (!allowed) return;
+    }
+
     switch (this.activeSurface) {
       case "employee":
         this.loadEmployeeData();

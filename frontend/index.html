@@ -341,67 +341,72 @@
          SURFACE 3: MANAGER EXPERIENCE & COACH
          ======================================================== -->
     <section id="view-manager" class="view-panel">
-      <div class="content-card" style="margin-bottom: 24px;">
-        <div class="privacy-wall-callout">
-          🛡️ <span id="managerPrivacyBanner">Strictly Anonymous: Zero individual employee check-ins or chat data are visible to managers.</span>
-        </div>
+      <!-- Role-Protected Authentication Gate -->
+      <div id="managerAuthGate" style="display: none;"></div>
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
-          <div>
-            <h2 style="font-size: 22px; font-weight: 700;">👥 Team Wellbeing Intelligence</h2>
-            <p style="font-size: 13px; color: var(--text-muted);">Squad: Frontend Experience · 12 Active Members (Cohort k ≥ 5 Met)</p>
+      <div id="managerProtectedContent">
+        <div class="content-card" style="margin-bottom: 24px;">
+          <div class="privacy-wall-callout">
+            🛡️ <span id="managerPrivacyBanner">Strictly Anonymous: Zero individual employee check-ins or chat data are visible to managers.</span>
           </div>
-          <span class="brand-badge" style="background: var(--recovery-teal);">Aggregate Mode Only</span>
-        </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
-          <div>
-            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Top Workplace Demand Themes</h4>
-            <div id="managerThemesList">
-              <!-- Populated dynamically -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+            <div>
+              <h2 style="font-size: 22px; font-weight: 700;">👥 Team Wellbeing Intelligence</h2>
+              <p style="font-size: 13px; color: var(--text-muted);">Squad: Frontend Experience · 12 Active Members (Cohort k ≥ 5 Met)</p>
+            </div>
+            <span class="brand-badge" style="background: var(--recovery-teal);">Aggregate Mode Only</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Top Workplace Demand Themes</h4>
+              <div id="managerThemesList">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+            <div>
+              <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Suggested Team-Level Actions</h4>
+              <div id="managerSuggestedActions">
+                <!-- Populated dynamically -->
+              </div>
             </div>
           </div>
-          <div>
-            <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Suggested Team-Level Actions</h4>
-            <div id="managerSuggestedActions">
-              <!-- Populated dynamically -->
+        </div>
+
+        <!-- 5-Minute Manager Coach -->
+        <div class="content-card">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">🎯 5-Minute Manager Recovery Coach™</h3>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                WHO-aligned conversation guidance for leaders when navigating team workload and burnout signals.
+              </p>
             </div>
+            <span class="brand-badge" style="background: var(--text-main);">Scenario Library</span>
+          </div>
+          <div id="managerCoachScenariosList">
+            <!-- Populated dynamically -->
           </div>
         </div>
-      </div>
 
-      <!-- 5-Minute Manager Coach -->
-      <div class="content-card">
-        <div class="card-header-flex">
-          <div>
-            <h3 class="card-title">🎯 5-Minute Manager Recovery Coach™</h3>
-            <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
-              WHO-aligned conversation guidance for leaders when navigating team workload and burnout signals.
-            </p>
+        <!-- Manager Copilot -->
+        <div class="content-card" style="margin-top: 24px;">
+          <div class="card-header-flex">
+            <div>
+              <h3 class="card-title">🤖 Ask RESETA Manager Copilot™</h3>
+              <p style="font-size: 13px; color: var(--text-muted);">
+                Get privacy-safe conversation guidance & workload distribution strategies.
+              </p>
+            </div>
+            <span class="brand-badge" style="background: var(--recovery-teal);">Zero Individual Disclosure</span>
           </div>
-          <span class="brand-badge" style="background: var(--text-main);">Scenario Library</span>
-        </div>
-        <div id="managerCoachScenariosList">
-          <!-- Populated dynamically -->
-        </div>
-      </div>
-
-      <!-- Manager Copilot -->
-      <div class="content-card" style="margin-top: 24px;">
-        <div class="card-header-flex">
-          <div>
-            <h3 class="card-title">🤖 Ask RESETA Manager Copilot™</h3>
-            <p style="font-size: 13px; color: var(--text-muted);">
-              Get privacy-safe conversation guidance & workload distribution strategies.
-            </p>
+          <div class="copilot-input-row">
+            <input type="text" id="managerCopilotInput" class="copilot-input" placeholder="e.g., 'My squad has 3 urgent release deadlines this week. How should I structure protected focus blocks?'">
+            <button class="btn-primary" onclick="App.askManagerCopilot()">Ask Copilot →</button>
           </div>
-          <span class="brand-badge" style="background: var(--recovery-teal);">Zero Individual Disclosure</span>
+          <div id="managerCopilotAnswer" class="copilot-answer-card"></div>
         </div>
-        <div class="copilot-input-row">
-          <input type="text" id="managerCopilotInput" class="copilot-input" placeholder="e.g., 'My squad has 3 urgent release deadlines this week. How should I structure protected focus blocks?'">
-          <button class="btn-primary" onclick="App.askManagerCopilot()">Ask Copilot →</button>
-        </div>
-        <div id="managerCopilotAnswer" class="copilot-answer-card"></div>
       </div>
     </section>
 
@@ -409,11 +414,15 @@
          SURFACE 4: HR / PEOPLE DASHBOARD
          ======================================================== -->
     <section id="view-hr" class="view-panel">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div>
-          <h2 style="font-size: 24px; font-weight: 800;">📊 Workforce Wellbeing Intelligence</h2>
-          <p style="font-size: 13px; color: var(--text-muted);">Real-time organizational recovery indicators · TechNova Solutions India</p>
-        </div>
+      <!-- Role-Protected Authentication Gate -->
+      <div id="hrAuthGate" style="display: none;"></div>
+
+      <div id="hrProtectedContent">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <div>
+            <h2 style="font-size: 24px; font-weight: 800;">📊 Workforce Wellbeing Intelligence</h2>
+            <p style="font-size: 13px; color: var(--text-muted);">Real-time organizational recovery indicators · TechNova Solutions India</p>
+          </div>
         <button class="btn-primary" style="background: var(--recovery-teal); font-weight: 700;" onclick="App.openPilotReport()">
           📄 View Executive Pilot Report (Q1 Analysis)
         </button>
@@ -539,13 +548,18 @@
         </div>
         <div id="hrCopilotAnswer" class="copilot-answer-card"></div>
       </div>
+      </div>
     </section>
 
     <!-- ========================================================
          SURFACE 5: ENTERPRISE ADMIN CONSOLE
          ======================================================== -->
     <section id="view-admin" class="view-panel">
-      <div class="content-card" style="margin-bottom: 24px;">
+      <!-- Role-Protected Authentication Gate -->
+      <div id="adminAuthGate" style="display: none;"></div>
+
+      <div id="adminProtectedContent">
+        <div class="content-card" style="margin-bottom: 24px;">
         <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 6px;">⚙️ Enterprise Admin Console</h2>
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Identity, SSO, SCIM provisioning, RBAC, and billing management.</p>
 
@@ -707,11 +721,16 @@
           </div>
         </div>
       </div>
+      </div>
     </section>
 
     <!-- SURFACE 6: CARE CONSOLE -->
     <section id="view-care" class="view-panel">
-      <div class="content-card" style="margin-bottom: 24px;">
+      <!-- Role-Protected Authentication Gate -->
+      <div id="careAuthGate" style="display: none;"></div>
+
+      <div id="careProtectedContent">
+        <div class="content-card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
           <h2 style="font-size: 22px; font-weight: 700;">🩺 RESETA Care™ Console</h2>
           <span class="brand-badge" style="background: var(--brand-reset);">Clinical Care Pathways</span>
@@ -753,6 +772,7 @@
             </tbody>
           </table>
         </div>
+      </div>
       </div>
     </section>
 
