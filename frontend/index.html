@@ -141,9 +141,9 @@
           </div>
         </div>
 
-        <div class="tenant-badge">
+        <div class="tenant-badge" title="Simulated corporate demonstration workspace">
           <span class="tenant-dot"></span>
-          <span id="tenantOrgDisplay">TechNova India (850 Seats)</span>
+          <span id="tenantOrgDisplay">Demo Sandbox: TechNova Solutions (850 Seats)</span>
         </div>
       </div>
     </div>
@@ -152,9 +152,32 @@
   <!-- Main Content Surfaces -->
   <main class="main-content">
     
-    <!-- ========================================================
-         SURFACE 1: EMPLOYEE APP & WEB (Sections 6, 7, 8, 9, 10, 11)
-         ======================================================== -->
+    <!-- Enterprise Workspace Orientation Hero Banner -->
+    <div id="enterpriseWelcomeBanner" class="welcome-guide-banner">
+      <div class="welcome-guide-left">
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <span class="brand-badge" style="background: var(--brand-reset);">DEMO SANDBOX SIMULATION</span>
+          <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Pre-loaded with TechNova Solutions (850 Seats)</span>
+        </div>
+        <h2 style="font-size: 17px; font-weight: 800; margin: 4px 0 3px; color: var(--text-main);">
+          Welcome to the RESETA™ Interactive Enterprise Workspace
+        </h2>
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
+          Experience how employees, managers, and HR leaders recover cognitive bandwidth in 2–10 minutes with guaranteed zero-surveillance. Switch between the <strong>7 Core Surfaces</strong> in the navigation above to explore every enterprise role.
+        </p>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <button class="btn-small-pill" onclick="App.run10SecondDemo()" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700; white-space: nowrap;">
+          ⚡ 10-Sec Demo
+        </button>
+        <a href="/pricing" class="btn-primary" style="font-size: 12px; padding: 7px 14px; text-decoration: none; white-space: nowrap;">
+          Pricing & ROI →
+        </a>
+        <button onclick="document.getElementById('enterpriseWelcomeBanner').style.display='none'" style="background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 4px 6px;" title="Dismiss banner">&times;</button>
+      </div>
+    </div>
+
+    <!-- SURFACE 1: EMPLOYEE APP & WEB -->
     <section id="view-employee" class="view-panel active">
       <div class="employee-hero-card">
         <div class="privacy-banner-pill">
@@ -195,7 +218,7 @@
         </div>
       </div>
 
-      <!-- Autopilot Contextual Signal Card (Section 15) -->
+      <!-- Autopilot Contextual Signal Card -->
       <div id="autopilotCard" class="content-card" style="margin-bottom: 24px; border-left: 4px solid var(--recovery-teal);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span class="brand-badge" style="background: var(--recovery-teal);">RESETA AUTOPILOT™</span>
@@ -278,7 +301,7 @@
     </section>
 
     <!-- ========================================================
-         SURFACE 2: WORKPLACE CHAT INTEGRATION (Section 34)
+         SURFACE 2: WORKPLACE CHAT INTEGRATION
          ======================================================== -->
     <section id="view-teams-slack" class="view-panel">
       <div class="content-card">
@@ -315,7 +338,7 @@
     </section>
 
     <!-- ========================================================
-         SURFACE 3: MANAGER EXPERIENCE & COACH (Sections 20, 64)
+         SURFACE 3: MANAGER EXPERIENCE & COACH
          ======================================================== -->
     <section id="view-manager" class="view-panel">
       <div class="content-card" style="margin-bottom: 24px;">
@@ -347,7 +370,7 @@
         </div>
       </div>
 
-      <!-- 5-Minute Manager Coach (Section 64) -->
+      <!-- 5-Minute Manager Coach -->
       <div class="content-card">
         <div class="card-header-flex">
           <div>
@@ -363,7 +386,7 @@
         </div>
       </div>
 
-      <!-- Manager Copilot (Section 48) -->
+      <!-- Manager Copilot -->
       <div class="content-card" style="margin-top: 24px;">
         <div class="card-header-flex">
           <div>
@@ -383,7 +406,7 @@
     </section>
 
     <!-- ========================================================
-         SURFACE 4: HR / PEOPLE DASHBOARD (Sections 21, 24, 25, 35)
+         SURFACE 4: HR / PEOPLE DASHBOARD
          ======================================================== -->
     <section id="view-hr" class="view-panel">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -422,7 +445,7 @@
       </div>
 
       <div class="privacy-wall-callout">
-        🛡️ <strong>RESETA Privacy Shield:</strong> Minimum cohort threshold enforced (k ≥ 5). Language sanitized to eliminate stigmatizing labels (Section 22: "Do not call everything risk").
+        🛡️ <strong>RESETA Privacy Shield:</strong> Minimum cohort threshold strictly enforced (k ≥ 5). Non-stigmatizing organizational taxonomy ensures team workload is supported without diagnostic labels.
       </div>
 
       <!-- HR Themes and Benchmarks -->
@@ -454,7 +477,7 @@
         </div>
       </div>
 
-      <!-- Organizational Action Engine™ (Section 24) -->
+      <!-- Organizational Action Engine™ -->
       <div class="content-card" style="margin-bottom: 28px;">
         <div class="card-header-flex">
           <div>
@@ -468,7 +491,7 @@
         </div>
       </div>
 
-      <!-- Team Recovery Lab™ (Section 25) & HR Campaign Engine (Section 35) -->
+      <!-- Team Recovery Lab™ & HR Campaign Engine -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
         <!-- Recovery Lab Experiments -->
         <div class="content-card">
@@ -499,7 +522,7 @@
         </div>
       </div>
 
-      <!-- Workforce Intelligence Copilot (Section 49) -->
+      <!-- Workforce Intelligence Copilot -->
       <div class="content-card" style="margin-top: 24px;">
         <div class="card-header-flex">
           <div>
@@ -519,7 +542,7 @@
     </section>
 
     <!-- ========================================================
-         SURFACE 5: ENTERPRISE ADMIN CONSOLE (Section 36, 37, 38)
+         SURFACE 5: ENTERPRISE ADMIN CONSOLE
          ======================================================== -->
     <section id="view-admin" class="view-panel">
       <div class="content-card" style="margin-bottom: 24px;">
@@ -565,7 +588,7 @@
           </table>
         </div>
 
-        <h4 style="font-size: 14px; font-weight: 700; margin: 20px 0 10px;">Privileged Analytics Audit Log (Section 23, 42)</h4>
+        <h4 style="font-size: 14px; font-weight: 700; margin: 20px 0 10px;">Privileged Access & Governance Audit Trail</h4>
         <div style="overflow-x: auto; margin-bottom: 24px;">
           <table class="data-table">
             <thead>
@@ -582,11 +605,11 @@
           </table>
         </div>
 
-        <!-- HRIS & Enterprise Directory Connectors (Section 39) -->
+        <!-- HRIS & Enterprise Directory Connectors -->
         <div style="border-top: 1px solid var(--border-light); padding-top: 24px; margin-top: 24px;">
           <div class="card-header-flex">
             <div>
-              <h4 style="font-size: 16px; font-weight: 700;">🏢 HRIS & Organizational Directory Connectors (Section 39)</h4>
+              <h4 style="font-size: 16px; font-weight: 700;">🏢 HRIS & Organizational Directory Connectors</h4>
               <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
                 Non-surveillance organizational directory sync only: name, department, and team. Zero keystroke, calendar, or screen monitoring.
               </p>
@@ -598,12 +621,12 @@
           </div>
         </div>
 
-        <!-- 🤖 AI Model Gateway & Live LLM Configuration (Section 31) -->
+        <!-- 🤖 AI Model Gateway & Live LLM Configuration -->
         <div style="border-top: 1px solid var(--border-light); padding-top: 24px; margin-top: 24px;">
           <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px;">
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <h4 style="font-size: 16px; font-weight: 700;">🤖 AI Model Gateway & Live LLM Configuration (Section 31)</h4>
+                <h4 style="font-size: 16px; font-weight: 700;">🤖 Enterprise AI Guardrails & Model Gateway</h4>
                 <span id="adminLlmStatusBadge" class="brand-badge" style="background: var(--recovery-teal);">Loading Gateway...</span>
               </div>
               <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
@@ -632,11 +655,11 @@
 
           <!-- Live Model Test Console -->
           <div style="margin-top: 16px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 16px;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Live Model Gateway Inference Test</div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Live Clinical Guardrail Verification & Latency Monitor</div>
             <div style="display: flex; gap: 8px;">
               <input type="text" id="llmTestPrompt" class="copilot-input" value="Suggest a 2-minute decompression strategy for high sprint pressure." style="flex: 1;">
               <button class="btn-primary" style="background: var(--recovery-teal); white-space: nowrap;" onclick="App.runLlmInferenceTest()">
-                Run Inference ⚡
+                Run Guardrail Test ⚡
               </button>
             </div>
             <div id="llmTestResultBox" style="margin-top: 12px; display: none; padding: 12px; background: var(--bg-subtle); border-radius: 6px; font-size: 13px; border-left: 3px solid var(--recovery-teal);">
@@ -649,12 +672,12 @@
           </div>
         </div>
 
-        <!-- Clinical & Ethical AI Safety Board / Red-Team Runner (Section 67, 68, 69) -->
+        <!-- Clinical & Ethical AI Safety Board / Red-Team Runner -->
         <div style="border-top: 1px solid var(--border-light); padding-top: 24px; margin-top: 24px;">
           <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px;">
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <h4 style="font-size: 16px; font-weight: 700;">🛡️ Clinical & Ethical AI Safety Board · Red-Team Audit (Section 67, 69)</h4>
+                <h4 style="font-size: 16px; font-weight: 700;">🛡️ Clinical & Ethical AI Safety Board · Red-Team Verification</h4>
                 <span class="brand-badge" style="background: var(--recovery-emerald);">10/10 Certified</span>
               </div>
               <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
@@ -677,7 +700,7 @@
           </div>
 
           <h5 style="font-size: 13px; font-weight: 700; margin: 24px 0 10px; color: var(--text-muted); text-transform: uppercase;">
-            AI Safety Board Release Checklist (Section 68)
+            AI Safety Board Enterprise Release Checklist
           </h5>
           <div id="aiReleaseChecklistContainer" style="overflow-x: auto;">
             <!-- Populated dynamically -->
@@ -686,9 +709,7 @@
       </div>
     </section>
 
-    <!-- ========================================================
-         SURFACE 6: CARE CONSOLE (Section 26, 27)
-         ======================================================== -->
+    <!-- SURFACE 6: CARE CONSOLE -->
     <section id="view-care" class="view-panel">
       <div class="content-card" style="margin-bottom: 24px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
@@ -715,7 +736,7 @@
           </div>
         </div>
 
-        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Active Safety & Care Triage Queue (Section 26, 27)</h4>
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Active Safety & Care Escalation Queue</h4>
         <div style="overflow-x: auto;">
           <table class="data-table">
             <thead>
@@ -736,7 +757,7 @@
     </section>
 
     <!-- ========================================================
-         SURFACE 7: TRUST CENTER & DPDP (Section 43, 44, 66)
+         SURFACE 7: TRUST CENTER & DPDP
          ======================================================== -->
     <section id="view-trust" class="view-panel">
       <div class="content-card">
@@ -787,6 +808,27 @@
       </div>
     </section>
 
+    <!-- High-Converting Enterprise Pilot CTA Section -->
+    <section class="enterprise-cta-card" style="margin-top: 40px; background: linear-gradient(135deg, rgba(225,29,72,0.06), rgba(13,148,136,0.06)); border: 1px solid var(--border-light); border-radius: var(--radius-lg); padding: 36px 32px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 24px;">
+      <div style="max-width: 640px;">
+        <span class="privacy-banner-pill" style="margin-bottom: 8px;">🚀 Risk-Free 30-Day Deployment</span>
+        <h2 style="font-size: 24px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; color: var(--text-main);">
+          Ready to Eliminate Workplace Burnout in Your Organization?
+        </h2>
+        <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin: 0;">
+          Deploy RESETA™ in your engineering, product, or business squads. 100% zero-surveillance guarantee, full DPDP Act 2023 compliance, and dedicated technical onboarding by Qsura India Pvt. Ltd.
+        </p>
+      </div>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+        <a href="/contact" class="btn-primary" style="font-size: 13px; padding: 11px 22px; text-decoration: none; background: var(--brand-reset);">
+          Book a 30-Day Pilot Demo →
+        </a>
+        <a href="/pricing" class="btn-small-pill" style="font-size: 13px; padding: 9px 18px; text-decoration: none; border-color: var(--border-strong); color: var(--text-main);">
+          View Transparent Plans
+        </a>
+      </div>
+    </section>
+
   </main>
 
   <!-- ==========================================================
@@ -804,7 +846,7 @@
           From workplace stress to workplace recovery. An AI-powered mental recovery system for the enterprise—without employee surveillance.
         </p>
         <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px;">
-          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🏢 Enterprise Licensed Tenant</div>
+          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🏢 Interactive Demonstration Sandbox</div>
           <div style="color: var(--text-muted);">TechNova Solutions India Pvt. Ltd. · Org ID: <code>org-technova-01</code></div>
           <div style="color: var(--text-muted); margin-top: 4px;">📍 Primary Data Sovereignty: AWS ap-south-1 (Mumbai, India)</div>
         </div>
@@ -912,7 +954,7 @@
   <!-- ==========================================================
        MODALS: RESET MODAL & TALK IT OUT MODAL
        ========================================================== -->
-  <!-- 🔴 RESET ME Modal (Section 8, 9, 10, 11, 12) -->
+  <!-- 🔴 RESET ME Modal -->
   <div id="resetModal" class="modal-backdrop">
     <div class="reset-modal-window">
       <button id="resetModalClose" class="modal-close-btn">&times;</button>
@@ -922,7 +964,7 @@
     </div>
   </div>
 
-  <!-- 🎙 TALK IT OUT Modal (Section 16) -->
+  <!-- 🎙 TALK IT OUT Modal -->
   <div id="talkModal" class="modal-backdrop">
     <div class="reset-modal-window">
       <button id="talkModalClose" class="modal-close-btn">&times;</button>
@@ -932,7 +974,7 @@
     </div>
   </div>
 
-  <!-- 📄 Pilot Report Executive Modal (Section 58) -->
+  <!-- 📄 Pilot Report Executive Modal -->
   <div id="pilotReportModal" class="modal-backdrop">
     <div class="pilot-report-window">
       <button class="modal-close-btn" onclick="App.closePilotReport()">&times;</button>
@@ -942,7 +984,7 @@
     </div>
   </div>
 
-  <!-- 📚 Program Walkthrough Modal (Section 18, 63) -->
+  <!-- 📚 Program Walkthrough Modal -->
   <div id="programModal" class="modal-backdrop">
     <div class="reset-modal-window" style="width: min(720px, 100%);">
       <button class="modal-close-btn" onclick="App.closeProgramModal()">&times;</button>
@@ -952,7 +994,7 @@
     </div>
   </div>
 
-  <!-- 🧪 Team Recovery Lab Experiment Creator Modal (Section 25) -->
+  <!-- 🧪 Team Recovery Lab Experiment Creator Modal -->
   <div id="experimentModal" class="modal-backdrop">
     <div class="reset-modal-window" style="width: min(640px, 100%);">
       <button class="modal-close-btn" onclick="document.getElementById('experimentModal').classList.remove('active')">&times;</button>
@@ -996,7 +1038,7 @@
     </div>
   </div>
 
-  <!-- 📢 HR Campaign Dispatcher Modal (Section 35) -->
+  <!-- 📢 HR Campaign Dispatcher Modal -->
   <div id="campaignModal" class="modal-backdrop">
     <div class="reset-modal-window" style="width: min(600px, 100%);">
       <button class="modal-close-btn" onclick="document.getElementById('campaignModal').classList.remove('active')">&times;</button>
@@ -1038,7 +1080,7 @@
     </div>
   </div>
 
-  <!-- 📥 DPDP Data Subject Export Modal (Section 43) -->
+  <!-- 📥 DPDP Data Subject Export Modal -->
   <div id="dpdpExportModal" class="modal-backdrop">
     <div class="reset-modal-window" style="width: min(720px, 100%);">
       <button class="modal-close-btn" onclick="document.getElementById('dpdpExportModal').classList.remove('active')">&times;</button>
@@ -1048,7 +1090,7 @@
     </div>
   </div>
 
-  <!-- 🎯 5-Minute Manager Recovery Coach Interactive Practice Modal (Section 64) -->
+  <!-- 🎯 5-Minute Manager Recovery Coach Interactive Practice Modal -->
   <div id="coachPracticeModal" class="modal-backdrop">
     <div class="reset-modal-window" style="width: min(680px, 100%);">
       <button class="modal-close-btn" onclick="document.getElementById('coachPracticeModal').classList.remove('active')">&times;</button>
@@ -1387,7 +1429,7 @@
     </div>
   </div>
 
-  <!-- Persistent 1-Click Floating Workplace Reset Widget (Section 61, 62) -->
+  <!-- Persistent 1-Click Floating Workplace Reset Widget -->
   <button class="floating-reset-widget" onclick="ResetModal.open('overloaded')" title="Quick 2/5 Min Workplace Reset">
     🔴 1-Click Reset
   </button>

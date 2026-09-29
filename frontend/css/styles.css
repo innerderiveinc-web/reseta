@@ -1630,4 +1630,33 @@ body {
   display: block;
 }
 
+/* Enterprise Workspace Orientation Hero Banner */
+.welcome-guide-banner {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--brand-reset);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.welcome-guide-left {
+  max-width: 820px;
+}
+
+@media (max-width: 868px) {
+  .welcome-guide-banner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}
+
+
 
