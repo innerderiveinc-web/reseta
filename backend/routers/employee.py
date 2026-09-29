@@ -381,5 +381,5 @@ def request_personal_data_erasure(
     db.commit()
     return {
         "success": True,
-        "message": "All private reflections, unloads, and personal relief patterns have been permanently erased per DPDP Act 2025."
+        "message": "All private reflections, unloads, and personal relief patterns have been permanently erased per DPDP Act 2023."
     }

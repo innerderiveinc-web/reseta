@@ -961,7 +961,7 @@ const App = {
       content.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
           <div>
-            <span class="brand-badge" style="background: var(--recovery-teal);">DPDP Act 2025 · Right to Data Portability</span>
+            <span class="brand-badge" style="background: var(--recovery-teal);">DPDP Act 2023 · Right to Data Portability</span>
             <h2 class="modal-step-title" style="margin-top: 6px;">Personal Data Archive</h2>
           </div>
           <button class="btn-primary" onclick="navigator.clipboard.writeText(JSON.stringify(window._lastDpdpExport, null, 2)); alert('Copied JSON archive to clipboard!');">📋 Copy JSON</button>
@@ -983,14 +983,14 @@ const App = {
   async toggleSampleConsent() {
     try {
       await API.toggleDpdpConsent("ANONYMIZED_WORKFORCE_AGGREGATION", false);
-      alert("🔒 Consent updated: Anonymized aggregation for your account has been toggled in accordance with DPDP Rules 2025.");
+      alert("🔒 Consent updated: Anonymized aggregation for your account has been toggled in accordance with DPDP Act, 2023.");
     } catch (err) {
       alert("Error: " + err.message);
     }
   },
 
   async requestDataErasure() {
-    const confirmErasure = confirm("Are you sure you want to invoke your Right to Erasure under the DPDP Act, 2025?\n\nThis will permanently delete all your private reflections, thought unload buckets, and learned personal patterns.");
+    const confirmErasure = confirm("Are you sure you want to invoke your Right to Erasure under the DPDP Act, 2023?\n\nThis will permanently delete all your private reflections, thought unload buckets, and learned personal patterns.");
     if (!confirmErasure) return;
 
     try {
@@ -1619,7 +1619,7 @@ const App = {
     {
       icon: "🛡️",
       title: "Trust Center & DPDP Controls",
-      desc: "India DPDP Act 2025 data portability and consent",
+      desc: "India DPDP Act 2023 data portability and consent",
       category: "Governance",
       action: "App.switchSurface('trust')"
     },

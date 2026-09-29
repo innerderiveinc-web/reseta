@@ -33,7 +33,7 @@ def get_organization_settings(db: Session = Depends(get_db), current_user: User 
         "sso_enabled": settings.sso_enabled if settings else True,
         "sso_provider": settings.sso_provider if settings else "Microsoft Entra ID / Okta SAML 2.0",
         "scim_enabled": settings.scim_enabled if settings else True,
-        "dpdp_compliance": "Digital Personal Data Protection (DPDP) Act, 2025 Aligned",
+        "dpdp_compliance": "Digital Personal Data Protection (DPDP) Act, 2023 Aligned",
         "min_cohort_size": settings.min_cohort_size if settings else 5,
         "slack_integrated": True,
         "teams_integrated": True
