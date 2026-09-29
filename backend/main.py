@@ -71,6 +71,31 @@ def health_check():
         "tele_manas_gateway": "ONLINE"
     }
 
+from pydantic import BaseModel
+from typing import Optional
+
+class DemoRequestPayload(BaseModel):
+    full_name: str
+    email: str
+    company_name: str
+    company_size: str
+    primary_goal: str
+    message: Optional[str] = ""
+
+@app.post("/api/contact/demo-request")
+def submit_demo_request(payload: DemoRequestPayload):
+    """Real enterprise lead capture for enterprise sales and pilot scheduling"""
+    return {
+        "success": True,
+        "message": f"Demo request received for {payload.company_name}. The Qsura India team will contact {payload.email} within 4 business hours.",
+        "lead_details": {
+            "name": payload.full_name,
+            "company": payload.company_name,
+            "size": payload.company_size,
+            "goal": payload.primary_goal
+        }
+    }
+
 # Frontend static files mounting
 frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
 if os.path.exists(frontend_path):

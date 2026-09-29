@@ -94,30 +94,47 @@ def get_current_user(
         except Exception:
             pass
 
-    # Seamless fallback if no bearer token provided
-    try:
-        from backend.routers.auth import ACTIVE_USER_ID
-        active_id = ACTIVE_USER_ID
-    except Exception:
-        active_id = "user-emp-arjun"
-
-    default_user = db.query(User).filter(User.id == active_id).first()
+    # Seamless fallback for public demo on employee homepage
+    default_user = db.query(User).filter(User.id == "user-emp-arjun").first()
     if not default_user:
         default_user = db.query(User).first()
     return default_user
 
 def require_roles(allowed_roles: list):
-    """Dependency factory enforcing Role-Based Access Control (RBAC). Returns 403 Forbidden on role mismatch."""
+    """
+    Dependency factory enforcing strict cryptographic Role-Based Access Control (RBAC).
+    - Unauthenticated callers (missing or invalid Bearer token) receive 401 Unauthorized.
+    - Authenticated users with insufficient privileges receive 403 Forbidden.
+    - Zero global state leakage across concurrent server requests.
+    """
     def role_checker(
         authorization: Optional[str] = Header(None),
         db: Session = Depends(get_db)
     ) -> User:
-        user = get_current_user(authorization=authorization, db=db)
-        if not user or user.role not in allowed_roles:
-            role_name = user.role if user else "ANONYMOUS"
+        if not authorization or not authorization.startswith("Bearer "):
+            raise HTTPException(
+                status_code=401,
+                detail="Authentication required: Please provide a valid Bearer token in the Authorization header."
+            )
+
+        token = authorization[7:].strip()
+        try:
+            payload = decode_access_token(token)
+            user_id = payload.get("sub")
+        except Exception as e:
+            raise HTTPException(
+                status_code=401,
+                detail=f"Invalid or expired authentication token: {str(e)}"
+            )
+
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="User specified in authentication token does not exist.")
+
+        if user.role not in allowed_roles:
             raise HTTPException(
                 status_code=403,
-                detail=f"Forbidden: Access requires one of {allowed_roles} roles. Current role: '{role_name}'."
+                detail=f"Forbidden: Access requires one of {allowed_roles} roles. Current role: '{user.role}'."
             )
         return user
     return role_checker

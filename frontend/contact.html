@@ -185,7 +185,7 @@
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <span>📞</span>
-            <span><strong>Direct Enterprise Line:</strong> +91 (080) 4123-RESETA</span>
+            <span><strong>Direct Enterprise Line:</strong> +91 (080) 4123 7373</span>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
             <span>📍</span>
@@ -268,10 +268,64 @@
   </footer>
 
   <script>
-    function handleContactSubmit(e) {
+    // Pre-select plan if passed from pricing page (e.g., /contact?plan=growth)
+    document.addEventListener("DOMContentLoaded", () => {
+      const params = new URLSearchParams(window.location.search);
+      const plan = params.get('plan');
+      const goalSelect = document.getElementById('primaryGoal');
+      const messageEl = document.getElementById('message');
+
+      if (plan === 'starter') {
+        if (goalSelect) goalSelect.value = 'pilot';
+        if (messageEl) messageEl.value = 'We are interested in the Starter Squad pilot (₹199/seat/month).';
+      } else if (plan === 'growth') {
+        if (goalSelect) goalSelect.value = 'pilot';
+        if (messageEl) messageEl.value = 'We would like to launch a 30-day Enterprise Growth pilot (₹299/seat/month).';
+      } else if (plan === 'enterprise') {
+        if (goalSelect) goalSelect.value = 'eap';
+        if (messageEl) messageEl.value = 'Inquiring about Custom Enterprise tier for 1,000+ employees with dedicated tenancy and custom compliance.';
+      }
+    });
+
+    async function handleContactSubmit(e) {
       e.preventDefault();
-      document.getElementById('contactForm').style.display = 'none';
-      document.getElementById('contactSuccessMsg').style.display = 'block';
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn ? submitBtn.innerText : 'Submit';
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Submitting Request...';
+      }
+
+      const payload = {
+        full_name: document.getElementById('contactName').value.trim(),
+        email: document.getElementById('contactEmail').value.trim(),
+        company_name: document.getElementById('companyName').value.trim(),
+        company_size: document.getElementById('teamSize').value,
+        primary_goal: document.getElementById('primaryGoal').value,
+        message: document.getElementById('message').value.trim()
+      };
+
+      try {
+        const res = await fetch('/api/contact/demo-request', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        document.getElementById('contactForm').style.display = 'none';
+        const msgEl = document.getElementById('contactSuccessMsg');
+        if (msgEl) {
+          msgEl.innerHTML = `🎉 <strong>Thank you, ${payload.full_name}!</strong> Your demo request for <strong>${payload.company_name}</strong> has been received.<br><span style="margin-top:6px; display:inline-block; font-size:12px; color:#047857;">Our Enterprise Solutions Team at Qsura India will reach out to <strong>${payload.email}</strong> within 4 business hours.</span>`;
+          msgEl.style.display = 'block';
+        }
+      } catch (err) {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = originalText;
+        }
+        alert('Could not submit request. Please try again or email enterprise@reseta.in');
+      }
     }
   </script>
 </body>

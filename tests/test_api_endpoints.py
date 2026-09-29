@@ -5,6 +5,13 @@ from backend.main import app
 
 client = TestClient(app)
 
+def switch_user(user_id: str):
+    res = client.post("/api/auth/switch-user", json={"user_id": user_id})
+    token = res.json().get('access_token')
+    if token:
+        client.headers['Authorization'] = f'Bearer {token}'
+    return res
+
 def test_health_endpoint():
     response = client.get("/api/health")
     assert response.status_code == 200
@@ -18,13 +25,13 @@ def test_auth_users_and_switching():
     users = resp.json()
     assert len(users) >= 4
 
-    switch_resp = client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    switch_resp = switch_user("user-hr-kavita")
     assert switch_resp.status_code == 200
     assert switch_resp.json()["role"] == "HR_ADMIN"
 
 def test_checkin_and_reset_flow():
     # 1. Switch back to employee
-    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    switch_user("user-emp-arjun")
 
     # 2. Check-in
     checkin_res = client.post("/api/employee/checkin", json={"state_reported": "Overloaded"})
@@ -68,7 +75,7 @@ def test_talk_it_out_endpoint():
     assert len(data["reflection"]) > 10
 
 def test_hr_workforce_metrics():
-    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    switch_user("user-hr-kavita")
     res = client.get("/api/hr/workforce-metrics")
     assert res.status_code == 200
     data = res.json()
@@ -77,7 +84,7 @@ def test_hr_workforce_metrics():
     assert len(data["aggregate_themes"]) > 0
 
 def test_manager_copilot_endpoint():
-    client.post("/api/auth/switch-user", json={"user_id": "user-mgr-priya"})
+    switch_user("user-mgr-priya")
     res = client.post("/api/copilot/manager", json={
         "query": "My team is overloaded with sprint deadlines. What should I do?"
     })
@@ -88,7 +95,7 @@ def test_manager_copilot_endpoint():
     assert "No employee-level check-ins" in data["privacy_guarantee"]
 
 def test_hr_copilot_endpoint():
-    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    switch_user("user-hr-kavita")
     res = client.post("/api/copilot/hr", json={
         "query": "What themes are increasing this quarter?"
     })
@@ -98,7 +105,7 @@ def test_hr_copilot_endpoint():
     assert len(data["answer"]) > 50
 
 def test_pilot_report_endpoint():
-    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    switch_user("user-hr-kavita")
     res = client.get("/api/hr/pilot-report")
     assert res.status_code == 200
     report = res.json()
@@ -107,7 +114,7 @@ def test_pilot_report_endpoint():
     assert report["sections"]["3_completed_recovery_moments"]["total_recovery_moments"] > 1000
 
 def test_autopilot_prompt_endpoint():
-    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    switch_user("user-emp-arjun")
     res = client.get("/api/employee/autopilot/prompt?meetings_today=4")
     assert res.status_code == 200
     data = res.json()
@@ -116,7 +123,7 @@ def test_autopilot_prompt_endpoint():
     assert "anxiety" not in data["headline"].lower()
 
 def test_dpdp_export_and_consent_toggle():
-    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    switch_user("user-emp-arjun")
     res = client.get("/api/employee/dpdp/export")
     assert res.status_code == 200
     data = res.json()
@@ -132,7 +139,7 @@ def test_dpdp_export_and_consent_toggle():
     assert toggle_res.json()["granted"] is False
 
 def test_experiment_creation():
-    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    switch_user("user-hr-kavita")
     res = client.post("/api/hr/experiments", json={
         "title": "25-Minute Meeting Rule Pilot",
         "hypothesis": "Ending meetings 5 minutes early will reduce cognitive fatigue.",
@@ -144,7 +151,7 @@ def test_experiment_creation():
     assert res.json()["success"] is True
 
 def test_campaign_creation():
-    client.post("/api/auth/switch-user", json={"user_id": "user-hr-kavita"})
+    switch_user("user-hr-kavita")
     res = client.post("/api/hr/campaigns", json={
         "title": "Focus Without Burnout Week",
         "theme": "Restorative Work Practices",
@@ -199,8 +206,13 @@ def test_modular_enterprise_pages():
         assert expected_text in resp.text, f"Expected '{expected_text}' not found in {route}"
 
 def test_rbac_forbidden_and_allowed_access():
+    # 0. Anonymous call with no token -> 401 Unauthorized
+    client.headers.pop("Authorization", None)
+    anon_res = client.get("/api/admin/organization-settings")
+    assert anon_res.status_code == 401, f"Expected 401 for anonymous caller on admin, got {anon_res.status_code}"
+
     # 1. Switch to normal employee
-    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    switch_user("user-emp-arjun")
 
     # Employee attempting privileged operations -> 403 Forbidden
     admin_res = client.get("/api/admin/organization-settings")
@@ -213,17 +225,17 @@ def test_rbac_forbidden_and_allowed_access():
     assert care_res.status_code == 403, f"Expected 403 for employee on care, got {care_res.status_code}"
 
     # 2. Switch to Super Admin -> 200 OK across admin
-    client.post("/api/auth/switch-user", json={"user_id": "user-admin-rahul"})
+    switch_user("user-admin-rahul")
     admin_ok = client.get("/api/admin/organization-settings")
     assert admin_ok.status_code == 200
 
     # 3. Switch to Clinician -> 200 OK on care triage
-    client.post("/api/auth/switch-user", json={"user_id": "user-care-ananya"})
+    switch_user("user-care-ananya")
     care_ok = client.get("/api/care/triage-queue")
     assert care_ok.status_code == 200
 
 def test_dpdp_erasure_endpoint():
-    client.post("/api/auth/switch-user", json={"user_id": "user-emp-arjun"})
+    switch_user("user-emp-arjun")
     res = client.post("/api/employee/dpdp/erasure")
     assert res.status_code == 200
     data = res.json()
@@ -237,6 +249,21 @@ def test_enterprise_security_headers():
     assert res.headers.get("X-Frame-Options") == "SAMEORIGIN"
     assert res.headers.get("X-XSS-Protection") == "1; mode=block"
     assert res.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+
+def test_demo_request_lead_capture():
+    res = client.post("/api/contact/demo-request", json={
+        "full_name": "Priya Sharma",
+        "email": "priya@acme.com",
+        "company_name": "Acme Tech Solutions",
+        "company_size": "250-1000",
+        "primary_goal": "pilot",
+        "message": "Interested in 30-day pilot"
+    })
+    assert res.status_code == 200
+    data = res.json()
+    assert data["success"] is True
+    assert "Acme Tech Solutions" in data["message"]
+    assert data["lead_details"]["name"] == "Priya Sharma"
 
 
 
