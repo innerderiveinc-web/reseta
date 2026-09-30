@@ -101,6 +101,12 @@ frontend_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "fronte
 if os.path.exists(frontend_path):
     app.mount("/static", StaticFiles(directory=frontend_path), name="static")
 
+    @app.get("/favicon.ico", include_in_schema=False)
+    def serve_favicon():
+        from fastapi.responses import Response
+        svg_favicon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="#E11D48"/><circle cx="50" cy="50" r="22" fill="#FFFFFF"/></svg>'
+        return Response(content=svg_favicon, media_type="image/svg+xml")
+
     @app.get("/")
     def serve_index():
         return FileResponse(os.path.join(frontend_path, "index.html"))
