@@ -15,11 +15,6 @@ if [[ ! -x "$PYTHON_BIN" ]]; then
   /usr/bin/python3 -m venv "$APP_DIR/.venv"
 fi
 
-# Set local node toolchain path if present
-if [[ -d "$APP_DIR/.tools/node/bin" ]]; then
-  export PATH="$APP_DIR/.tools/node/bin:$PATH"
-fi
-
 export PYTHONPATH="$APP_DIR:$PYTHONPATH"
 
 # Run tests before launch
