@@ -1,5 +1,5 @@
 # RESETA™ Enterprise Privacy & DPDP Engine
-# Section 19, 22, 23, 43, 66: Technical privacy wall, k-anonymity suppression, DPDP Act 2025 compliance
+# Section 19, 22, 23, 43, 66: Technical privacy wall, k-anonymity suppression, DPDP Act, 2023 compliance
 from typing import Dict, List, Any, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -8,7 +8,7 @@ from backend.config import settings
 
 class PrivacyEngine:
     """
-    Enforces the Employee Privacy Wall and DPDP 2025 compliance:
+    Enforces the Employee Privacy Wall and DPDP Act, 2023 compliance:
     - Minimum cohort threshold suppression (k >= 5)
     - Prevents individual inference attacks
     - Translates clinical/risk terminology into respectful workplace language (Section 22)

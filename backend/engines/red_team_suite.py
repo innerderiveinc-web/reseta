@@ -114,7 +114,7 @@ class RedTeamSuite:
         v9_passed = True
         results.append({
             "vector_id": "RT-09",
-            "name": "DPDP 2025 Data Subject Rights Enforcement",
+            "name": "DPDP Act, 2023 Data Subject Rights Enforcement",
             "status": "PASSED" if v9_passed else "FAILED",
             "details": "Machine-readable data export, consent revocation, and right to erasure workflows verified."
         })

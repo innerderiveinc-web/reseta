@@ -3,6 +3,16 @@ const App = {
   activeSurface: "employee",
   currentUser: null,
 
+  escapeHtml(str) {
+    if (!str) return "";
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  },
+
   async init() {
     console.log("Initializing RESETA™ Enterprise Platform...");
     ResetModal.init();
@@ -339,9 +349,13 @@ const App = {
     if (sendResetBtn) {
       sendResetBtn.addEventListener("click", async () => {
         const name = prompt("Enter colleague's first name to send a gentle reset invite:", "Priya");
-        if (name) {
-          const res = await API.sendAReset(name);
-          alert(`✅ Sent to ${name}!\n\nMessage: "${res.invite_text}"\n\nNo personal stress or health info is ever transmitted.`);
+        if (name && name.trim()) {
+          try {
+            const res = await API.sendAReset(name.trim());
+            this.showToast(`💌 Reset invite sent to ${name.trim()}! Zero private data shared.`);
+          } catch (err) {
+            this.showToast("Could not send invite: " + err.message);
+          }
         }
       });
     }
@@ -1829,9 +1843,10 @@ const App = {
     });
 
     if (matches.length === 0) {
+      const safeQuery = this.escapeHtml(query);
       resultsContainer.innerHTML = `
         <div style="padding: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
-          No matching commands found for "${query}". Try "reset", "coach", "dpdp", or "status".
+          No matching commands found for "${safeQuery}". Try "reset", "coach", "dpdp", or "status".
         </div>
       `;
       return;

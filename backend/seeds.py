@@ -147,7 +147,7 @@ def seed_database():
 
     db.add_all([user_emp, user_mgr, user_hr, user_admin, user_care, user_auditor] + extra_users)
 
-    # 5. Consents (DPDP 2025 compliant)
+    # 5. Consents (DPDP Act, 2023 compliant)
     all_users = [user_emp, user_mgr, user_hr, user_admin, user_care, user_auditor] + extra_users
     for u in all_users:
         c1 = Consent(user_id=u.id, purpose="WELLNESS_INTERVENTIONS", granted=True, dpdp_notice_acknowledged=True)
@@ -315,7 +315,7 @@ def seed_database():
         AuditLog(organization_id=org.id, actor_id=user_mgr.id, actor_role="MANAGER",
                  action="VIEW_TEAM_AGGREGATE_INSIGHTS", details="Accessed Frontend Squad aggregate wellbeing themes (k=12)."),
         AuditLog(organization_id=org.id, actor_id=user_auditor.id, actor_role="AUDITOR",
-                 action="EXPORT_DPDP_CONSENT_REGISTRY", details="Periodic verification of DPDP Act 2025 consent compliance."),
+                 action="EXPORT_DPDP_CONSENT_REGISTRY", details="Periodic verification of DPDP Act, 2023 consent compliance."),
         AuditLog(organization_id=org.id, actor_id=user_care.id, actor_role="CLINICIAN",
                  action="TRIAGE_SAFETY_EVENT", details="Reviewed confidential tele-MANAS crisis referral queue. Zero PII exposed.")
     ]

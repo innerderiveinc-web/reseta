@@ -162,6 +162,7 @@ def test_campaign_creation():
     assert res.json()["success"] is True
 
 def test_governance_hris_connectors_and_sync():
+    switch_user("user-admin-rahul")
     res = client.get("/api/governance/hris/connectors")
     assert res.status_code == 200
     connectors = res.json()
@@ -178,6 +179,7 @@ def test_governance_hris_connectors_and_sync():
     assert "Darwinbox" in data["provider"]
 
 def test_governance_red_team_and_checklist():
+    switch_user("user-admin-rahul")
     res = client.post("/api/governance/red-team/run")
     assert res.status_code == 200
     data = res.json()
@@ -189,6 +191,15 @@ def test_governance_red_team_and_checklist():
     chk = chk_res.json()
     assert len(chk["items"]) == 7
     assert all(item["status"] == "CERTIFIED" for item in chk["items"])
+
+def test_governance_unauthorized_and_employee_blocked():
+    client.headers.pop("Authorization", None)
+    anon_res = client.post("/api/governance/hris/sync", json={"provider_id": "darwinbox"})
+    assert anon_res.status_code == 401
+
+    switch_user("user-emp-arjun")
+    emp_res = client.post("/api/governance/hris/sync", json={"provider_id": "darwinbox"})
+    assert emp_res.status_code == 403
 
 def test_modular_enterprise_pages():
     routes = {

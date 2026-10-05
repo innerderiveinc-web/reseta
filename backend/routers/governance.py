@@ -6,8 +6,12 @@ from typing import Dict, Any, List
 
 from backend.engines.hris_engine import HRISEngine
 from backend.engines.red_team_suite import RedTeamSuite
+from backend.security import require_roles
+from backend.models import User
 
 router = APIRouter(prefix="/api/governance", tags=["Enterprise AI Governance"])
+
+admin_guard = require_roles(["SUPER_ADMIN", "AUDITOR"])
 
 class HRISSyncRequest(BaseModel):
     provider_id: str
@@ -18,12 +22,17 @@ def get_hris_connectors():
     return HRISEngine.get_connectors()
 
 @router.post("/hris/sync")
-def sync_hris_directory(req: HRISSyncRequest):
+def sync_hris_directory(
+    req: HRISSyncRequest,
+    user: User = Depends(admin_guard)
+):
     """Trigger non-surveillance organizational directory sync (Section 39)"""
     return HRISEngine.sync_directory(req.provider_id)
 
 @router.post("/red-team/run")
-def execute_red_team_suite():
+def execute_red_team_suite(
+    user: User = Depends(admin_guard)
+):
     """Execute live 10-vector security, privacy, and clinical red-team suite (Section 69)"""
     return RedTeamSuite.run_all_tests()
 
