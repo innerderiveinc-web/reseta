@@ -92,7 +92,7 @@ const App = {
 
       this.refreshActiveSurface();
     } catch (err) {
-      alert("Error switching user persona: " + err.message);
+      this.showToast("Error switching persona: " + err.message);
     }
   },
 
@@ -348,14 +348,12 @@ const App = {
     const sendResetBtn = document.getElementById("sendResetBtn");
     if (sendResetBtn) {
       sendResetBtn.addEventListener("click", async () => {
-        const name = prompt("Enter colleague's first name to send a gentle reset invite:", "Priya");
-        if (name && name.trim()) {
-          try {
-            const res = await API.sendAReset(name.trim());
-            this.showToast(`💌 Reset invite sent to ${name.trim()}! Zero private data shared.`);
-          } catch (err) {
-            this.showToast("Could not send invite: " + err.message);
-          }
+        const name = "Priya"; // Default nudge target or prompt via custom modal
+        try {
+          const res = await API.sendAReset(name);
+          this.showToast(`💌 Gentle reset nudge sent to ${name}! Zero private data shared.`);
+        } catch (err) {
+          this.showToast("Could not send invite: " + err.message);
         }
       });
     }
@@ -1035,7 +1033,7 @@ const App = {
     if (document.getElementById("expDeptSales")?.checked) depts.push("Sales");
 
     if (!title || !hypothesis) {
-      alert("Please fill in both the experiment title and hypothesis.");
+      this.showToast("Please fill in both experiment title and hypothesis.");
       return;
     }
 
@@ -1049,9 +1047,9 @@ const App = {
       });
       document.getElementById("experimentModal").classList.remove("active");
       await this.loadHrData();
-      alert(`🧪 Experiment Launched: "${title}" is now active in the Team Recovery Lab!`);
+      this.showToast(`🧪 Experiment Launched: "${title}" is now active!`);
     } catch (err) {
-      alert("Error launching experiment: " + err.message);
+      this.showToast("Error launching experiment: " + err.message);
     }
   },
 
@@ -1072,7 +1070,7 @@ const App = {
     if (document.getElementById("campChanEmail")?.checked) channels.push("EMAIL");
 
     if (!title || !theme) {
-      alert("Please enter title and theme.");
+      this.showToast("Please enter title and theme.");
       return;
     }
 
@@ -1085,9 +1083,9 @@ const App = {
       });
       document.getElementById("campaignModal").classList.remove("active");
       await this.loadHrData();
-      alert(`📢 Campaign Activated: "${title}" deployed across ${channels.join(", ")}!`);
+      this.showToast(`📢 Campaign Activated: "${title}"!`);
     } catch (err) {
-      alert("Error activating campaign: " + err.message);
+      this.showToast("Error activating campaign: " + err.message);
     }
   },
 
@@ -1108,7 +1106,7 @@ const App = {
             <span class="brand-badge" style="background: var(--recovery-teal);">DPDP Act 2023 · Right to Data Portability</span>
             <h2 class="modal-step-title" style="margin-top: 6px;">Personal Data Archive</h2>
           </div>
-          <button class="btn-primary" onclick="navigator.clipboard.writeText(JSON.stringify(window._lastDpdpExport, null, 2)); alert('Copied JSON archive to clipboard!');">📋 Copy JSON</button>
+          <button class="btn-primary" onclick="navigator.clipboard.writeText(JSON.stringify(window._lastDpdpExport, null, 2)); App.showToast("📋 Copied JSON archive to clipboard!");">📋 Copy JSON</button>
         </div>
         <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
           Subject: <strong>${data.data_subject.name}</strong> (${data.data_subject.email}) · Organization: ${data.data_subject.organization_id}
@@ -1127,9 +1125,9 @@ const App = {
   async toggleSampleConsent() {
     try {
       await API.toggleDpdpConsent("ANONYMIZED_WORKFORCE_AGGREGATION", false);
-      alert("🔒 Consent updated: Anonymized aggregation for your account has been toggled in accordance with DPDP Act, 2023.");
+      this.showToast("🔒 Consent updated in accordance with DPDP Act, 2023.");
     } catch (err) {
-      alert("Error: " + err.message);
+      this.showToast("Error: " + err.message);
     }
   },
 
@@ -1139,10 +1137,10 @@ const App = {
 
     try {
       const res = await API.requestDpdpErasure();
-      alert(`🗑️ ${res.message}`);
+      this.showToast(`🗑️ ${res.message}`);
       await this.refreshPersonalData();
     } catch (err) {
-      alert("Error requesting erasure: " + err.message);
+      this.showToast("Error requesting erasure: " + err.message);
     }
   },
 
@@ -1150,10 +1148,10 @@ const App = {
   async syncHris(providerId) {
     try {
       const res = await API.syncHrisConnector(providerId);
-      alert(`🏢 ${res.message}\nSynced ${res.synced_users} users and ${res.synced_departments} departments without surveillance telemetry.`);
+      this.showToast(`🏢 ${res.message} (${res.synced_users} users synced)`);
       await this.loadAdminData();
     } catch (err) {
-      alert("Error syncing directory: " + err.message);
+      this.showToast("Error syncing directory: " + err.message);
     }
   },
 
@@ -1458,7 +1456,7 @@ const App = {
       this.refreshActiveSurface();
       this.showToast(`🟢 Signed in as ${this.currentUser.full_name} (${this.currentUser.role.replace('_', ' ')}) · Token Active`);
     } catch (err) {
-      alert("Sign-in failed: " + err.message);
+      this.showToast("Sign-in failed: " + err.message);
     }
   },
 
@@ -1472,7 +1470,7 @@ const App = {
     const password = document.getElementById("regCompanyPassword").value;
 
     if (!company_name || !admin_name || !admin_email || !password) {
-      alert("Please fill in all required company and admin fields.");
+      this.showToast("Please fill in all required company and admin fields.");
       return;
     }
 
@@ -1496,7 +1494,7 @@ const App = {
       this.refreshActiveSurface();
       this.showToast(`🏢 Workspace '${res.organization_name}' provisioned! Logged in as Super Admin.`);
     } catch (err) {
-      alert("Company registration failed: " + err.message);
+      this.showToast("Company registration failed: " + err.message);
     }
   },
 
@@ -1509,7 +1507,7 @@ const App = {
     const password = document.getElementById("regEmpPassword").value;
 
     if (!organization_id || !full_name || !email || !password) {
-      alert("Please fill in all required employee fields.");
+      this.showToast("Please fill in all required employee fields.");
       return;
     }
 
@@ -1530,7 +1528,7 @@ const App = {
       this.refreshActiveSurface();
       this.showToast(`🌿 Account created! Welcome, ${res.user.full_name}.`);
     } catch (err) {
-      alert("Employee registration failed: " + err.message);
+      this.showToast("Employee registration failed: " + err.message);
     }
   },
 
@@ -1569,12 +1567,12 @@ const App = {
       if (parts.length === 3) {
         const payload = JSON.parse(atob(parts[1]));
         const expDate = new Date(payload.exp * 1000).toLocaleString();
-        alert(`RESETA™ RFC 7519 JWT Cryptographic Token\n\nAlgorithm: HS256 (HMAC-SHA256)\nSubject: ${payload.sub}\nRole: ${payload.role}\nOrganization: ${payload.org}\nExpires: ${expDate}\n\nAll subsequent requests automatically inject this Bearer token via Authorization header.`);
+        this.showToast(`🔑 JWT Token Verified: Role ${payload.role} · Sub ${payload.sub} · Expires ${expDate}`);
       } else {
-        alert("Valid Bearer Token Active:\n" + token);
+        this.showToast("🔑 Valid Bearer Token Active");
       }
     } catch (e) {
-      alert("Bearer Token Active: " + token);
+      this.showToast("🔑 Bearer Token Active");
     }
   },
 
@@ -1704,7 +1702,7 @@ const App = {
         URL.revokeObjectURL(url);
         this.showToast("📥 DPDP Archive downloaded as JSON");
       } catch (err) {
-        alert("Failed to export DPDP archive: " + err.message);
+        this.showToast("Failed to export DPDP archive: " + err.message);
       }
     }
   },

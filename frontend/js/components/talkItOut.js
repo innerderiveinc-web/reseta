@@ -76,7 +76,9 @@ const TalkItOut = {
   toggleMicrophone() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition) {
-      alert("Web Speech API is not supported in this browser. You can type or use the quick sample buttons below.");
+      if (window.App && window.App.showToast) {
+        window.App.showToast("Speech recognition is not supported in this browser. You can type below.");
+      }
       return;
     }
 
@@ -139,7 +141,9 @@ const TalkItOut = {
     const input = document.getElementById("talkTranscriptInput");
     const text = input ? input.value : "";
     if (!text.trim()) {
-      alert("Please speak or enter what is on your mind.");
+      if (window.App && window.App.showToast) {
+        window.App.showToast("Please speak or enter what is on your mind.");
+      }
       return;
     }
 
@@ -185,7 +189,9 @@ const TalkItOut = {
         </div>
       `;
     } catch (err) {
-      alert("Error: " + err.message);
+      if (window.App && window.App.showToast) {
+        window.App.showToast("Error: " + err.message);
+      }
       this.renderInitial();
     }
   },

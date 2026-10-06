@@ -554,7 +554,9 @@ const ResetModal = {
       this.renderGuidedStep();
     } catch (err) {
       SoundEngine.stopAmbientSoundscape(0.3);
-      alert("Error starting reset: " + err.message);
+      if (window.App && window.App.showToast) {
+        window.App.showToast("Could not start reset: " + err.message);
+      }
       this.renderStep1();
     }
   },
@@ -934,7 +936,9 @@ const ResetModal = {
         </div>
       `;
     } catch (err) {
-      alert("Error saving reset: " + err.message);
+      if (window.App && window.App.showToast) {
+        window.App.showToast("Could not save reset: " + err.message);
+      }
       this.close();
     }
   }
