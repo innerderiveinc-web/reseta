@@ -1,0 +1,58 @@
+# Netlify Configuration for RESETA™ Enterprise
+[build]
+  publish = "frontend"
+
+# Redirect /static/* requests to the root directory for CSS, JS, etc.
+[[redirects]]
+  from = "/static/*"
+  to = "/:splat"
+  status = 200
+
+# Pretty URL rewrites for modular static HTML pages
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+
+[[redirects]]
+  from = "/security"
+  to = "/security.html"
+  status = 200
+
+[[redirects]]
+  from = "/pricing"
+  to = "/pricing.html"
+  status = 200
+
+[[redirects]]
+  from = "/faq"
+  to = "/faq.html"
+  status = 200
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+
+# Optional: Proxy API calls to your live backend if deployed (e.g. Render, Railway, Fly.io)
+# [[redirects]]
+#   from = "/api/*"
+#   to = "https://your-backend-api.onrender.com/api/:splat"
+#   status = 200
+#   force = true
+
+# Default Single Page App fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
