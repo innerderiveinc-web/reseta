@@ -26,9 +26,9 @@ def get_care_resources():
             "confidentiality_guarantee": "100% strictly confidential external provider."
         },
         "care_statement": (
-            "RESETA is an AI-powered mental recovery system for in-the-moment workplace relief. "
-            "It is not an AI therapist or diagnostic system. When support needs exceed self-guided resets, "
-            "seamless human clinical pathways are immediately provided."
+            "RESETA is an in-the-moment cognitive recovery system for workplace strain relief. "
+            "It is not a clinical therapy or psychiatric diagnosis service. When support needs exceed self-guided resets, "
+            "direct human clinical pathways and certified helplines are immediately provided."
         )
     }
 
