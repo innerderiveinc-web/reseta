@@ -806,6 +806,11 @@ const App = {
     }
   },
 
+  toggleMobileMenu() {
+    const nav = document.querySelector(".enterprise-nav-links");
+    if (nav) nav.classList.toggle("active");
+  },
+
   // 8. The 10-Second Sales Demo (Section 87)
   run10SecondDemo() {
     this.switchSurface("employee");

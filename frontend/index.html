@@ -34,6 +34,7 @@
 
       <!-- Utility & Access Controls -->
       <div style="display: flex; align-items: center; gap: 8px;">
+        <button class="mobile-nav-toggle" onclick="App.toggleMobileMenu()" aria-label="Toggle navigation">☰</button>
         <button id="themeToggleBtn" class="theme-toggle-btn" onclick="App.toggleTheme()" title="Toggle Dark/Light Mode">
           🌙 Dark
         </button>
@@ -312,7 +313,7 @@
             <span class="brand-badge" style="background: var(--recovery-teal);">Aggregate Mode Only</span>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <div class="grid-two-col" style="margin-bottom: 24px;">
             <div>
               <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">Top Workplace Demand Themes</h4>
               <div id="managerThemesList">
@@ -412,7 +413,7 @@
       </div>
 
       <!-- HR Themes and Benchmarks -->
-      <div style="display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 24px; margin-bottom: 28px;">
+      <div class="grid-two-col" style="margin-bottom: 28px;">
         <div class="content-card">
           <h3 class="card-title" style="margin-bottom: 16px;">📈 Aggregate Workplace Themes</h3>
           <div id="hrAggregateThemesList">
@@ -455,7 +456,7 @@
       </div>
 
       <!-- Team Recovery Lab™ & HR Campaign Engine -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+      <div class="grid-two-col">
         <!-- Recovery Lab Experiments -->
         <div class="content-card">
           <div class="card-header-flex">
@@ -739,7 +740,7 @@
           "Your employer doesn't need to know what's inside your head to build a healthier workplace."
         </p>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px;">
+        <div class="grid-two-col" style="margin-bottom: 28px;">
           <div style="background: var(--bg-subtle); border-radius: var(--radius-sm); padding: 20px;">
             <h4 style="font-size: 15px; font-weight: 700; color: var(--brand-reset); margin-bottom: 8px;">PRIVATE TO YOU (Employee)</h4>
             <ul style="list-style: none; font-size: 13px; line-height: 1.8; color: var(--text-main);">
@@ -1087,7 +1088,7 @@
 
         <div style="border-top: 1px solid var(--border-light); margin-top: 16px; padding-top: 12px;">
           <span style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Quick Persona Access (1-Click JWT Switch)</span>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+          <div class="grid-two-col" style="gap: 8px; margin-top: 8px;">
             <button class="btn-secondary" style="font-size: 11px; text-align: left; padding: 8px;" onclick="App.loginAsPersona('user-emp-arjun')">
               👨‍💻 <strong>Arjun Mehta</strong><br><span style="color: var(--text-muted); font-size: 10px;">Employee (Frontend Dev)</span>
             </button>
@@ -1114,7 +1115,7 @@
             <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Company / Organization Name</label>
             <input type="text" id="regCompanyName" class="copilot-input" placeholder="e.g. Acme Technologies India" required style="width: 100%;">
           </div>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div class="grid-two-col" style="gap: 10px; margin-bottom: 12px;">
             <div>
               <label style="display: block; font-size: 11px; font-weight: 700; margin-bottom: 4px; color: var(--text-muted); text-transform: uppercase;">Industry</label>
               <select id="regCompanyIndustry" class="copilot-input" style="width: 100%;">
@@ -1204,7 +1205,7 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <div class="grid-two-col" style="gap: 12px; margin-bottom: 20px;">
         <div class="action-card">
           <div class="action-signal">Platform Uptime (90 Days)</div>
           <div style="font-size: 18px; font-weight: 800; color: #059669;">99.99% Operational</div>
@@ -1256,7 +1257,7 @@
         </p>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+      <div class="grid-two-col" style="gap: 12px; margin-bottom: 16px;">
         <div class="action-card">
           <div style="font-size: 12px; font-weight: 700;">Vandrevala Foundation</div>
           <div style="font-size: 15px; font-weight: 800; color: var(--text-main); margin: 4px 0;">📞 +91 9999 666 555</div>
@@ -1328,7 +1329,7 @@
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+      <div class="grid-two-col" style="gap: 12px; margin-bottom: 20px;">
         <div class="action-card">
           <div class="action-signal">SOC 2 Type II Certified</div>
           <div style="font-size: 13px; font-weight: 600; margin-top: 2px;">Security, Availability & Confidentiality</div>
