@@ -500,7 +500,7 @@ const ResetModal = {
           🔒 Private to you: Not shared with managers or HR.
         </span>
         <button class="btn-reset-hero" style="padding: 12px 28px; font-size: 15px;" onclick="ResetModal.launchSession()">
-          Start Reset 🔴
+          Start Reset →
         </button>
       </div>
     `;

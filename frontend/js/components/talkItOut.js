@@ -183,7 +183,7 @@ const TalkItOut = {
           <div style="display: flex; justify-content: flex-end; gap: 12px;">
             <button class="btn-secondary" onclick="TalkItOut.renderInitial()">Speak Again</button>
             <button class="btn-reset-hero" style="padding: 12px 28px; font-size: 14px;" onclick="TalkItOut.launchFromTalk('${res.detected_state}')">
-              Start 5-Min Reset 🔴
+              Start 5-Min Reset →
             </button>
           </div>
         </div>

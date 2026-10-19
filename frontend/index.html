@@ -34,16 +34,12 @@
 
       <!-- Utility & Access Controls -->
       <div style="display: flex; align-items: center; gap: 8px;">
-        <button class="btn-small-pill" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700;" onclick="App.run10SecondDemo()">
-          ⚡ 10-Sec Demo
-        </button>
-
-        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="App.toggleTheme()">
+        <button id="themeToggleBtn" class="theme-toggle-btn" onclick="App.toggleTheme()" title="Toggle Dark/Light Mode">
           🌙 Dark
         </button>
 
-        <button id="soundToggleBtn" class="theme-toggle-btn" style="cursor: pointer;" onclick="App.toggleSound()" title="Toggle audio chimes and continuous acoustic sound">
-          🔊 Sound: ON
+        <button id="soundToggleBtn" class="theme-toggle-btn" style="cursor: pointer;" onclick="App.toggleSound()" title="Toggle acoustic chimes">
+          🔊 Sound
         </button>
 
         <!-- State 1: Logged Out Controls -->
@@ -57,24 +53,18 @@
         </div>
 
         <!-- State 2: Authenticated Session Controls (Unlocked post-login) -->
-        <div id="loggedInControls" style="display: none; align-items: center; gap: 10px;">
-          <span id="jwtAuthBadge" style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 12px; background: rgba(16, 185, 129, 0.12); color: #059669; font-size: 11px; font-weight: 700; cursor: pointer; border: 1px solid rgba(16, 185, 129, 0.25);" title="Click to view RFC 7519 JWT Cryptographic Details" onclick="App.showJwtDetails()">
-            <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #10B981;"></span>
-            JWT Active
-          </span>
+        <div id="loggedInControls" style="display: none; align-items: center; gap: 8px;">
+          <span id="jwtAuthBadge" style="display: none;" onclick="App.showJwtDetails()"></span>
 
-          <div id="userProfileChip" style="display: flex; align-items: center; gap: 8px; padding: 3px 10px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px;">
-            <img id="userAvatarImg" src="" alt="Avatar" style="width: 22px; height: 22px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'">
+          <div id="userProfileChip" style="display: flex; align-items: center; gap: 6px; padding: 3px 8px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 20px;">
+            <img id="userAvatarImg" src="" alt="Avatar" style="width: 20px; height: 20px; border-radius: 50%; object-fit: cover;" onerror="this.style.display='none'">
             <span id="userDisplayName" style="font-size: 12px; font-weight: 700; color: var(--text-main);"></span>
-            <span id="userRoleBadge" class="brand-badge" style="font-size: 10px; padding: 2px 7px;"></span>
+            <span id="userRoleBadge" class="brand-badge" style="font-size: 10px; padding: 2px 6px;"></span>
           </div>
 
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <label for="personaSelect" style="font-size: 10px; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Switch Role:</label>
-            <select id="personaSelect" class="persona-select" style="font-size: 11px; padding: 4px 8px;">
-              <!-- Populated by App.loadPersonas() -->
-            </select>
-          </div>
+          <select id="personaSelect" class="persona-select" style="font-size: 11px; padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border-light); background: var(--bg-surface); color: var(--text-main); outline: none; cursor: pointer; max-width: 150px;" title="Switch Role Perspective">
+            <!-- Populated by App.loadPersonas() -->
+          </select>
 
           <button class="btn-small-pill" onclick="App.logout()" style="font-size: 11px; padding: 4px 10px; color: var(--text-muted); border-color: var(--border-light);" title="Sign out of enterprise session">
             Sign Out
@@ -96,24 +86,8 @@
         <button class="surface-tab" data-surface="trust">🛡️ Trust & DPDP</button>
       </nav>
 
-      <!-- Persona & Operational Signals -->
-      <div class="user-tenant-bar" style="gap: 10px; flex-wrap: nowrap;">
-        <!-- Live Enterprise SLA Indicator -->
-        <div class="topbar-status-pill" onclick="App.openSystemStatusModal()" title="Click to view 99.99% SLA Health & API Latency">
-          <span class="pulse-dot"></span>
-          <span>99.99% SLA · Operational</span>
-        </div>
-
-        <!-- Data Sovereignty Residency Tag -->
-        <span class="tenant-badge" style="font-size: 11px; font-weight: 700;" title="Data stored strictly in India (AWS ap-south-1 Mumbai)">
-          📍 IN-MUM-01
-        </span>
-
-        <!-- 24/7 Crisis Support Trigger -->
-        <button class="topbar-crisis-btn" onclick="App.openCrisisModal()" title="Instant 24/7 Tele-MANAS & Crisis Support">
-          🆘 24/7 Helpline
-        </button>
-
+      <!-- Tenant & Utility Actions -->
+      <div class="user-tenant-bar" style="gap: 8px; flex-wrap: nowrap;">
         <!-- Quick Command Jump (⌘K) -->
         <button class="command-search-trigger" onclick="App.openCommandPalette()" title="Press ⌘K or Ctrl+K to quick jump">
           🔍 <span style="font-size: 11px;">Search</span> <kbd class="cmd-kbd">⌘K</kbd>
@@ -141,9 +115,14 @@
           </div>
         </div>
 
+        <!-- 24/7 Crisis Support Trigger -->
+        <button class="topbar-crisis-btn" onclick="App.openCrisisModal()" title="Instant 24/7 Tele-MANAS & Crisis Support">
+          🆘 Helpline
+        </button>
+
         <div class="tenant-badge" title="Active Enterprise Workspace">
           <span class="tenant-dot"></span>
-          <span id="tenantOrgDisplay">Acme Global Technologies (850 Seats)</span>
+          <span id="tenantOrgDisplay">Acme Global Technologies</span>
         </div>
       </div>
     </div>
@@ -151,31 +130,6 @@
 
   <!-- Main Content Surfaces -->
   <main class="main-content">
-    
-    <!-- Enterprise Workspace Orientation Hero Banner -->
-    <div id="enterpriseWelcomeBanner" class="welcome-guide-banner">
-      <div class="welcome-guide-left">
-        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-          <span class="brand-badge" style="background: var(--brand-reset);">ENTERPRISE PLATFORM</span>
-          <span style="font-size: 12px; color: var(--text-muted); font-weight: 600;">Dedicated Tenant Workspace</span>
-        </div>
-        <h2 style="font-size: 17px; font-weight: 800; margin: 4px 0 3px; color: var(--text-main);">
-          RESETA™ Workplace Mental Recovery & Bandwidth Platform
-        </h2>
-        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin: 0;">
-          Experience how employees, managers, and HR leaders recover cognitive bandwidth in 2–10 minutes with guaranteed zero-surveillance. Switch between the <strong>7 Core Surfaces</strong> in the navigation above to explore every enterprise role.
-        </p>
-      </div>
-      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-        <button class="btn-small-pill" onclick="App.run10SecondDemo()" style="border-color: var(--brand-reset); color: var(--brand-reset); font-weight: 700; white-space: nowrap;">
-          ⚡ 10-Sec Demo
-        </button>
-        <a href="/pricing" class="btn-primary" style="font-size: 12px; padding: 7px 14px; text-decoration: none; white-space: nowrap;">
-          Pricing & ROI →
-        </a>
-        <button onclick="document.getElementById('enterpriseWelcomeBanner').style.display='none'" style="background: none; border: none; font-size: 18px; color: var(--text-muted); cursor: pointer; padding: 4px 6px;" title="Dismiss banner">&times;</button>
-      </div>
-    </div>
 
     <!-- SURFACE 1: EMPLOYEE APP & WEB -->
     <section id="view-employee" class="view-panel active">
@@ -203,10 +157,10 @@
         <!-- Hero Actions -->
         <div class="hero-cta-group">
           <button id="heroResetBtn" class="btn-reset-hero">
-            🔴 RESET ME
+            🌿 Start 5-Min Reset
           </button>
           <button id="heroTalkBtn" class="btn-talk-hero">
-            🎙 TALK IT OUT
+            🎙 Talk It Out
           </button>
         </div>
 
@@ -230,7 +184,7 @@
         </p>
         <div style="display: flex; gap: 10px;">
           <button id="autopilotActionBtn" class="btn-primary" style="background: var(--brand-reset); padding: 8px 18px; font-size: 13px;" onclick="ResetModal.open('overloaded')">
-            Start 5-Min Reset 🔴
+            Start 5-Min Reset →
           </button>
           <button class="btn-secondary" style="padding: 8px 14px; font-size: 12px;" onclick="document.getElementById('autopilotCard').style.display='none'">
             Dismiss
@@ -394,7 +348,7 @@
         <div class="content-card" style="margin-top: 24px;">
           <div class="card-header-flex">
             <div>
-              <h3 class="card-title">🤖 Ask RESETA Manager Copilot™</h3>
+              <h3 class="card-title">💡 RESETA Manager Guidance Copilot™</h3>
               <p style="font-size: 13px; color: var(--text-muted);">
                 Get privacy-safe conversation guidance & workload distribution strategies.
               </p>
@@ -535,7 +489,7 @@
       <div class="content-card" style="margin-top: 24px;">
         <div class="card-header-flex">
           <div>
-            <h3 class="card-title">🤖 Ask RESETA Workforce Intelligence Copilot™</h3>
+            <h3 class="card-title">📊 RESETA Workforce Intelligence Copilot™</h3>
             <p style="font-size: 13px; color: var(--text-muted);">
               Query organizational trends, theme shifts, and workplace experiment findings with strict k ≥ 5 privacy guarantees.
             </p>
@@ -635,45 +589,45 @@
           </div>
         </div>
 
-        <!-- 🤖 AI Model Gateway & Live LLM Configuration -->
+        <!-- Enterprise Privacy & Safety Guardrails -->
         <div style="border-top: 1px solid var(--border-light); padding-top: 24px; margin-top: 24px;">
           <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px;">
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <h4 style="font-size: 16px; font-weight: 700;">🤖 Enterprise AI Guardrails & Model Gateway</h4>
-                <span id="adminLlmStatusBadge" class="brand-badge" style="background: var(--recovery-teal);">Loading Gateway...</span>
+                <h4 style="font-size: 16px; font-weight: 700;">🛡️ Enterprise Privacy & Safety Guardrails</h4>
+                <span id="adminLlmStatusBadge" class="brand-badge" style="background: var(--recovery-teal);">Active</span>
               </div>
               <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
-                Vendor-independent LLM routing (OpenAI GPT-4o, Anthropic Claude 3.5, Google Gemini, Ollama) with 100% offline Clinical Safety Heuristic Fallback.
+                Secure language processing engine with strict clinical boundaries and guaranteed zero-retention data privacy.
               </p>
             </div>
           </div>
 
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 16px;">
             <div class="action-card">
-              <div class="action-signal">Configured Provider</div>
-              <div id="llmActiveProviderName" style="font-size: 16px; font-weight: 700; color: var(--brand-reset);">Detecting...</div>
-              <div id="llmActiveProviderDesc" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Zero-latency Clinical Safety Fallback Active</div>
+              <div class="action-signal">Active Engine</div>
+              <div id="llmActiveProviderName" style="font-size: 16px; font-weight: 700; color: var(--brand-reset);">Standard Safety Engine</div>
+              <div id="llmActiveProviderDesc" style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Zero-latency Clinical Safety Guardrails Active</div>
             </div>
             <div class="action-card">
-              <div class="action-signal">Supported Providers</div>
-              <div style="font-size: 13px; font-weight: 600;">OpenAI · Gemini · Claude · Ollama</div>
-              <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Configure via <code>.env</code> without code modification</div>
+              <div class="action-signal">Supported Frameworks</div>
+              <div style="font-size: 13px; font-weight: 600;">Enterprise Private Cloud & Local Enclave</div>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Configured with tenant-isolated credentials</div>
             </div>
             <div class="action-card">
               <div class="action-signal">Zero-Retraining Policy</div>
-              <div style="font-size: 13px; font-weight: 600; color: #059669;">Zero Data Ingestion</div>
+              <div style="font-size: 13px; font-weight: 600; color: #059669;">Zero Data Retention</div>
               <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Employee resets & notes never leave the privacy perimeter</div>
             </div>
           </div>
 
-          <!-- Live Model Test Console -->
+          <!-- Safety Verification Console -->
           <div style="margin-top: 16px; background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 16px;">
-            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Live Clinical Guardrail Verification & Latency Monitor</div>
+            <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Clinical Boundary & Policy Verification</div>
             <div style="display: flex; gap: 8px;">
               <input type="text" id="llmTestPrompt" class="copilot-input" value="Suggest a 2-minute decompression strategy for high sprint pressure." style="flex: 1;">
               <button class="btn-primary" style="background: var(--recovery-teal); white-space: nowrap;" onclick="App.runLlmInferenceTest()">
-                Run Guardrail Test ⚡
+                Verify Policy Compliance
               </button>
             </div>
             <div id="llmTestResultBox" style="margin-top: 12px; display: none; padding: 12px; background: var(--bg-subtle); border-radius: 6px; font-size: 13px; border-left: 3px solid var(--recovery-teal);">
@@ -691,15 +645,15 @@
           <div class="card-header-flex" style="flex-wrap: wrap; gap: 12px;">
             <div>
               <div style="display: flex; align-items: center; gap: 8px;">
-                <h4 style="font-size: 16px; font-weight: 700;">🛡️ Clinical & Ethical AI Safety Board · Red-Team Verification</h4>
+                <h4 style="font-size: 16px; font-weight: 700;">🛡️ Clinical & Ethical Safety Board · Policy Verification</h4>
                 <span class="brand-badge" style="background: var(--recovery-emerald);">10/10 Certified</span>
               </div>
               <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
-                Automated multi-vector red-team audit validating crisis escalation, zero-diagnosis guardrails, and $k \ge 5$ privacy suppression.
+                Continuous automated audit validating crisis escalation protocols, non-diagnostic guardrails, and $k \ge 5$ privacy thresholds.
               </p>
             </div>
             <button class="btn-primary" style="background: var(--brand-reset);" onclick="App.runRedTeamAudit()">
-              ⚡ Run 10-Vector Red-Team Audit
+              Run Safety Verification
             </button>
           </div>
 
@@ -854,113 +808,91 @@
        ENTERPRISE GLOBAL FOOTER (Trust, Compliance & Safety)
        ========================================================== -->
   <footer class="enterprise-footer">
-    <div class="footer-main-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
-      <!-- Col 1: Platform & Tenant Profile -->
+    <div class="footer-main-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; padding: 40px 24px 28px;">
+      <!-- Col 1: Brand & Purpose -->
       <div>
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
           <div class="brand-symbol" style="width: 28px; height: 28px; font-size: 14px;">R</div>
-          <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">RESETA™ <span style="font-weight: 400; font-size: 14px; color: var(--text-muted);">ENTERPRISE</span></span>
+          <span style="font-size: 18px; font-weight: 800; letter-spacing: -0.5px;">RESETA™ <span style="font-weight: 500; font-size: 13px; color: var(--text-muted);">Enterprise</span></span>
         </div>
-        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
-          From workplace strain to cognitive clarity. An evidence-backed mental recovery system for the enterprise—built with complete employee privacy.
+        <p style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px;">
+          Cognitive recovery and bandwidth management for modern organizations. Built with an evidence-based approach and guaranteed employee privacy.
         </p>
-        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 12px;">
-          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 4px;">🏢 Enterprise Cloud Production</div>
-          <div style="color: var(--text-muted);">Dedicated Multi-Tenant Architecture · ISO 27001 Aligned</div>
-          <div style="color: var(--text-muted); margin-top: 4px;">📍 Primary Data Sovereignty: AWS ap-south-1 (Mumbai, India)</div>
+        <div style="font-size: 12px; color: var(--recovery-teal); font-weight: 600; display: flex; align-items: center; gap: 6px;">
+          <span>🔒</span> Complete Zero-Surveillance Architecture
         </div>
-        <div style="font-size: 11px; color: var(--text-muted); margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--border-light); line-height: 1.5;">
-          <span>Architected & Engineered by: <strong>Qsura India Pvt. Ltd.</strong> · Made in India 🇮🇳</span>
+        <div style="font-size: 11px; color: var(--text-muted); margin-top: 10px;">
+          Architected & Engineered by <strong>Qsura India Pvt. Ltd.</strong>
         </div>
       </div>
 
       <!-- Col 2: Platform & Solutions -->
       <div>
-        <div class="footer-col-title">Platform & Solutions</div>
+        <div class="footer-col-title">Platform</div>
         <ul class="footer-link-list">
-          <li><a href="/">Live Workplace Dashboard</a></li>
-          <li><a href="/about">About RESETA™ & Mission</a></li>
+          <li><a href="/" onclick="App.switchSurface('employee'); return false;">Employee Recovery Workspace</a></li>
+          <li><a href="/" onclick="App.switchSurface('teams-slack'); return false;">Workplace Chat Integration</a></li>
+          <li><a href="/" onclick="App.switchSurface('manager'); return false;">Manager Recovery Coach</a></li>
+          <li><a href="/" onclick="App.switchSurface('hr'); return false;">HR Wellbeing Intelligence</a></li>
           <li><a href="/pricing">Enterprise Pricing & ROI</a></li>
           <li><a href="/faq">Frequently Asked Questions</a></li>
-          <li><a href="/contact">Book an Enterprise Demo</a></li>
-          <li><a href="#" onclick="App.run10SecondDemo(); return false;">⚡ Run 10-Second Simulation</a></li>
         </ul>
       </div>
 
       <!-- Col 3: Trust, Security & Legal -->
       <div>
-        <div class="footer-col-title">Security & Legal</div>
+        <div class="footer-col-title">Security & Governance</div>
         <ul class="footer-link-list">
-          <li><a href="/security">Security Architecture & SOC 2</a></li>
+          <li><a href="/security">Security Architecture & Controls</a></li>
           <li><a href="/security#dpdp">India DPDP Act 2023 Compliance</a></li>
-          <li><a href="/privacy">Privacy Policy (Full Statutory)</a></li>
-          <li><a href="/terms">Terms of Service (Enterprise MSA)</a></li>
-          <li><button onclick="App.openCharterModal()">🔒 Anti-Surveillance Charter</button></li>
-          <li><button onclick="App.exportDpdpArchive()">📥 Export Personal Data Archive (JSON)</button></li>
-          <li><button onclick="App.openSystemStatusModal()">⚡ Live System Status & 99.99% SLA</button></li>
+          <li><a href="/security#soc2">SOC 2 Type II & ISO 27001</a></li>
+          <li><button onclick="App.openCharterModal()" style="background: none; border: none; padding: 0; font: inherit; color: var(--text-muted); cursor: pointer; text-align: left;">Anti-Surveillance Charter</button></li>
+          <li><button onclick="App.openSystemStatusModal()" style="background: none; border: none; padding: 0; font: inherit; color: var(--text-muted); cursor: pointer; text-align: left;">Live System Health & SLA</button></li>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
         </ul>
       </div>
 
-      <!-- Col 4: 24/7 Immediate Crisis Care Anchors -->
+      <!-- Col 4: Duty of Care & Contact -->
       <div>
-        <div class="footer-col-title">Certified Human Care & Crisis</div>
-        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 8px;">
-          RESETA is a stress recovery platform, not a medical clinic. If an employee experiences acute distress:
+        <div class="footer-col-title">Duty of Care & Support</div>
+        <p style="font-size: 12px; color: var(--text-muted); line-height: 1.5; margin-bottom: 10px;">
+          RESETA™ is a proactive workplace wellness platform and not a medical clinic or diagnostic service.
         </p>
-        <div class="footer-crisis-box">
-          <div style="font-size: 11px; font-weight: 700; color: var(--brand-reset); text-transform: uppercase;">Govt. of India Tele-MANAS (24/7 Toll-Free)</div>
-          <div style="font-size: 16px; font-weight: 800; color: var(--brand-reset); margin: 2px 0;">📞 14416 / 1800-89-14416</div>
-          <div style="font-size: 11px; color: var(--text-muted);">Psychological First Aid available in 20+ Indian languages.</div>
-          
-          <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(225,29,72,0.15); font-size: 12px;">
-            <strong>Vandrevala Foundation:</strong> 📞 +91 9999 666 555 (24/7 Helpline)<br>
-            <strong>Enterprise EAP Gateway:</strong> Certified External Provider
-          </div>
+        <div style="background: var(--bg-subtle); border: 1px solid var(--border-light); border-radius: var(--radius-sm); padding: 12px; font-size: 12px; margin-bottom: 10px;">
+          <div style="font-weight: 700; color: var(--text-main); margin-bottom: 2px;">24/7 National Crisis Support</div>
+          <div style="color: var(--brand-reset); font-weight: 800; font-size: 13px;">📞 Tele-MANAS: 14416</div>
+          <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">Govt. of India Toll-Free Helpline (20+ Languages)</div>
+        </div>
+        <div style="font-size: 12px;">
+          <a href="/contact" style="color: var(--recovery-teal); font-weight: 600; text-decoration: none;">Contact Enterprise Support →</a>
         </div>
       </div>
     </div>
 
-    <!-- Compliance Badges Strip -->
-    <div class="footer-cert-strip">
-      <div class="cert-badge-group">
-        <span class="cert-pill">🛡️ India DPDP 2023 Aligned</span>
-        <span class="cert-pill">🔒 SOC 2 Type II Certified</span>
-        <span class="cert-pill">🌐 ISO/IEC 27001:2022</span>
-        <span class="cert-pill">🔐 TLS 1.3 / AES-256</span>
-        <span class="cert-pill">⚖️ Zero Model Retraining</span>
-        <span class="cert-pill">👥 Minimum Cohort k ≥ 5</span>
+    <!-- Trust Certifications Bar -->
+    <div class="footer-cert-strip" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); flex-wrap: wrap; gap: 8px;">
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <span>🛡️ India DPDP 2023 Aligned</span>
+        <span>🔒 SOC 2 Type II Certified</span>
+        <span>🌐 ISO/IEC 27001:2022</span>
+        <span>🔐 TLS 1.3 / AES-256</span>
+        <span>👥 Minimum Cohort k ≥ 5</span>
       </div>
-      <div style="font-size: 12px; color: #059669; font-weight: 700;">
-        🟢 All Systems Operational · 99.99% Uptime
-      </div>
-    </div>
-
-    <!-- Legal Safe Harbor, Third-Party Trademarks & Statutory Disclaimers -->
-    <div style="background: var(--bg-subtle); border-top: 1px solid var(--border-light); padding: 16px 24px; font-size: 11px; color: var(--text-muted); line-height: 1.6;">
-      <div style="margin-bottom: 8px;">
-        <strong style="color: var(--text-main);">Third-Party Trademarks & Fair Use Notice:</strong>
-        Slack® is a registered trademark of Slack Technologies, Inc. / Salesforce, Inc. Microsoft Teams® and Microsoft Entra ID® are registered trademarks of Microsoft Corporation. Okta® is a registered trademark of Okta, Inc. Workday®, BambooHR®, and Darwinbox® are trademarks of their respective holders. All product and service names used on this site are for identification and technical compatibility purposes only. Use of these names, logos, or brands does not imply endorsement, affiliation, or sponsorship.
-      </div>
-      <div style="margin-bottom: 8px;">
-        <strong style="color: var(--text-main);">Public Crisis Helplines Directory Notice:</strong>
-        Tele-MANAS (14416 / 1800-89-14416) is operated by the Ministry of Health & Family Welfare, Govt. of India. Vandrevala Foundation (+91 9999 666 555) is an independent non-profit crisis line. RESETA™ is an independent software application and is not directly affiliated with, operated by, or an agent of these emergency services. All crisis helplines are provided as a duty-of-care public service directory for immediate assistance in acute distress.
-      </div>
-      <div>
-        <strong style="color: var(--text-main);">Statutory Clinical & Medical Disclaimer:</strong>
-        RESETA™ is an in-the-moment cognitive recovery and workplace stress triage software platform. It does NOT provide medical advice, psychiatric diagnosis, clinical therapy, or mental illness treatment, and is not a medical device. It must not be used as a replacement for professional clinical care.
+      <div style="color: #059669; font-weight: 600; display: flex; align-items: center; gap: 6px;">
+        <span class="tenant-dot"></span> All Systems Operational (99.99% SLA)
       </div>
     </div>
 
-    <!-- Copyright & Trademark Disclaimers -->
-    <div class="footer-bottom-row">
+    <!-- Bottom Copyright -->
+    <div class="footer-bottom-row" style="padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-light); font-size: 12px; color: var(--text-muted); flex-wrap: wrap; gap: 10px;">
       <div>
-        © 2026 <strong>Qsura India Pvt. Ltd.</strong> All rights reserved.
-        RESETA™, RELIEFLOOP™, Do It With Me™, and Mental Load Unload™ are proprietary technologies architected & developed by <strong>Qsura India Pvt. Ltd.</strong>
+        © 2026 <strong>Qsura India Pvt. Ltd.</strong> All rights reserved. Built for enterprise teams.
       </div>
       <div style="display: flex; gap: 16px;">
-        <a href="/privacy" style="color: var(--text-muted); text-decoration: none;">Privacy Policy</a>
-        <a href="/terms" style="color: var(--text-muted); text-decoration: none;">Terms of Service</a>
-        <a href="/security" style="color: var(--text-muted); text-decoration: none;">Security & DPDP</a>
+        <a href="/privacy" style="color: var(--text-muted); text-decoration: none;">Privacy</a>
+        <a href="/terms" style="color: var(--text-muted); text-decoration: none;">Terms</a>
+        <a href="/security" style="color: var(--text-muted); text-decoration: none;">Security</a>
         <a href="/contact" style="color: var(--text-muted); text-decoration: none;">Contact</a>
       </div>
     </div>
@@ -1444,9 +1376,9 @@
     </div>
   </div>
 
-  <!-- Persistent 1-Click Floating Workplace Reset Widget -->
-  <button class="floating-reset-widget" onclick="ResetModal.open('overloaded')" title="Quick 2/5 Min Workplace Reset">
-    🔴 1-Click Reset
+  <!-- Persistent Floating Workplace Reset Widget -->
+  <button class="floating-reset-widget" onclick="ResetModal.open('overloaded')" title="Start a 2-5 min recovery reset">
+    🌿 Quick Reset
   </button>
 
   <!-- Live Toast Notifications Container -->

@@ -409,7 +409,7 @@ const App = {
           document.getElementById("autopilotSubtext").innerText = autopilot.subtext;
           const autoBtn = document.getElementById("autopilotActionBtn");
           if (autoBtn) {
-            autoBtn.innerText = `Start ${autopilot.recommended_minutes}-Min Reset 🔴`;
+            autoBtn.innerText = `Start ${autopilot.recommended_minutes}-Min Reset →`;
             autoBtn.onclick = () => ResetModal.open(autopilot.recommended_state);
           }
         }
@@ -989,7 +989,7 @@ const App = {
               <div style="font-size: 14px; font-weight: 600; margin-top: 2px;">${step.title}</div>
             </div>
             <button class="btn-small-pill" onclick="App.startProgramStep(${step.day}, '${prog.name}', '${step.title}')">
-              ${idx === 0 ? 'Start Day 1 🔴' : 'Preview'}
+              ${idx === 0 ? 'Start Day 1 →' : 'Preview'}
             </button>
           </div>
         `).join('')}
