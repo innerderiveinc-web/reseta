@@ -2,9 +2,12 @@
 # Section 31: Model Gateway (OpenAI, Anthropic, Gemini, Ollama, and Clinical Heuristic Engine)
 import os
 import json
+import logging
 import urllib.request
 import urllib.error
 from typing import Dict, Any, Optional
+
+logger = logging.getLogger("RESETA.LLMProvider")
 
 class LLMProvider:
     """
@@ -73,8 +76,7 @@ class LLMProvider:
                         "status": "LIVE_LLM_GENERATED"
                     }
             except Exception as e:
-                # Log error and fall back gracefully
-                pass
+                logger.warning(f"OpenAI invocation failed: {e}; falling back to clinical heuristic engine.")
 
         # 2. Google Gemini Integration
         elif provider == "GEMINI":
@@ -97,10 +99,45 @@ class LLMProvider:
                         "model": model,
                         "status": "LIVE_LLM_GENERATED"
                     }
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Gemini invocation failed: {e}; falling back to clinical heuristic engine.")
 
-        # 3. Clinically Reviewed Heuristic Engine (Reliable, Zero-Latency, Zero-Cost Enterprise Fallback)
+        # 3. Anthropic Claude Integration
+        elif provider == "ANTHROPIC":
+            api_key = os.getenv("ANTHROPIC_API_KEY")
+            model = os.getenv("ANTHROPIC_MODEL", "claude-3-haiku-20240307")
+            try:
+                req_data = json.dumps({
+                    "model": model,
+                    "max_tokens": max_tokens,
+                    "system": system_prompt,
+                    "messages": [
+                        {"role": "user", "content": user_prompt}
+                    ]
+                }).encode("utf-8")
+
+                req = urllib.request.Request(
+                    "https://api.anthropic.com/v1/messages",
+                    data=req_data,
+                    headers={
+                        "x-api-key": api_key,
+                        "anthropic-version": "2023-06-01",
+                        "content-type": "application/json"
+                    }
+                )
+                with urllib.request.urlopen(req, timeout=8) as response:
+                    res_body = json.loads(response.read().decode("utf-8"))
+                    text = res_body["content"][0]["text"].strip()
+                    return {
+                        "text": text,
+                        "provider": "ANTHROPIC_CLAUDE",
+                        "model": model,
+                        "status": "LIVE_LLM_GENERATED"
+                    }
+            except Exception as e:
+                logger.warning(f"Anthropic Claude invocation failed: {e}; falling back to clinical heuristic engine.")
+
+        # 4. Clinically Reviewed Heuristic Engine (Reliable, Zero-Latency, Zero-Cost Enterprise Fallback)
         return {
             "text": fallback_response,
             "provider": "RESETA_CLINICAL_HEURISTIC_ENGINE",

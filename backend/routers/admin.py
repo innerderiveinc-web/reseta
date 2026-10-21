@@ -20,15 +20,15 @@ class LLMTestRequest(BaseModel):
 
 @router.get("/organization-settings")
 def get_organization_settings(db: Session = Depends(get_db), current_user: User = Depends(admin_guard)):
-    """Organization profile, SSO, SCIM and plan information (Section 36, 37)"""
-    org = db.query(Organization).first()
-    settings = db.query(OrganizationSetting).first()
+    """Organization profile, SSO, SCIM and plan information strictly scoped to authenticated tenant (Section 36, 37)"""
+    org = db.query(Organization).filter(Organization.id == current_user.organization_id).first()
+    settings = db.query(OrganizationSetting).filter(OrganizationSetting.organization_id == current_user.organization_id).first()
 
     return {
-        "organization_id": org.id if org else "org-technova-01",
-        "name": org.name if org else "TechNova Solutions India",
+        "organization_id": org.id if org else current_user.organization_id,
+        "name": org.name if org else "Enterprise Tenant",
         "industry": org.industry if org else "Enterprise Cloud",
-        "employee_count": org.employee_count if org else 850,
+        "employee_count": org.employee_count if org else 100,
         "plan_tier": settings.plan_tier if settings else "ENTERPRISE",
         "total_licenses": settings.total_licenses if settings else 1000,
         "sso_enabled": settings.sso_enabled if settings else True,
@@ -55,10 +55,18 @@ def get_rbac_matrix(current_user: User = Depends(admin_guard)):
 
 @router.get("/dpdp-status", response_model=DPDPStatusResponse)
 def get_dpdp_status(db: Session = Depends(get_db), current_user: User = Depends(admin_guard)):
-    """India DPDP Act 2023 Compliance status and consent metrics (Section 43)"""
-    consent_count = db.query(Consent).filter(Consent.granted == True).count()
-    withdrawn_count = db.query(Consent).filter(Consent.granted == False).count()
-    audit_events_count = db.query(AuditLog).count()
+    """India DPDP Act 2023 Compliance status and consent metrics scoped strictly to tenant (Section 43)"""
+    consent_count = db.query(Consent).join(User, Consent.user_id == User.id).filter(
+        User.organization_id == current_user.organization_id,
+        Consent.granted == True
+    ).count()
+    withdrawn_count = db.query(Consent).join(User, Consent.user_id == User.id).filter(
+        User.organization_id == current_user.organization_id,
+        Consent.granted == False
+    ).count()
+    audit_events_count = db.query(AuditLog).filter(
+        AuditLog.organization_id == current_user.organization_id
+    ).count()
 
     return DPDPStatusResponse(
         act_name="Digital Personal Data Protection Act, 2023 / Rules 2025",
@@ -96,8 +104,10 @@ def test_llm_generation(req: LLMTestRequest, current_user: User = Depends(admin_
 
 @router.get("/audit-logs")
 def get_audit_logs(db: Session = Depends(get_db), current_user: User = Depends(admin_guard)):
-    """Immutable audit logs for privileged analytics queries (Section 23, 42)"""
-    logs = db.query(AuditLog).order_by(AuditLog.timestamp.desc()).limit(15).all()
+    """Immutable audit logs for privileged analytics queries scoped strictly to tenant (Section 23, 42)"""
+    logs = db.query(AuditLog).filter(
+        AuditLog.organization_id == current_user.organization_id
+    ).order_by(AuditLog.timestamp.desc()).limit(15).all()
     return [
         {
             "id": l.id,

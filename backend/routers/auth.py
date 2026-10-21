@@ -11,6 +11,7 @@ from backend.database import get_db
 from backend.models import User, Organization, OrganizationSetting, Department, Consent, AuditLog
 from backend.schemas import UserProfile, SwitchUserRequest
 from backend.security import create_access_token, get_current_user as security_get_user, verify_password, hash_password
+from backend.config import settings
 
 router = APIRouter(prefix="/api/auth", tags=["Authentication & Identity"])
 
@@ -91,6 +92,9 @@ def register_company(req: RegisterCompanyRequest, db: Session = Depends(get_db))
     Onboard a new Enterprise Tenant & Super Admin.
     Creates isolated workspace, departments, security policies, and issues RFC 7519 JWT.
     """
+    if len(req.password.strip()) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
+
     clean_email = req.admin_email.strip().lower()
     existing_user = db.query(User).filter(User.email == clean_email).first()
     if existing_user:
@@ -199,6 +203,9 @@ def register_employee(req: RegisterEmployeeRequest, db: Session = Depends(get_db
     Direct self-service employee onboarding under an existing licensed enterprise tenant.
     Assigns role, defaults DPDP consent, and returns signed JWT Bearer token.
     """
+    if len(req.password.strip()) < 8:
+        raise HTTPException(status_code=400, detail="Password must be at least 8 characters long.")
+
     clean_email = req.email.strip().lower()
     existing_user = db.query(User).filter(User.email == clean_email).first()
     if existing_user:
@@ -207,6 +214,15 @@ def register_employee(req: RegisterEmployeeRequest, db: Session = Depends(get_db
     org = db.query(Organization).filter(Organization.id == req.organization_id).first()
     if not org:
         raise HTTPException(status_code=404, detail="Selected organization tenant does not exist.")
+
+    # Enforce license limits and tenant capacity controls
+    active_user_count = db.query(User).filter(User.organization_id == org.id).count()
+    setting = db.query(OrganizationSetting).filter(OrganizationSetting.organization_id == org.id).first()
+    if setting and setting.total_licenses and active_user_count >= setting.total_licenses:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Enterprise license capacity reached ({setting.total_licenses} seats). Please contact your administrator to provision additional seats."
+        )
 
     # Validate or fallback department
     dept_id = req.department_id
@@ -305,7 +321,7 @@ def get_me(
 
 @router.post("/login", response_model=AuthTokenResponse)
 def login(req: LoginRequest, db: Session = Depends(get_db)):
-    """Enterprise authentication with email/password verification and JWT issuance"""
+    """Enterprise authentication with cryptographic PBKDF2 verification and JWT issuance"""
     search_term = req.email.strip().lower()
     prefix = search_term.split('@')[0]
     user = db.query(User).filter(
@@ -316,13 +332,15 @@ def login(req: LoginRequest, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=401, detail="Invalid enterprise email or password")
 
-    # Verify password if hashed_password is set
-    if user.hashed_password:
-        if not verify_password(req.password, user.hashed_password):
-            raise HTTPException(status_code=401, detail="Invalid enterprise email or password")
-    elif req.password != "technova2026":
-        # Check against default seed demo password
-        pass
+    # Cryptographically verify password hash; reject immediately if hash missing or mismatched
+    if not user.hashed_password:
+        raise HTTPException(
+            status_code=401,
+            detail="Account security requires password reset or external identity provider sign-in."
+        )
+
+    if not verify_password(req.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid enterprise email or password")
 
     token = create_access_token(
         user_id=user.id,
@@ -355,9 +373,34 @@ def switch_active_user(
     db: Session = Depends(get_db)
 ):
     """
-    Switch active persona and generate cryptographically signed JWT token.
-    Provides instant multi-role exploration with true cryptographic isolation.
+    Switch active persona.
+    STRICT SECURITY CONTROLS:
+    - Disabled completely in production environments (HTTP 403).
+    - In demo/development mode, restricted strictly to pre-authorized synthetic demo personas.
     """
+    import os
+    env_name = os.environ.get("ENVIRONMENT", getattr(settings, "ENVIRONMENT", "")).lower()
+    if env_name == "production":
+        raise HTTPException(
+            status_code=403,
+            detail="Persona switching is strictly disabled in production environments. Please authenticate via enterprise SSO or direct credentials."
+        )
+
+    ALLOWED_DEMO_PERSONAS = {
+        "user-emp-arjun",
+        "user-mgr-priya",
+        "user-hr-kavita",
+        "user-admin-rahul",
+        "user-care-ananya",
+        "user-audit-suresh"
+    }
+
+    if req.user_id not in ALLOWED_DEMO_PERSONAS:
+        raise HTTPException(
+            status_code=403,
+            detail="Unauthorized impersonation: In demo mode, only designated synthetic demo personas may be previewed."
+        )
+
     global ACTIVE_USER_ID
     user = db.query(User).filter(User.id == req.user_id).first()
     if not user:

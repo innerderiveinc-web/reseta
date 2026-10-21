@@ -32,7 +32,13 @@ def test_scim_service_provider_config():
     assert data["patch"]["supported"] is True
 
 def test_scim_users_collection():
-    res = client.get("/api/scim/v2/Users?count=10")
+    # Unauthenticated request is strictly rejected with 401
+    unauth_res = client.get("/api/scim/v2/Users?count=10")
+    assert unauth_res.status_code == 401
+
+    # Authenticated SCIM admin request succeeds and scopes to tenant
+    token = create_access_token("user-admin-rahul", "SUPER_ADMIN", "org-technova-01")
+    res = client.get("/api/scim/v2/Users?count=10", headers={"Authorization": f"Bearer {token}"})
     assert res.status_code == 200
     data = res.json()
     assert data["totalResults"] >= 6
@@ -42,7 +48,13 @@ def test_scim_users_collection():
     assert "emails" in first_user
 
 def test_scim_groups_collection():
-    res = client.get("/api/scim/v2/Groups")
+    # Unauthenticated request is strictly rejected with 401
+    unauth_res = client.get("/api/scim/v2/Groups")
+    assert unauth_res.status_code == 401
+
+    # Authenticated SCIM admin request succeeds
+    token = create_access_token("user-admin-rahul", "SUPER_ADMIN", "org-technova-01")
+    res = client.get("/api/scim/v2/Groups", headers={"Authorization": f"Bearer {token}"})
     assert res.status_code == 200
     data = res.json()
     assert data["totalResults"] >= 5

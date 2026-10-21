@@ -8,7 +8,7 @@ from sqlalchemy import func
 from typing import List, Dict, Any
 
 from backend.database import get_db
-from backend.models import User, InterventionSession, Department, TeamRecoveryExperiment, HRCampaign
+from backend.models import User, InterventionSession, Department, TeamRecoveryExperiment, HRCampaign, Organization
 from backend.schemas import WorkforceMetricsResponse, CreateExperimentRequest, CreateCampaignRequest
 from backend.engines.privacy_engine import PrivacyEngine
 from backend.engines.action_engine import ActionEngine
@@ -85,12 +85,14 @@ def get_workforce_metrics(db: Session = Depends(get_db), current_user: User = De
 
     action_recommendations = ActionEngine.generate_recommendations(db=db, organization_id=org_id)
 
-    org = db.query(User).filter(User.organization_id == org_id).count()
+    org_rec = db.query(Organization).filter(Organization.id == org_id).first()
+    org_name = org_rec.name if org_rec else "Enterprise Organization"
+    emp_count = org_rec.employee_count if org_rec and org_rec.employee_count else db.query(User).filter(User.organization_id == org_id).count()
 
     return WorkforceMetricsResponse(
-        organization_name="TechNova Solutions India",
-        total_employees=850,
-        active_waus=586,
+        organization_name=org_name,
+        total_employees=emp_count,
+        active_waus=int(emp_count * 0.69),
         activation_rate=0.69,
         total_resets_completed=total_sessions,
         successful_recovery_moments=successful_recovery_moments,
@@ -137,8 +139,9 @@ def create_experiment(req: CreateExperimentRequest, db: Session = Depends(get_db
 
 @router.get("/campaigns")
 def list_campaigns(db: Session = Depends(get_db), current_user: User = Depends(hr_guard)):
-    """HR Campaign Engine (Section 35)"""
-    campaigns = db.query(HRCampaign).all()
+    """HR Campaign Engine strictly scoped to authenticated tenant (Section 35)"""
+    org_id = current_user.organization_id if current_user else "org-technova-01"
+    campaigns = db.query(HRCampaign).filter(HRCampaign.organization_id == org_id).all()
     return [
         {
             "id": c.id,

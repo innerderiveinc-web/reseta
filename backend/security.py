@@ -80,25 +80,45 @@ def get_current_user(
     db: Session = Depends(get_db)
 ) -> User:
     """
-    FastAPI dependency resolving current user via JWT Bearer Token.
-    Fallback to default demo user if header is omitted (smooth demo UX).
+    FastAPI dependency resolving current user strictly via RFC 7519 JWT Bearer Token.
+    CRITICAL SECURITY GUARANTEE:
+    - Rejects missing, invalid, expired or unresolvable tokens with HTTP 401 Unauthorized.
+    - Zero silent fallbacks to default or demo users.
+    - Full cryptographic tenant and user resolution.
     """
-    if authorization and authorization.startswith("Bearer "):
-        token = authorization[7:].strip()
-        try:
-            payload = decode_access_token(token)
-            user_id = payload.get("sub")
-            user = db.query(User).filter(User.id == user_id).first()
-            if user:
-                return user
-        except Exception:
-            pass
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=401,
+            detail="Authentication required: Please provide a valid Bearer token in the Authorization header.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
 
-    # Seamless fallback for public demo on employee homepage
-    default_user = db.query(User).filter(User.id == "user-emp-arjun").first()
-    if not default_user:
-        default_user = db.query(User).first()
-    return default_user
+    token = authorization[7:].strip()
+    try:
+        payload = decode_access_token(token)
+        user_id = payload.get("sub")
+        if not user_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid authentication token: missing subject claim.",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
+    except Exception as e:
+        raise HTTPException(
+            status_code=401,
+            detail=f"Invalid or expired authentication token: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="User account does not exist or has been deactivated.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    return user
 
 def require_roles(allowed_roles: list):
     """
@@ -114,7 +134,8 @@ def require_roles(allowed_roles: list):
         if not authorization or not authorization.startswith("Bearer "):
             raise HTTPException(
                 status_code=401,
-                detail="Authentication required: Please provide a valid Bearer token in the Authorization header."
+                detail="Authentication required: Please provide a valid Bearer token in the Authorization header.",
+                headers={"WWW-Authenticate": "Bearer"}
             )
 
         token = authorization[7:].strip()
@@ -124,12 +145,17 @@ def require_roles(allowed_roles: list):
         except Exception as e:
             raise HTTPException(
                 status_code=401,
-                detail=f"Invalid or expired authentication token: {str(e)}"
+                detail=f"Invalid or expired authentication token: {str(e)}",
+                headers={"WWW-Authenticate": "Bearer"}
             )
 
-        user = db.query(User).filter(User.id == user_id).first()
+        user = db.query(User).filter(User.id == user_id, User.is_active == True).first()
         if not user:
-            raise HTTPException(status_code=401, detail="User specified in authentication token does not exist.")
+            raise HTTPException(
+                status_code=401,
+                detail="User specified in authentication token does not exist or has been deactivated.",
+                headers={"WWW-Authenticate": "Bearer"}
+            )
 
         if user.role not in allowed_roles:
             raise HTTPException(

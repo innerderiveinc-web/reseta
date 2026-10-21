@@ -34,8 +34,10 @@ def get_care_resources():
 
 @router.get("/triage-queue", response_model=List[CareEscalationItem])
 def get_care_triage_queue(db: Session = Depends(get_db), current_user: User = Depends(care_guard)):
-    """Safety and escalation queue for certified clinical staff (Section 26, 27)"""
-    events = db.query(SafetyEvent).order_by(SafetyEvent.created_at.desc()).limit(10).all()
+    """Safety and escalation queue for certified clinical staff strictly scoped to tenant (Section 26, 27)"""
+    events = db.query(SafetyEvent).filter(
+        SafetyEvent.organization_id == current_user.organization_id
+    ).order_by(SafetyEvent.created_at.desc()).limit(10).all()
     return [
         CareEscalationItem(
             id=e.id,

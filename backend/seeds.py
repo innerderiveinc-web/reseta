@@ -9,14 +9,23 @@ from backend.models import (
     WorkplaceProgram, TeamRecoveryExperiment, HRCampaign, AuditLog, SafetyEvent
 )
 from backend.engines.intervention_router import INTERVENTION_CATALOG
+from backend.security import hash_password
 
 def seed_database():
     Base.metadata.create_all(bind=engine)
     db: Session = SessionLocal()
 
+    default_pwd_hash = hash_password("technova2026")
+
     # Check if already seeded
-    if db.query(Organization).filter(Organization.id == "org-technova-01").first():
-        print("Database already seeded with TechNova Solutions.")
+    existing_org = db.query(Organization).filter(Organization.id == "org-technova-01").first()
+    if existing_org:
+        # Guarantee all existing seed users have cryptographic password hashes
+        unhashed_users = db.query(User).filter((User.hashed_password == None) | (User.hashed_password == "")).all()
+        if unhashed_users:
+            for u in unhashed_users:
+                u.hashed_password = default_pwd_hash
+            db.commit()
         db.close()
         return
 
@@ -74,6 +83,7 @@ def seed_database():
         email="arjun.sharma@technova.com",
         full_name="Arjun Sharma",
         role="EMPLOYEE",
+        hashed_password=default_pwd_hash,
         preferred_language="Hinglish",
         avatar_url="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
     )
@@ -86,6 +96,7 @@ def seed_database():
         email="priya.nair@technova.com",
         full_name="Priya Nair",
         role="MANAGER",
+        hashed_password=default_pwd_hash,
         preferred_language="English",
         avatar_url="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80"
     )
@@ -98,6 +109,7 @@ def seed_database():
         email="kavita.mehta@technova.com",
         full_name="Kavita Mehta",
         role="HR_ADMIN",
+        hashed_password=default_pwd_hash,
         preferred_language="English",
         avatar_url="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=120&auto=format&fit=crop&q=80"
     )
@@ -110,6 +122,7 @@ def seed_database():
         email="rahul.verma@technova.com",
         full_name="Rahul Verma",
         role="SUPER_ADMIN",
+        hashed_password=default_pwd_hash,
         preferred_language="English",
         avatar_url="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&auto=format&fit=crop&q=80"
     )
@@ -122,6 +135,7 @@ def seed_database():
         email="ananya.sharma@reseta-care.internal",
         full_name="Dr. Ananya Sharma",
         role="CLINICIAN",
+        hashed_password=default_pwd_hash,
         preferred_language="English",
         avatar_url="https://images.unsplash.com/photo-1594824813586-7a87640c4954?w=120&auto=format&fit=crop&q=80"
     )
@@ -134,6 +148,7 @@ def seed_database():
         email="suresh.iyer@technova.com",
         full_name="Suresh Iyer",
         role="AUDITOR",
+        hashed_password=default_pwd_hash,
         preferred_language="English",
         avatar_url="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80"
     )
@@ -141,7 +156,7 @@ def seed_database():
     # Additional employees for k-anonymity validation
     extra_users = [
         User(id=f"user-emp-extra-{i}", organization_id=org.id, department_id=dept_eng.id, team_id=team_frontend.id,
-             email=f"dev{i}@technova.com", full_name=f"Developer {i}", role="EMPLOYEE")
+             email=f"dev{i}@technova.com", full_name=f"Developer {i}", role="EMPLOYEE", hashed_password=default_pwd_hash)
         for i in range(1, 15)
     ]
 

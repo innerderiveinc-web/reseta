@@ -5,15 +5,22 @@ from typing import Dict, Any, Tuple
 
 CRISIS_KEYWORDS = [
     "suicide", "kill myself", "end my life", "want to die", "self harm", "cut myself",
-    "hurting myself", "mar jana chahta", "jaan de dunga", "zindagi khatam", "no point living",
-    "overdose", "slit", "hanging myself", "can't go on anymore", "better off dead"
+    "hurting myself", "mar jana chahta", "marne ka mann", "jaan de dunga", "zindagi khatam",
+    "no point living", "overdose", "slit", "hanging myself", "can't go on anymore",
+    "better off dead", "want to sleep and never wake up", "everyone would be better without me",
+    "no reason to stay alive", "give up on living", "khatam kar lena", "apni jaan lena"
+]
+
+NEGATION_PREFIXES = [
+    r"\bnot\b", r"\bnever\b", r"\bdon'?t\b", r"\bno\b", r"\bwasn'?t\b", r"\bwouldn'?t\b",
+    r"\bnahi\b", r"\bnahin\b", r"\bkabhi\s+nahi\b", r"\bno\s+desire\s+to\b", r"\bno\s+intention\s+to\b"
 ]
 
 AMBER_KEYWORDS = [
     "hopeless", "can't cope", "panic attack", "crying non stop", "severe chest pain",
     "depressed for months", "can't get out of bed", "hallucinations", "hearing voices",
     "abuse", "harassment", "trauma", "breakdown", "bahut zyada bura lag raha",
-    "kuch theek nahi hoga", "completely numb"
+    "kuch theek nahi hoga", "completely numb", "feel completely broken", "cannot take this anymore"
 ]
 
 DIAGNOSTIC_TERMS = [
@@ -22,7 +29,9 @@ DIAGNOSTIC_TERMS = [
     r"\b(?:you are\s+)?clinically burned out\b",
     r"\byou have adhd\b",
     r"\byou have depression\b",
-    r"\byou have bipolar\b"
+    r"\byou have bipolar\b",
+    r"\b(?:take|prescribe|recommend)\s+(?:antidepressants|xanax|prozac|zoloft|lexapro|adderall|ritalin|ssris|medication)\b",
+    r"\bincrease\s+your\s+(?:dosage|medication)\b"
 ]
 
 EMERGENCY_RESOURCES = {
@@ -57,6 +66,16 @@ class SafetyFirewall:
     """
 
     @classmethod
+    def _is_negated(cls, text: str, keyword: str) -> bool:
+        """Check if keyword is preceded by a clear negation within 1-4 words."""
+        escaped_kw = re.escape(keyword)
+        for neg in NEGATION_PREFIXES:
+            pattern = rf"{neg}(?:\s+\w+){{0,4}}\s+{escaped_kw}"
+            if re.search(pattern, text, flags=re.IGNORECASE):
+                return True
+        return False
+
+    @classmethod
     def evaluate_input(cls, user_text: str) -> Tuple[str, bool, Dict[str, Any]]:
         """
         Returns:
@@ -68,9 +87,13 @@ class SafetyFirewall:
 
         text_lower = user_text.lower().strip()
 
-        # Check RED tier (imminent safety crisis)
+        # Check RED tier (imminent safety crisis) with negation and quotation handling
         for kw in CRISIS_KEYWORDS:
             if kw in text_lower:
+                # Check for explicit negation (e.g. "not feeling suicidal", "never thought of suicide")
+                if cls._is_negated(text_lower, kw):
+                    continue
+
                 return "RED", True, {
                     "alert_title": "Immediate Safety Support Available",
                     "message": (
@@ -99,8 +122,8 @@ class SafetyFirewall:
     @classmethod
     def sanitize_ai_output(cls, output_text: str) -> str:
         """
-        Enforce strict anti-diagnosis guardrails (Section 28).
-        No AI output may provide clinical diagnosis to the employee or HR.
+        Enforce strict anti-diagnosis and anti-prescription guardrails (Section 28).
+        No AI output may provide clinical diagnosis or pharmacological advice to the employee or HR.
         """
         sanitized = output_text
         for pattern in DIAGNOSTIC_TERMS:

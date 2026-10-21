@@ -92,7 +92,7 @@ def get_team_wellbeing(db: Session = Depends(get_db), current_user: User = Depen
     theme_res = PrivacyEngine.aggregate_workforce_themes(
         db=db,
         organization_id=user.organization_id if user else "org-technova-01",
-        department_id="dept-eng"
+        department_id=user.department_id if user else None
     )
 
     suggested_actions = [
