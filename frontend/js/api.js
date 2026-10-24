@@ -301,6 +301,34 @@ const API = {
         }
       };
     }
+    if (url.includes('/api/employee/reset/complete')) {
+      const delta = (data && data.stress_before && data.stress_after) ? (data.stress_before - data.stress_after) : 3;
+      const isSuccess = delta > 0 && data.did_this_help !== "NO";
+      return {
+        success: true,
+        session_id: (data && data.session_id) || "sess-mock-01",
+        delta_relief: delta,
+        is_successful_recovery: isSuccess,
+        personal_insight: isSuccess ? `You created breathing space (stress dropped by ${delta} points).` : "Tension is still lingering. Some high-intensity days require a physical reset.",
+        next_recommendation: isSuccess ? "Take a sip of water and tackle your top focus item." : "Queue a 60-second somatic physiological sigh to physically release tension.",
+        adaptive_recovery_action: isSuccess ? null : {
+          protocol_id: "adaptive_somatic_grounding",
+          title: "Adaptive Somatic Recovery Protocol",
+          recommended_duration_seconds: 60,
+          reasoning: "When cognitive unloading does not reduce stress, resetting autonomic nervous system tone physically is the clinically proven secondary pathway.",
+          steps: [
+            "Physiological Sigh: Take two quick inhales through your nose, then one slow, long exhale through your mouth (repeat 3 times).",
+            "Physical De-tensioning: Drop your shoulders down and away from your ears; unclamp your jaw.",
+            "Visual Detachment: Look at an object 20 feet away for 20 seconds to release optical nerve fatigue."
+          ],
+          care_option: {
+            available: true,
+            prompt: "If strain feels persistent or difficult to manage alone, confidential 1-on-1 human support is always available.",
+            helpline: "Tele-MANAS (14416 / 1800-89-14416)"
+          }
+        }
+      };
+    }
 
     return { success: true, message: "Action recorded successfully." };
   },

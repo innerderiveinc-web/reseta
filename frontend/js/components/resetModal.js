@@ -917,6 +917,46 @@ const ResetModal = {
         did_this_help: this.selectedHelped
       });
 
+      if (res.adaptive_recovery_action) {
+        const action = res.adaptive_recovery_action;
+        const stepsHtml = action.steps.map((s, idx) => `
+          <div style="display: flex; gap: 10px; margin-bottom: 8px; text-align: left; background: var(--bg-card); padding: 10px 14px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-orange);">
+            <span style="font-weight: 700; color: var(--accent-orange); font-size: 13px;">0${idx + 1}</span>
+            <span style="font-size: 13px; color: var(--text-primary);">${s}</span>
+          </div>
+        `).join("");
+
+        this.containerEl.innerHTML = `
+          <div style="text-align: center; padding: 24px 10px;">
+            <div style="display: inline-block; background: rgba(245, 158, 11, 0.15); color: #d97706; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-bottom: 14px;">
+              ⚡ Autonomous Adaptive Recovery Activated
+            </div>
+            <h2 class="modal-step-title" style="margin-bottom: 8px;">Switching to Somatic Protocol</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5;">
+              ${res.personal_insight}
+            </p>
+            <div style="background: var(--bg-subtle); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 18px;">
+              <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px; font-weight: 600;">
+                ADAPTIVE 60-SECOND SEQUENCE:
+              </p>
+              ${stepsHtml}
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 16px;">
+              <button class="btn-primary" onclick="ResetModal.startAdaptiveTimer(60)">
+                Begin 60s Somatic Grounding
+              </button>
+              <button class="btn-secondary" onclick="ResetModal.close(); window.App.refreshPersonalData();">
+                Done for Now
+              </button>
+            </div>
+            <p style="font-size: 12px; color: var(--text-muted);">
+              Need human support? 24/7 confidential helpline: <strong style="color: var(--recovery-teal);">${action.care_option.helpline}</strong>
+            </p>
+          </div>
+        `;
+        return;
+      }
+
       this.containerEl.innerHTML = `
         <div style="text-align: center; padding: 30px 10px;">
           <div style="font-size: 48px; margin-bottom: 12px;">🌿</div>
@@ -941,6 +981,55 @@ const ResetModal = {
       }
       this.close();
     }
+  },
+
+  startAdaptiveTimer(seconds) {
+    let remaining = seconds;
+    const render = () => {
+      const mins = Math.floor(remaining / 60);
+      const secs = remaining % 60;
+      const formatted = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+      const phase = (remaining % 6 < 3) ? "Inhale slowly through your nose..." : "Release and exhale completely...";
+      this.containerEl.innerHTML = `
+        <div style="text-align: center; padding: 30px 10px;">
+          <div style="width: 100px; height: 100px; border-radius: 50%; background: rgba(13, 148, 136, 0.15); border: 3px solid var(--recovery-teal); display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+            <span style="font-size: 26px; font-weight: 800; color: var(--recovery-teal);">${formatted}</span>
+          </div>
+          <h3 style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">Adaptive Somatic Reset</h3>
+          <p style="font-size: 14px; color: var(--recovery-teal); font-weight: 600; margin-bottom: 16px;">
+            ${phase}
+          </p>
+          <p style="font-size: 13px; color: var(--text-muted); max-width: 320px; margin: 0 auto 24px auto; line-height: 1.5;">
+            Focus on dropping your shoulders and releasing tension with every exhale.
+          </p>
+          <button class="btn-primary" onclick="clearInterval(ResetModal.adaptiveInterval); ResetModal.close(); window.App.refreshPersonalData();">
+            Finish Grounding
+          </button>
+        </div>
+      `;
+    };
+    render();
+    if (this.adaptiveInterval) clearInterval(this.adaptiveInterval);
+    this.adaptiveInterval = setInterval(() => {
+      remaining--;
+      if (remaining <= 0) {
+        clearInterval(this.adaptiveInterval);
+        this.containerEl.innerHTML = `
+          <div style="text-align: center; padding: 30px 10px;">
+            <div style="font-size: 48px; margin-bottom: 12px;">✨</div>
+            <h2 class="modal-step-title">Grounding Complete</h2>
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">
+              Your somatic reset is complete. Headspace restored.
+            </p>
+            <button class="btn-primary" onclick="ResetModal.close(); window.App.refreshPersonalData();">
+              Return to Work Space
+            </button>
+          </div>
+        `;
+      } else {
+        render();
+      }
+    }, 1000);
   }
 };
 
