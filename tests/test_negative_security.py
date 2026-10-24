@@ -197,3 +197,66 @@ def test_production_weak_secret_fails_startup():
             SECRET_KEY="reseta-enterprise-super-secure-secret-token-2026"
         )
     assert "FATAL SECURITY MISCONFIGURATION" in str(excinfo.value)
+
+# ==============================================================================
+# Agentic System: Adaptive Closed-Loop Recovery & Action Engine Pipeline
+# ==============================================================================
+def test_adaptive_recovery_closed_loop_agent():
+    """Verify that when cognitive decompression fails, the agent autonomously adapts to somatic grounding."""
+    token = create_access_token("user-emp-arjun", "EMPLOYEE", "org-technova-01")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    # 1. Start a reset session
+    plan_res = client.post("/api/employee/reset/plan", json={
+        "time_choice_minutes": 5,
+        "state": "overloaded",
+        "input_mode": "TEXT",
+        "raw_input": "3 client escalations and context switching"
+    }, headers=headers)
+    assert plan_res.status_code == 200
+    session_id = plan_res.json()["session_id"]
+
+    # 2. Case A: Successful recovery (stress dropped from 8 to 4)
+    success_res = client.post("/api/employee/reset/complete", json={
+        "session_id": session_id,
+        "stress_before": 8,
+        "stress_after": 4,
+        "did_this_help": "YES"
+    }, headers=headers)
+    assert success_res.status_code == 200
+    s_data = success_res.json()
+    assert s_data["is_successful_recovery"] is True
+    assert s_data["delta_relief"] == 4
+    assert s_data["adaptive_recovery_action"] is None
+
+    # 3. Case B: Unsuccessful recovery (stress stayed at 8, did_this_help: NO)
+    # The agent MUST autonomously trigger an adaptive secondary somatic protocol
+    fail_res = client.post("/api/employee/reset/complete", json={
+        "session_id": session_id,
+        "stress_before": 8,
+        "stress_after": 8,
+        "did_this_help": "NO"
+    }, headers=headers)
+    assert fail_res.status_code == 200
+    f_data = fail_res.json()
+    assert f_data["is_successful_recovery"] is False
+    assert f_data["delta_relief"] == 0
+    assert f_data["adaptive_recovery_action"] is not None
+    assert f_data["adaptive_recovery_action"]["protocol_id"] == "adaptive_somatic_grounding"
+    assert len(f_data["adaptive_recovery_action"]["steps"]) >= 3
+
+def test_autonomous_action_engine_telemetry_synthesis():
+    """Verify that ActionEngine dynamically synthesizes organizational experiments based on tenant data."""
+    from backend.database import SessionLocal
+    from backend.engines.action_engine import ActionEngine
+    db = SessionLocal()
+    try:
+        recs = ActionEngine.generate_recommendations(db, organization_id="org-technova-01")
+        assert len(recs) >= 2
+        assert all("recommended_action" in r and "owner" in r for r in recs)
+
+        exps = ActionEngine.get_recovery_lab_experiments(db, organization_id="org-technova-01")
+        assert len(exps) >= 1
+        assert any(e["status"] == "ACTIVE" for e in exps)
+    finally:
+        db.close()

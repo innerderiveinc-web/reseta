@@ -30,7 +30,8 @@ class PersonalizationEngine:
             session_obj.is_successful_recovery = is_successful
             db.commit()
 
-        # Generate personal insight based on the delta
+        # Generate personal insight and adaptive recovery action based on the delta
+        adaptive_action = None
         if delta >= 3:
             insight = f"You created genuine breathing space (stress dropped by {delta} points). Taking those minutes to step back made a tangible difference."
             recommendation = "Saved to your Personal Relief Map™ so you know this works for you next time."
@@ -38,14 +39,31 @@ class PersonalizationEngine:
             insight = f"You moved the needle by {delta} point(s). Even a quick deceleration helps clear cognitive clutter."
             recommendation = "Take a sip of water and tackle your chosen single focus with a clearer head."
         else:
-            insight = "Tension is still lingering, and that's completely okay. Some days require physical movement or quiet."
-            recommendation = "Try standing up, stretching your shoulders, or stepping outside for 5 minutes."
+            insight = "Tension is still lingering, and that is completely natural. Cognitive resets do not always break through physical strain on high-intensity days."
+            recommendation = "Our adaptive recovery engine has queued a 60-second somatic reset to release physical tension."
+            adaptive_action = {
+                "protocol_id": "adaptive_somatic_grounding",
+                "title": "Adaptive Somatic Recovery Protocol",
+                "recommended_duration_seconds": 60,
+                "reasoning": "When cognitive unloading does not reduce stress, resetting autonomic nervous system tone physically is the clinically proven secondary pathway.",
+                "steps": [
+                    "Physiological Sigh: Take two quick inhales through your nose, then one slow, long exhale through your mouth (repeat 3 times).",
+                    "Physical De-tensioning: Drop your shoulders down and away from your ears; unclamp your jaw.",
+                    "Visual Detachment: Look at an object 20 feet away for 20 seconds to release optical nerve fatigue."
+                ],
+                "care_option": {
+                    "available": True,
+                    "prompt": "If strain feels persistent or difficult to manage alone, confidential 1-on-1 human support is always available.",
+                    "helpline": "Tele-MANAS (14416 / 1800-89-14416)"
+                }
+            }
 
         return {
             "delta_relief": delta,
             "is_successful_recovery": is_successful,
             "personal_insight": insight,
-            "next_recommendation": recommendation
+            "next_recommendation": recommendation,
+            "adaptive_recovery_action": adaptive_action
         }
 
     @classmethod

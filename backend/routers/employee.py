@@ -181,7 +181,8 @@ def complete_reset_session(
         delta_relief=outcome["delta_relief"],
         is_successful_recovery=outcome["is_successful_recovery"],
         personal_insight=outcome["personal_insight"],
-        next_recommendation=outcome["next_recommendation"]
+        next_recommendation=outcome["next_recommendation"],
+        adaptive_recovery_action=outcome.get("adaptive_recovery_action")
     )
 
 @router.post("/talk-it-out", response_model=TalkItOutResponse)

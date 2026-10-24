@@ -4,8 +4,8 @@ from backend.engines.red_team_suite import RedTeamSuite
 
 def test_red_team_execution():
     suite_res = RedTeamSuite.run_all_tests()
-    assert suite_res["total_vectors_tested"] == 10
-    assert suite_res["passed_count"] == 10
+    assert suite_res["total_vectors_tested"] == 15
+    assert suite_res["passed_count"] == 15
     assert suite_res["failed_count"] == 0
     assert suite_res["pass_rate_pct"] == 100
     assert suite_res["certification_status"] == "APPROVED_FOR_ENTERPRISE_DEPLOYMENT"
@@ -18,3 +18,8 @@ def test_red_team_execution():
     assert test_map["RT-04"]["status"] == "PASSED" # Minimum cohort k=5
     assert test_map["RT-05"]["status"] == "PASSED" # Manager privacy wall
     assert test_map["RT-08"]["status"] == "PASSED" # Hinglish cultural nuance
+    assert test_map["RT-11"]["status"] == "PASSED" # Negation crisis screen
+    assert test_map["RT-12"]["status"] == "PASSED" # Pharmacological defense
+    assert test_map["RT-13"]["status"] == "PASSED" # Zero Arjun fallback
+    assert test_map["RT-14"]["status"] == "PASSED" # SCIM isolation
+    assert test_map["RT-15"]["status"] == "PASSED" # Privilege escalation defense

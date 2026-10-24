@@ -81,6 +81,7 @@ class CompleteResetResponse(BaseModel):
     is_successful_recovery: bool
     personal_insight: str
     next_recommendation: str
+    adaptive_recovery_action: Optional[Dict[str, Any]] = None
 
 # Talk It Out™
 class TalkItOutRequest(BaseModel):

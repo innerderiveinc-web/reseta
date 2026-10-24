@@ -184,7 +184,7 @@ def test_governance_red_team_and_checklist():
     assert res.status_code == 200
     data = res.json()
     assert data["pass_rate_pct"] == 100
-    assert data["total_vectors_tested"] == 10
+    assert data["total_vectors_tested"] == 15
 
     chk_res = client.get("/api/governance/ai-release-checklist")
     assert chk_res.status_code == 200
