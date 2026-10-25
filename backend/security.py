@@ -126,7 +126,10 @@ def require_roles(allowed_roles: list):
     - Unauthenticated callers (missing or invalid Bearer token) receive 401 Unauthorized.
     - Authenticated users with insufficient privileges receive 403 Forbidden.
     - Zero global state leakage across concurrent server requests.
+    Supports both UserRole enums and string role values.
     """
+    normalized_roles = [r.value if hasattr(r, "value") else str(r) for r in allowed_roles]
+
     def role_checker(
         authorization: Optional[str] = Header(None),
         db: Session = Depends(get_db)
@@ -157,10 +160,10 @@ def require_roles(allowed_roles: list):
                 headers={"WWW-Authenticate": "Bearer"}
             )
 
-        if user.role not in allowed_roles:
+        if user.role not in normalized_roles:
             raise HTTPException(
                 status_code=403,
-                detail=f"Forbidden: Access requires one of {allowed_roles} roles. Current role: '{user.role}'."
+                detail=f"Forbidden: Access requires one of {normalized_roles} roles. Current role: '{user.role}'."
             )
         return user
     return role_checker

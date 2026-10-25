@@ -8,3 +8,9 @@ __pycache__/
 *.db-wal
 *.log
 .DS_Store
+*.zip
+dist/
+build/
+*.egg-info/
+.coverage
+htmlcov/
