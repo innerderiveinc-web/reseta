@@ -20,7 +20,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="RESETA™ Enterprise",
-    description="B2B Mental Wellness & Stress Recovery Platform · Architected & Engineered by Qsura India Pvt. Ltd.",
+    description="B2B Mental Wellness & Stress Recovery Platform · Proprietary Property of Qsura India Pvt. Ltd. · Founder & Architect: Dr. Irfan Ashraf",
     version=settings.APP_VERSION,
     docs_url="/api/docs",
     redoc_url="/api/redoc",

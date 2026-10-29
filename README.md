@@ -140,4 +140,14 @@ make adversarial
 ```
 Evaluates prompt injections, psychiatric persona defenses, negation screening, pharmacological scrubbing, k-anonymity defense, manager privacy firewalls, and multi-tenant isolation. Certified for enterprise deployment.
 
+---
+
+## 8. Ownership, Attribution & Intellectual Property
+
+* **Proprietary Property**: **Qsura India Pvt. Ltd.**
+* **Founder & Chief Architect**: **Dr. Irfan Ashraf**
+* **Jurisdiction**: Bengaluru & New Delhi, India
+* **Legal Notice**: All intellectual property rights, trademarks, patents, proprietary algorithms, acoustic synthesis sound engines, closed-loop recovery agents, and behavioral architectures associated with RESETA™ — including **RESETA™**, **RELIEFLOOP™**, **Do It With Me™**, **Mental Load Unload™**, and **Mind Mirror™** — are and shall remain the exclusive proprietary property of **Qsura India Pvt. Ltd.**
+
+
 

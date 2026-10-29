@@ -276,6 +276,30 @@ def test_demo_request_lead_capture():
     assert "Acme Tech Solutions" in data["message"]
     assert data["lead_details"]["name"] == "Priya Sharma"
 
+def test_ownership_and_founder_attribution():
+    from backend.config import settings
+    import os
+
+    assert settings.PROPRIETARY_ENTITY == "Qsura India Pvt. Ltd."
+    assert settings.FOUNDER_AND_ARCHITECT == "Dr. Irfan Ashraf"
+
+    about_res = client.get("/about")
+    assert about_res.status_code == 200
+    assert "Dr. Irfan Ashraf" in about_res.text
+    assert "Qsura India Private Limited" in about_res.text
+
+    terms_res = client.get("/terms")
+    assert terms_res.status_code == 200
+    assert "Dr. Irfan Ashraf" in terms_res.text
+    assert "Qsura India Private Limited" in terms_res.text
+
+    assert os.path.exists("COPYRIGHT.md")
+    with open("COPYRIGHT.md", "r", encoding="utf-8") as f:
+        content = f.read()
+        assert "Dr. Irfan Ashraf" in content
+        assert "Qsura India Pvt. Ltd." in content
+
+
 
 
 
